@@ -1,0 +1,65 @@
+name: Retour de partie
+description: Racontez une partie jouée contre l'automa (playtest report).
+title: "[Partie] "
+labels: [playtest]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de partager votre partie ! Chaque retour aide à équilibrer l'automa. *English is welcome too.*
+  - type: input
+    id: version
+    attributes:
+      label: Version des règles
+      description: Indiquée sur le livret ou les cartes.
+      placeholder: v0.3
+    validations:
+      required: true
+  - type: dropdown
+    id: difficulte
+    attributes:
+      label: Difficulté
+      options:
+        - Facile
+        - Standard
+        - Difficile
+    validations:
+      required: true
+  - type: input
+    id: automas
+    attributes:
+      label: Nombre d'automas
+      placeholder: "1"
+  - type: dropdown
+    id: support
+    attributes:
+      label: Support utilisé
+      multiple: true
+      options:
+        - Cartes imprimées
+        - Appli
+  - type: input
+    id: scores
+    attributes:
+      label: Scores et durée
+      placeholder: "Moi 78 PV, automa 71 PV — 9 manches, 1 h 15"
+    validations:
+      required: true
+  - type: textarea
+    id: deroulement
+    attributes:
+      label: Déroulement
+      description: Votre corporation, les moments marquants, comment la partie s'est terminée.
+  - type: textarea
+    id: bien
+    attributes:
+      label: Ce qui a bien marché
+  - type: textarea
+    id: coince
+    attributes:
+      label: Ce qui a coincé
+      description: Règles ambiguës, calculs pénibles, automa trop fort ou trop faible…
+  - type: textarea
+    id: idees
+    attributes:
+      label: Idées ou propositions

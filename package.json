@@ -1,0 +1,13 @@
+{
+  "name": "ares-solo-automa",
+  "private": true,
+  "description": "Unofficial solo automa for Terraforming Mars: Ares Expedition — rules, print & play cards and a companion PWA.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/build-site.mjs"
+  }
+}

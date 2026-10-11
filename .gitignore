@@ -1,0 +1,13 @@
+# site built by scripts/build-site.mjs
+_site/
+node_modules/
+# the PDF files are copied at build time from rules/ and cards/
+site/downloads/**
+!site/downloads/README.md
+.DS_Store
+
+# design work lives in the private ares-solo-automa-lab repository
+/design/
+/cards/src/
+/rules/src/
+/drafts/

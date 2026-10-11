@@ -1,0 +1,44 @@
+name: Bug appli
+description: Signaler un problème dans l'appli (app bug report).
+title: "[Appli] "
+labels: [bug, appli]
+body:
+  - type: textarea
+    id: probleme
+    attributes:
+      label: Que s'est-il passé ?
+      description: Ce que vous avez fait, ce que vous attendiez, et ce qui s'est passé à la place.
+    validations:
+      required: true
+  - type: textarea
+    id: etapes
+    attributes:
+      label: Étapes pour reproduire
+      placeholder: |
+        1. Nouvelle partie, difficulté Standard, 1 automa
+        2. …
+  - type: input
+    id: appareil
+    attributes:
+      label: Appareil et navigateur
+      placeholder: iPad, Safari 26 · Android, Chrome…
+    validations:
+      required: true
+  - type: dropdown
+    id: hors-ligne
+    attributes:
+      label: Connexion
+      options:
+        - En ligne
+        - Hors ligne
+        - Je ne sais pas
+  - type: input
+    id: version
+    attributes:
+      label: Version des règles ou de l'appli
+      placeholder: v0.3
+  - type: textarea
+    id: captures
+    attributes:
+      label: Captures d'écran
+      description: Glissez-déposez des images ici si utile.

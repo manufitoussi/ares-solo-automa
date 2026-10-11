@@ -1,0 +1,684 @@
+<title>Assistant Automa hybride</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;1,700;1,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* Layout: one mobile-first column, a sticky status strip for the automa, the current step as the main card. */
+:root{
+  --bg:#FFFFFF; --panel:#F3F8F8; --panel2:#E3F2F3; --ink:#12202B; --muted:#4F5B62; --line:#CFE0E2;
+  --cyan:#2FB6C0; --cyan-ink:#1B5A7E; --sand:#EDE0CD; --sand-ink:#8F3A10; --danger:#B5342A;
+  --display:'Barlow Condensed','Arial Narrow',sans-serif; --text:'Source Serif 4',Georgia,serif;
+  --p1:#3D7A47; --p2:#2E5A8A; --p3:#24719E; --p4:#B84D18; --p5:#E2BE2C;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1820; --panel:#15232D; --panel2:#18303A; --ink:#E4EEF0; --muted:#9DB2BA; --line:#2A4552;
+  --cyan:#3CC4CE; --cyan-ink:#8FE3E8; --sand:#2C2620; --sand-ink:#F0A77E; --danger:#F07468; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1820; --panel:#15232D; --panel2:#18303A; --ink:#E4EEF0; --muted:#9DB2BA; --line:#2A4552;
+  --cyan:#3CC4CE; --cyan-ink:#8FE3E8; --sand:#2C2620; --sand-ink:#F0A77E; --danger:#F07468; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--text);font-size:16px;line-height:1.5;margin:0}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:0 48px;display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+p{margin:0;text-wrap:pretty}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+.lab{font-family:var(--display);font-weight:700;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+.pi{display:inline-block;vertical-align:-3px;flex-shrink:0}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:3px solid var(--cyan);margin-inline:-16px;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;margin-right:auto}
+.brand b{font-family:var(--display);font-style:italic;font-weight:800;font-size:24px;text-transform:uppercase;line-height:1}
+.brand span{font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan-ink)}
+.tb{border:1.5px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 12px;min-height:40px;font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:.06em;text-transform:uppercase}
+.tb:disabled{opacity:.4;cursor:default}
+.tb.warn{border-color:var(--danger);color:var(--danger)}
+
+/* panels */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px}
+.stat{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:6px 10px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat .v{font-family:var(--display);font-weight:700;font-size:24px;line-height:1;display:flex;align-items:center;gap:6px}
+.stat .v small{font-size:14px;color:var(--muted);font-weight:600}
+.stat .sub{font-size:12px;line-height:1.25;color:var(--muted)}
+.stat .k{font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.adj{display:flex;gap:4px}
+.adj button{width:34px;height:30px;border-radius:6px;border:1px solid var(--line);background:var(--panel);font-family:var(--display);font-weight:800;font-size:17px;line-height:1}
+.params{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.param{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.param .v{font-family:var(--display);font-weight:700;font-size:22px;line-height:1}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--cyan)}
+.param.max .v{color:var(--cyan-ink)}
+
+/* phase banner and buttons */
+.ban{color:#fff;display:grid;grid-template-columns:64px minmax(0,1fr);clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:inset 0 -4px 0 rgba(0,0,0,.22)}
+.ban .r{display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.26);font-family:var(--display);font-style:italic;font-weight:800;font-size:34px;padding-bottom:4px}
+.ban > div{padding:8px 16px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.ban .nm{font-family:var(--display);font-style:italic;font-weight:800;font-size:26px;text-transform:uppercase;line-height:1}
+.ban .tg{font-size:14px}
+.ban.dark{color:#1F1A24}
+.phases{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.phb{border:none;color:#fff;padding:10px 6px 12px;display:flex;flex-direction:column;align-items:flex-start;gap:0;min-height:64px;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);box-shadow:inset 0 -4px 0 rgba(0,0,0,.22);opacity:.8;text-align:left}
+.short{display:none}
+.stats.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.phb .r{font-family:var(--display);font-style:italic;font-weight:800;font-size:24px;line-height:1}
+.phb .n{font-family:var(--display);font-style:italic;font-weight:800;font-size:12.5px;text-transform:uppercase;letter-spacing:.02em;overflow-wrap:anywhere}
+.phb[aria-pressed="true"]{opacity:1;outline:3px solid var(--ink);outline-offset:2px}
+.phb:disabled{opacity:.25;cursor:not-allowed;filter:grayscale(.6)}
+.phb:disabled .n,.phb:disabled .short{text-decoration:line-through}
+.cta{border:none;background:var(--ink);color:var(--bg);border-radius:10px;padding:12px 18px;min-height:48px;font-family:var(--display);font-style:italic;font-weight:800;font-size:19px;text-transform:uppercase;letter-spacing:.03em;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)}
+.cta:disabled{opacity:.35;cursor:default}
+.ghost{border:1.5px solid var(--line);background:transparent;border-radius:10px;padding:10px 16px;min-height:44px;font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase}
+.note{background:var(--panel2);border-radius:10px;padding:10px 14px;font-size:15px}
+.note b{font-family:var(--display);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:13px;color:var(--cyan-ink);margin-right:4px}
+.bonus{background:var(--sand);border-radius:10px;padding:10px 14px;font-size:15px}
+.bonus b{font-family:var(--display);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:13px;color:var(--sand-ink);margin-right:6px}
+.todo{border:2px solid var(--cyan);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.todo li{font-size:16px}
+.todo ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.steps{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--display);font-style:italic;font-weight:800;font-size:13px;text-transform:uppercase;color:#fff;padding:3px 10px 4px 0;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%)}
+.chip i{background:rgba(0,0,0,.26);padding:3px 7px 4px;margin:-3px 0 -4px;font-style:italic}
+.chip.done{opacity:.4}
+.chip.cur{outline:2px solid var(--ink);outline-offset:2px}
+
+/* automa card */
+.acard{width:238px;max-width:100%;background:#fff;color:#1F1A24;border:1px solid #BDBDBD;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px;box-shadow:0 6px 18px rgba(0,0,0,.18);flex-shrink:0}
+.acard .kban{display:grid;grid-template-columns:42px minmax(0,1fr);height:45px;color:#fff;clip-path:polygon(0 0,calc(100% - 15px) 0,100% 15px,100% 100%,8px 100%,0 calc(100% - 8px));box-shadow:inset 0 -4px 0 rgba(0,0,0,.22)}
+.acard .kban .r{display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.26);font-family:var(--display);font-style:italic;font-weight:800;font-size:24px;padding-bottom:4px}
+.acard .kban .nm{display:flex;align-items:center;padding:0 10px 4px;font-family:var(--display);font-style:italic;font-weight:800;font-size:18px;text-transform:uppercase;white-space:nowrap}
+.acard .meta{display:flex;justify-content:space-between;font-family:var(--display);font-weight:600;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#1B5A7E;border-bottom:1.3px solid #2FB6C0;padding-bottom:3px}
+.acard .cib{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 0}
+.acard .ring{width:76px;height:76px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;background:#F4FAFA}
+.acard .cn{font-family:var(--display);font-style:italic;font-weight:800;font-size:20px;text-transform:uppercase;line-height:1}
+.acard .does{border-radius:6px;padding:7px 8px;font-size:12px;line-height:1.4;display:flex;flex-direction:column;gap:3px}
+.acard .does b{font-family:var(--display);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:12px}
+.acard .does .pi{vertical-align:-2px}
+.acard .why{font-size:12.5px;line-height:1.35;background:#E3F2F3;border-radius:6px;padding:6px 8px}
+.reveal{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.reveal > div:last-child{flex:1;min-width:220px;display:flex;flex-direction:column;gap:10px}
+
+/* forms */
+.fcard{border:1.5px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:5px}
+.field input[type=number],.field select,.field input[type=text]{border:1.5px solid var(--line);background:var(--panel);border-radius:8px;padding:8px 10px;min-height:42px;width:100%}
+.check{display:flex;align-items:center;gap:8px;font-size:15px;min-height:42px}
+.check input{width:20px;height:20px;accent-color:var(--cyan)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{border:1.5px solid var(--line);background:var(--panel);border-radius:8px;padding:8px 12px;min-height:42px;font-family:var(--display);font-weight:700;font-size:15px;text-transform:uppercase}
+.seg button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.lvl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.lvl button{border:1.5px solid var(--line);background:var(--panel);border-radius:10px;padding:10px;text-align:left;display:flex;flex-direction:column;gap:2px;min-height:76px}
+.lvl button b{font-family:var(--display);font-style:italic;font-weight:800;font-size:20px;text-transform:uppercase}
+.lvl button span{font-size:13px;color:var(--muted)}
+.lvl button[aria-pressed="true"]{border:2.5px solid var(--cyan);background:var(--panel2)}
+.stepper{display:flex;align-items:stretch;gap:4px}
+.stepper input{flex:1;min-width:0;text-align:center}
+.stepper button{width:44px;flex-shrink:0;border-radius:8px;border:1px solid var(--line);background:var(--panel2);font-family:var(--display);font-weight:800;font-size:20px;line-height:1;color:var(--ink)}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.stepper input{-moz-appearance:textfield}
+.lvl.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.pick15{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+.pick15 button{border:1.5px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 8px;text-align:left;display:flex;align-items:center;gap:8px;min-height:44px;font-size:14px}
+.pick15 button b{font-family:var(--display);font-weight:800;font-size:18px;min-width:22px}
+.pick15 button i{display:inline-block;width:6px;align-self:stretch;border-radius:3px}
+.pick15 button:disabled{opacity:.35}
+
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:8px 10px;border-top:1px solid var(--line)}
+th{font-family:var(--display);font-weight:700;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-top:none}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+details summary{cursor:pointer;font-family:var(--display);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:13px;color:var(--muted)}
+.log{margin:8px 0 0;padding-left:36px;font-size:14px;color:var(--muted);display:flex;flex-direction:column;gap:2px;max-height:260px;overflow:auto}
+.score{font-family:var(--display);font-weight:800;font-style:italic;font-size:44px;line-height:1}
+.toast{font-size:14px;color:var(--cyan-ink)}
+@media (max-width:520px){
+  .phases{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .phb{padding:8px 4px 10px}
+  .phb .n,.full{display:none}
+  .short{display:inline}
+  .phb .short{font-family:var(--display);font-style:italic;font-weight:800;font-size:13px;text-transform:uppercase}
+  .lvl{grid-template-columns:1fr}
+  .params .v{font-size:19px}
+}
+@media (prefers-reduced-motion:no-preference){.acard{animation:flip .35s ease-out}@keyframes flip{from{transform:rotateY(70deg);opacity:.2}to{transform:none;opacity:1}}}
+</style>
+
+<div class="wrap" id="root">
+  <header class="top">
+    <div class="brand"><b>Automa hybride</b><span id="sub">Assistant de partie · v0.3</span></div>
+    <button class="tb" id="btn-undo" data-act="undo" disabled>Annuler</button>
+    <button class="tb" id="btn-hist" data-act="hist">Historique</button>
+    <button class="tb" id="btn-new" data-act="askNew">Nouvelle partie</button>
+  </header>
+  <div id="app"><p class="note">Chargement…</p></div>
+  <footer style="border-top:1px solid var(--line);padding-top:12px;font-size:13px;color:var(--muted)">
+    <p>Projet de fans non officiel, non affilié à FryxGames ni à Stronghold Games. Terraforming Mars est une marque de FryxGames. Nécessite le jeu original.</p>
+    <p>Règles et cartes sous licence CC BY-NC-SA 4.0 · <a href="https://github.com/manufitoussi/ares-solo-automa" style="color:inherit">GitHub</a></p>
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- Données du jeu ---------- */
+const PH = {
+  I:{n:1,nom:"Développement",court:"Dév.",col:"var(--p1)",dark:false},
+  II:{n:2,nom:"Construction",court:"Const.",col:"var(--p2)",dark:false},
+  III:{n:3,nom:"Action",court:"Action",col:"var(--p3)",dark:false},
+  IV:{n:4,nom:"Production",court:"Prod.",col:"var(--p4)",dark:false},
+  V:{n:5,nom:"Recherche",court:"Rech.",col:"var(--p5)",dark:true}
+};
+const ORDER = ["I","II","III","IV","V"];
+const CIB = {foret:{nom:"Forêt",cout:20,col:"#3D7A47"},temp:{nom:"Température",cout:14,col:"#C2362B"},ocean:{nom:"Océan",cout:15,col:"#2E6FA8"}};
+const CARDS = [
+  {n:1,ph:"IV",c:"foret"},{n:2,ph:"IV",c:"temp"},{n:3,ph:"IV",c:"ocean"},
+  {n:4,ph:"III",c:"foret"},{n:5,ph:"III",c:"temp"},{n:6,ph:"III",c:"ocean"},
+  {n:7,ph:"I",c:"foret"},{n:8,ph:"I",c:"temp"},{n:9,ph:"I",c:"ocean"},
+  {n:10,ph:"II",c:"foret"},{n:11,ph:"II",c:"temp"},{n:12,ph:"V",c:"ocean"},
+  {n:13,react:"Riposte",c:"foret"},{n:14,react:"Opportuniste",c:"temp"},{n:15,react:"Course",c:"low"}
+];
+const PROD0 = {facile:{mc:1,chaleur:1,plantes:1},standard:{mc:3,chaleur:2,plantes:2},difficile:{mc:5,chaleur:3,plantes:3}};
+const NIV = {facile:"Facile",standard:"Standard",difficile:"Difficile"};
+const MAX = {oxy:14,temp:19,oce:9};
+
+/* ---------- Pictos ---------- */
+const IC = {
+  mc:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><rect x="1.5" y="1.5" width="17" height="17" rx="4" fill="#E2BE2C" stroke="#8A6D0B" stroke-width="1.2"/><text x="10" y="13.6" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="700" font-size="9" fill="#3A2C00">MC</text></svg>',
+  chaleur:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5c.6 3.2 5 5.2 5 10.2a5 5 0 0 1-10 0c0-2.6 1.4-4.1 2.6-5.1.1 1.7.8 2.8 1.9 3.2-.1-3.2-.4-5.8.5-8.3z" fill="#E0702E" stroke="#8F3A10" stroke-width="1.2" stroke-linejoin="round"/></svg>',
+  plantes:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17C3 8.5 8.5 3 17 3c0 8.5-5.5 14-14 14z" fill="#5A9A3C" stroke="#2F5F1E" stroke-width="1.2" stroke-linejoin="round"/><path d="M4.5 15.5L12.5 7.5" stroke="#2F5F1E" stroke-width="1.2"/></svg>',
+  cartes:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="1.5" width="12" height="17" rx="2" fill="#FFFFFF" stroke="#1F1A24" stroke-width="1.2"/><rect x="5.5" y="3" width="9" height="4" fill="#6E625A"/></svg>',
+  foret:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5L16.5 12H3.5Z" fill="#3D8A3A" stroke="#22521F" stroke-width="1.2" stroke-linejoin="round"/><path d="M10 6L15 14.5H5Z" fill="#4FA048" stroke="#22521F" stroke-width="1.2" stroke-linejoin="round"/><rect x="8.8" y="14.5" width="2.4" height="4" fill="#6B4423"/></svg>',
+  temp:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><rect x="7.5" y="1.5" width="5" height="12" rx="2.5" fill="#FFFFFF" stroke="#7A1F18" stroke-width="1.2"/><rect x="9" y="6" width="2" height="8" fill="#C2362B"/><circle cx="10" cy="15" r="3.8" fill="#C2362B" stroke="#7A1F18" stroke-width="1.2"/></svg>',
+  ocean:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><polygon points="10,1 17.8,5.5 17.8,14.5 10,19 2.2,14.5 2.2,5.5" fill="#2E6FA8" stroke="#183F66" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.5 11c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0" stroke="#FFFFFF" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>',
+  nt:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#C4572E" stroke="#7A2E14" stroke-width="1.2"/><path d="M5 9h10M6.5 13h7" stroke="#FCE3C6" stroke-width="1.2"/></svg>'
+};
+const big = (svg, s) => svg.replace(/width="18" height="18"/, `width="${s}" height="${s}"`);
+const sm = svg => big(svg, 14);
+const cardIc = col => sm(IC.cartes.replace('fill="#6E625A"', `fill="${col}"`));
+const TINT = {I:"#DCEADB", II:"#DAE3EF", III:"#D6E9F3", IV:"#F6DCCB", V:"#F6EBBF"};
+const EFFECT = {
+  I:[`Prend 1 ${cardIc("#3D7A47")} carte verte et applique sa production.`, `1 ${cardIc("#3D7A47")} carte verte de plus`],
+  II:[`Prend 1 ${cardIc("#2E5A8A")}${cardIc("#B5342A")} carte bleue ou rouge, +2 ${sm(IC.mc)}`, `1 ${cardIc("#2E5A8A")}${cardIc("#B5342A")} carte bleue ou rouge de plus`],
+  III:[`Convertit ${sm(IC.plantes)} plantes et ${sm(IC.chaleur)} chaleur, puis achète sa cible avec ses ${sm(IC.mc)}`, `+5 ${sm(IC.mc)} avant ses dépenses`],
+  IV:[`Produit comme un joueur : ${sm(IC.mc)} production + NT, ${sm(IC.chaleur)} chaleur, ${sm(IC.plantes)} plantes.`, `+4 ${sm(IC.mc)}`],
+  V:[`+3 ${sm(IC.mc)}`, `+3 ${sm(IC.mc)} de plus`]
+};
+
+/* ---------- État ---------- */
+const S = { state:null, undo:[], view:"game", hist:[], confirmNew:false, setup:{niveau:"standard", pioche:"app", oxy:0, temp:0, oce:0}, toast:"" };
+const LS_STATE = "automa-hybride-partie", LS_HIST = "automa-hybride-historique";
+let db = null;
+
+const clone = o => JSON.parse(JSON.stringify(o));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const allMax = p => p.oxy >= MAX.oxy && p.temp >= MAX.temp && p.oce >= MAX.oce;
+const tempC = step => -30 + 2 * step;
+const paramOf = c => c === "foret" ? "oxy" : c === "temp" ? "temp" : "oce";
+const card = n => CARDS.find(c => c.n === n);
+
+function newGame(){
+  const s = S.setup;
+  return {
+    v:1, status:"playing", niveau:s.niveau, pioche:s.pioche || "app", createdAt:Date.now(), savedAt:Date.now(), turn:1,
+    deck:shuffle(CARDS.map(c => c.n)), discard:[], card:null, step:"plan",
+    playerPhase:null, automaPhase:null, cible:null, why:"", queue:[], qi:0, lastPlayerPhase:null,
+    a:{mc:0, chaleur:0, plantes:0, prod:{...PROD0[s.niveau], cartes:0}, nt:5, forets:0, cartes:[]},
+    p:{oxy:+s.oxy||0, temp:+s.temp||0, oce:+s.oce||0},
+    log:[]
+  };
+}
+function log(msg){ S.state.log.unshift(`T${S.state.turn} · ${msg}`); if (S.state.log.length > 120) S.state.log.length = 120; }
+function commit(){ S.undo.push(JSON.stringify(S.state)); if (S.undo.length > 30) S.undo.shift(); }
+
+/* ---------- Règles ---------- */
+function leastAdvanced(p){
+  const f = [["foret", p.oxy / MAX.oxy], ["temp", p.temp / MAX.temp], ["ocean", p.oce / MAX.oce]];
+  let best = f[0]; for (const x of f) if (x[1] < best[1]) best = x; return best[0];
+}
+function effCible(c, p){
+  const order = ["foret","temp","ocean"]; let i = order.indexOf(c);
+  for (let k = 0; k < 3; k++) { const x = order[(i + k) % 3]; if (p[paramOf(x)] < MAX[paramOf(x)]) return x; }
+  return "foret";
+}
+function resolveCard(st){
+  const cd = card(st.card); let phase = cd.ph, why = "", cible = cd.c;
+  if (cd.react === "Riposte") { phase = st.lastPlayerPhase || "IV"; why = st.lastPlayerPhase ? `Votre phase du tour précédent : ${PH[phase].nom}.` : "Premier tour : Production."; }
+  if (cd.react === "Opportuniste") { phase = st.a.mc >= 20 ? "III" : "IV"; why = st.a.mc >= 20 ? `Il a ${st.a.mc} MC (20 ou plus) : il dépense en Action.` : `Il n'a que ${st.a.mc} MC (moins de 20) : il produit.`; }
+  if (cd.react === "Course") { phase = "III"; cible = leastAdvanced(st.p); why = `Paramètre le moins avancé : ${CIB[cible].nom.toLowerCase()}.`; }
+  return {phase, cible, why};
+}
+function computeAction(st, chose){
+  const a = clone(st.a), p = {...st.p};
+  const ch = {bonus:0, fPl:0, fMc:0, tCh:0, tMc:0, oce:0, nt:0, spent:0, oxy:0};
+  if (chose) { a.mc += 5; ch.bonus = 5; }
+  while (a.plantes >= 8) { a.plantes -= 8; a.forets++; ch.fPl++; if (p.oxy < MAX.oxy) { p.oxy++; a.nt++; ch.nt++; ch.oxy++; } }
+  while (a.chaleur >= 8 && p.temp < MAX.temp) { a.chaleur -= 8; p.temp++; a.nt++; ch.nt++; ch.tCh++; }
+  for (let g = 0; g < 200; g++) {
+    const c = allMax(p) ? "foret" : effCible(st.cible, p), cost = CIB[c].cout;
+    if (a.mc < cost) break;
+    a.mc -= cost; ch.spent += cost;
+    if (c === "foret") { a.forets++; ch.fMc++; if (p.oxy < MAX.oxy) { p.oxy++; a.nt++; ch.nt++; ch.oxy++; } }
+    else if (c === "temp") { p.temp++; a.nt++; ch.nt++; ch.tMc++; }
+    else { p.oce++; a.nt++; ch.nt++; ch.oce++; }
+  }
+  return {a, p, ch};
+}
+function computeProd(st, chose){
+  const pr = st.a.prod;
+  return {mc: pr.mc + st.a.nt + (chose ? 4 : 0) + pr.cartes * 3, chaleur: pr.chaleur, plantes: pr.plantes, cartesMc: pr.cartes * 3, bonus: chose ? 4 : 0};
+}
+function scoreAutoma(a){ const pv = a.cartes.reduce((s, c) => s + (+c.pv || 0), 0); return {nt:a.nt, forets:a.forets, pv, total:a.nt + a.forets + pv}; }
+
+/* ---------- Persistance ---------- */
+let saveTimer = null;
+function save(){
+  if (!S.state) return;
+  S.state.savedAt = Date.now();
+  try { localStorage.setItem(LS_STATE, JSON.stringify(S.state)); } catch (e) {}
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => { if (!db) return; try { await db.doc("partie/courante").set({state:S.state, savedAt:S.state.savedAt}); } catch (e) {} }, 500);
+}
+function loadLocal(){ try { const s = JSON.parse(localStorage.getItem(LS_STATE)); return s && s.v === 1 ? s : null; } catch (e) { return null; } }
+async function loadHist(){
+  if (db) { try { const q = await db.collection("parties").orderBy("date", "desc").limit(100).get(); S.hist = q.docs.map(d => d.data()); return; } catch (e) {} }
+  try { S.hist = JSON.parse(localStorage.getItem(LS_HIST)) || []; } catch (e) { S.hist = []; }
+}
+async function saveGameRecord(rec){
+  try { const h = JSON.parse(localStorage.getItem(LS_HIST) || "[]"); h.unshift(rec); localStorage.setItem(LS_HIST, JSON.stringify(h.slice(0, 100))); } catch (e) {}
+  if (db) { try { await db.collection("parties").doc("p-" + rec.createdAt).set(rec); return true; } catch (e) { return false; } }
+  return false;
+}
+
+/* ---------- Rendu ---------- */
+const $app = document.getElementById("app");
+function phaseChip(ph, cls){ const P = PH[ph]; return `<span class="chip ${cls || ""}" style="background:${P.col};${P.dark ? "color:#1F1A24" : ""}"><i>${ph}</i>${P.nom}</span>`; }
+function banner(ph, tag){ const P = PH[ph]; return `<div class="ban ${P.dark ? "dark" : ""}" style="background:${P.col}"><span class="r">${ph}</span><div><span class="nm">${P.nom}</span><span class="tg">${tag}</span></div></div>`; }
+function stat(k, v, icon, key, sub){
+  const adj = key ? `<div class="adj"><button type="button" data-act="adj" data-k="${key}" data-d="-1" aria-label="Retirer 1 ${esc(k)}">−</button><button type="button" data-act="adj" data-k="${key}" data-d="1" aria-label="Ajouter 1 ${esc(k)}">+</button></div>` : "";
+  return `<div class="stat"><span class="k">${k}</span><span class="v num">${icon || ""}${v}</span>${sub ? `<span class="sub">${sub}</span>` : ""}${S.edit ? adj : ""}</div>`;
+}
+function renderStatus(){
+  const st = S.state, a = st.a, sc = scoreAutoma(a);
+  const pr = a.prod;
+  return `<section class="panel" aria-label="État de l'automa">
+    <div class="row" style="justify-content:space-between"><span class="lab">Automa · ${NIV[st.niveau]} · tour ${st.turn}</span>
+    <button type="button" class="ghost" data-act="edit" style="min-height:36px;padding:4px 12px">${S.edit ? "Terminer" : "Corriger"}</button></div>
+    <div class="stats">
+      ${stat("MC", a.mc, IC.mc, "mc")}${stat("Chaleur", a.chaleur, IC.chaleur, "chaleur")}${stat("Plantes", a.plantes, IC.plantes, "plantes")}
+      ${stat("NT", a.nt, IC.nt, "nt")}${stat("Forêts", a.forets, IC.foret, "forets")}${stat("Cartes", `${a.cartes.length} <small>${sc.pv} PV</small>`, IC.cartes, null, `${a.cartes.filter(c => c.couleur === "verte").length} vertes · ${a.cartes.filter(c => c.couleur !== "verte").length} bleues/rouges`)}
+    </div>
+    <span class="lab">Production</span>
+    <div class="stats four">
+      ${stat("MC", pr.mc, IC.mc, "prod.mc")}${stat("Chaleur", pr.chaleur, IC.chaleur, "prod.chaleur")}${stat("Plantes", pr.plantes, IC.plantes, "prod.plantes")}${stat("Cartes", pr.cartes, IC.cartes, "prod.cartes")}
+    </div>
+    ${(st.track || []).length >= 2 ? curveBlock(st.track) : `<p style="font-size:13px;color:var(--muted)">La courbe de progression apparaîtra ici après 2 tours (entrez votre NT en fin de tour).</p>`}
+  </section>`;
+}
+function renderParams(){
+  const p = S.state.p;
+  const ARIA = {oxy:"l'oxygène", temp:"la température", oce:"les océans"};
+  const one = (k, label, val, icon, max) => `<div class="param ${p[k] >= max ? "max" : ""}">
+    <span class="lab" style="display:flex;align-items:center;gap:5px">${icon}${label}</span>
+    <span class="v num">${val}</span><span class="bar"><i style="width:${Math.round(p[k] / max * 100)}%"></i></span>
+    <div class="adj"><button type="button" data-act="par" data-k="${k}" data-d="-1" aria-label="Baisser ${ARIA[k]}">−</button><button type="button" data-act="par" data-k="${k}" data-d="1" aria-label="Monter ${ARIA[k]}">+</button></div></div>`;
+  return `<section class="panel" aria-label="Paramètres de Mars">
+    <span class="lab">Mars · mettez à jour quand vous augmentez un paramètre</span>
+    <div class="params">${one("oxy", "Oxygène", p.oxy + " %", IC.foret, MAX.oxy)}${one("temp", '<span class="full">Température</span><span class="short">Temp.</span>', (tempC(p.temp) > 0 ? "+" : "") + tempC(p.temp) + " °C", IC.temp, MAX.temp)}${one("oce", "Océans", p.oce + " / 9", IC.ocean, MAX.oce)}</div>
+  </section>`;
+}
+function automaCardHTML(st){
+  const cd = card(st.card), ph = st.automaPhase, P = PH[ph];
+  const c = st.cible, C = c === "low" ? null : CIB[c];
+  const title = cd.react ? `<span class="r" style="color:#8FE3E8">?</span><span class="nm">${cd.react}</span>` : `<span class="r">${ph}</span><span class="nm">${P.nom}</span>`;
+  const bg = cd.react ? "#12202B" : P.col;
+  return `<div class="acard" aria-label="Carte automa ${cd.n}">
+    <div class="kban" style="background:${bg};${!cd.react && P.dark ? "color:#1F1A24" : ""}">${title}</div>
+    <div class="meta"><span>Automa${cd.react ? " · réactive" : ""}</span><span>${String(cd.n).padStart(2, "0")} / 15</span></div>
+    <div class="cib"><span class="lab" style="color:#6E625A">Cible</span><span class="ring" style="border-color:${C.col}">${big(IC[c], 46)}</span><span class="cn">${C.nom}</span><span style="font-size:12px;font-style:italic;color:#4F5B62;display:flex;align-items:center;gap:4px">action standard · ${C.cout} ${IC.mc}</span></div>
+    ${cd.react ? `<div class="why">Il joue : <b>${P.nom}</b>. ${esc(st.why)}</div>` : `<div class="does" style="background:${TINT[ph]}"><p>${EFFECT[ph][0]}</p><p><b>Bonus</b> s'il l'a choisie : ${EFFECT[ph][1]}</p></div>`}
+  </div>`;
+}
+function cardLabel(cd){ return cd.react ? cd.react : `${PH[cd.ph].court} · ${CIB[cd.c].nom}`; }
+function pick15(st){
+  const full = !st.deck.length;
+  const btns = CARDS.map(cd => { const used = !full && !st.deck.includes(cd.n), col = cd.react ? "#12202B" : PH[cd.ph].col;
+    return `<button type="button" data-act="draw" data-n="${cd.n}" ${st.playerPhase && !used ? "" : "disabled"} aria-label="Carte ${cd.n}, ${cardLabel(cd)}${used ? ", déjà sortie" : ""}"><i style="background:${col}"></i><b>${String(cd.n).padStart(2, "0")}</b>${cardLabel(cd)}</button>`; }).join("");
+  return `<div><span class="lab">${st.playerPhase ? "Retournez sa carte, puis touchez son numéro" : "Choisissez d'abord votre phase"}</span>
+    ${full ? `<p class="note" style="margin-top:6px"><b>Pioche vide</b> Remélangez ses 15 cartes avant de tirer.</p>` : ""}
+    <div class="pick15" style="margin-top:6px">${btns}</div>
+    <p style="font-size:13px;color:var(--muted);margin-top:6px">Les cartes déjà sorties depuis le dernier mélange sont grisées.</p></div>`;
+}
+function renderPlan(){
+  const st = S.state;
+  const btns = ORDER.map(ph => { const P = PH[ph], dis = st.lastPlayerPhase === ph;
+    return `<button type="button" class="phb" style="background:${P.col};${P.dark ? "color:#1F1A24" : ""}" data-act="pick" data-ph="${ph}" aria-pressed="${st.playerPhase === ph}" ${dis ? "disabled" : ""} aria-label="${P.nom}${dis ? ", déjà jouée au tour précédent" : ""}"><span class="r">${ph}</span><span class="n">${P.nom}</span><span class="short">${P.court}</span></button>`; }).join("");
+  return `<section class="panel">
+    <h2 style="font-size:28px;font-style:italic;text-transform:uppercase">Planification</h2>
+    <p>Choisissez votre carte de phase${st.lastPlayerPhase ? ` (pas ${PH[st.lastPlayerPhase].nom}, jouée au tour précédent)` : ""}, puis retournez la carte de l'automa.</p>
+    <div class="phases">${btns}</div>
+    ${st.pioche === "cartes" ? pick15(st) : `<div class="row"><button type="button" class="cta" data-act="draw" ${st.playerPhase ? "" : "disabled"}>Retourner la carte automa</button>
+    <span class="lab">${st.deck.length} carte${st.deck.length > 1 ? "s" : ""} dans la pioche</span></div>`}
+  </section>`;
+}
+function phasePreview(st, ph){
+  const chose = st.automaPhase === ph, who = [st.playerPhase === ph ? "votre choix" : "", chose ? "son choix" : ""].filter(Boolean).join(" et ");
+  let what = "";
+  if (ph === "I") what = `il prend ${chose ? "2 cartes vertes" : "1 carte verte"} : vous révélerez 3 cartes projet pour lui${chose ? " (deux fois)" : ""} et noterez sa production.`;
+  else if (ph === "II") what = `il prend ${chose ? "2 cartes bleues ou rouges" : "1 carte bleue ou rouge"} et gagne 2 MC : vous révélerez 3 cartes projet pour lui${chose ? " (deux fois)" : ""}.`;
+  else if (ph === "III") { const r = computeAction(st, chose); what = r.ch.nt ? `il convertit et achète sa cible (${CIB[effCible(st.cible, st.p)].nom.toLowerCase()}) : environ ${r.ch.nt} paramètre${r.ch.nt > 1 ? "s" : ""} à avancer.` : `il convertit et achète sa cible, mais n'a pas encore assez de ressources.`; }
+  else if (ph === "IV") { const g = computeProd(st, chose); what = `il produit : ${g.mc} MC, ${g.chaleur} chaleur, ${g.plantes} plantes. Rien à faire sur le plateau.`; }
+  else what = `il gagne ${chose ? 6 : 3} MC. Rien à faire sur le plateau.`;
+  return `<li>${phaseChip(ph)} <span style="font-size:13px;color:var(--muted)">(${who})</span><br>${what}</li>`;
+}
+function renderReveal(){
+  const st = S.state;
+  const cib = effCible(st.cible, st.p), hasAction = st.queue.includes("III");
+  return `<section class="panel">
+    <h2 style="font-size:28px;font-style:italic;text-transform:uppercase">Carte de l'automa</h2>
+    <div class="reveal">${automaCardHTML(st)}
+      <div>
+        <div class="todo"><span class="lab">Ce tour, pour l'automa</span>
+          <ul style="list-style:none;padding-left:0;gap:10px">${st.queue.map(ph => phasePreview(st, ph)).join("")}</ul></div>
+        <p class="note"><b>Sa cible</b>${hasAction ? ` Elle sert en phase Action : c'est le paramètre qu'il achète${cib !== st.cible ? ` (au maximum : il vise ${CIB[cib].nom.toLowerCase()} à la place)` : ""}.` : " Elle ne sert qu'en phase Action. Pas de phase Action ce tour : ignorez-la."}</p>
+        <p style="font-size:14px;color:var(--muted)">Rien à faire pour l'instant. Résolvez les phases dans l'ordre : l'assistant vous guide pour chacune.</p>
+        <button type="button" class="cta" data-act="start">Résoudre les phases</button>
+      </div>
+    </div>
+  </section>`;
+}
+function cardForm(i, defCol){
+  const cols = [["verte","Verte"],["bleue","Bleue"],["rouge","Rouge"]];
+  return `<div class="fcard">
+    <span class="lab">Carte ${i + 1} prise par l'automa</span>
+    <div class="field"><label for="c${i}-col">Couleur</label><select id="c${i}-col" data-act="colchg" data-i="${i}">${cols.map(([v, l]) => `<option value="${v}" ${v === defCol ? "selected" : ""}>${l}</option>`).join("")}</select></div>
+    <div class="fgrid">
+      <div class="field"><label for="c${i}-pv">PV de la carte</label><input type="number" id="c${i}-pv" min="0" max="20" value="0" inputmode="numeric"></div>
+      <div class="field"><span class="check"><input type="checkbox" id="c${i}-pre"><label for="c${i}-pre" style="text-transform:none;letter-spacing:0;font-family:var(--text);font-weight:400;font-size:15px;color:var(--ink)">Avec prérequis (−5 MC)</label></span></div>
+    </div>
+    <div class="fgrid" id="c${i}-prod" ${defCol === "verte" ? "" : "hidden"}>
+      <div class="field"><label for="c${i}-pmc">${IC.mc} Prod. MC</label><input type="number" id="c${i}-pmc" min="-5" max="10" value="0" inputmode="numeric"></div>
+      <div class="field"><label for="c${i}-pch">${IC.chaleur} Prod. chaleur</label><input type="number" id="c${i}-pch" min="-5" max="10" value="0" inputmode="numeric"></div>
+      <div class="field"><label for="c${i}-ppl">${IC.plantes} Prod. plantes</label><input type="number" id="c${i}-ppl" min="-5" max="10" value="0" inputmode="numeric"></div>
+      <div class="field"><label for="c${i}-pca">${IC.cartes} Prod. cartes</label><input type="number" id="c${i}-pca" min="0" max="5" value="0" inputmode="numeric"></div>
+    </div>
+  </div>`;
+}
+function renderPhase(){
+  const st = S.state, ph = st.queue[st.qi], chose = st.automaPhase === ph;
+  const chips = st.queue.map((x, i) => phaseChip(x, i < st.qi ? "done" : i === st.qi ? "cur" : "")).join("");
+  const you = st.playerPhase === ph ? "Vous avez choisi cette phase : prenez votre bonus." : "Vous jouez aussi cette phase, sans bonus.";
+  let body = "";
+  if (ph === "I" || ph === "II") {
+    const n = chose ? 2 : 1, col = ph === "I" ? "verte" : "bleue";
+    body = `${banner(ph, ph === "I" ? "Il prend 1 carte verte et applique sa production." : "Il prend 1 carte bleue ou rouge et gagne 2 MC.")}
+      <p class="note"><b>Prendre une carte</b> Révélez 3 cartes projet. Il prend la bonne couleur, sans prérequis d'abord, la plus chère (égalité : plus de PV). Aucune de la bonne couleur : la plus chère des 3. Défaussez les autres.</p>
+      ${chose ? `<p class="bonus"><b>Bonus</b>Il a choisi la phase : il prend une 2e carte (3 nouvelles cartes révélées).</p>` : ""}
+      ${Array.from({length:n}, (_, i) => cardForm(i, col)).join("")}`;
+  } else if (ph === "III") {
+    const r = computeAction(st, chose), ch = r.ch, todo = [];
+    const fTot = ch.fPl + ch.fMc;
+    if (fTot) todo.push(`${IC.foret} <b>${fTot} forêt${fTot > 1 ? "s" : ""}</b> (${ch.fPl ? ch.fPl + " avec ses plantes" : ""}${ch.fPl && ch.fMc ? ", " : ""}${ch.fMc ? ch.fMc + " achetée" + (ch.fMc > 1 ? "s" : "") : ""}) : oxygène +${ch.oxy}`);
+    if (ch.tCh + ch.tMc) todo.push(`${IC.temp} <b>Température +${ch.tCh + ch.tMc} cran${ch.tCh + ch.tMc > 1 ? "s" : ""}</b>${ch.tCh ? ` (${ch.tCh} avec sa chaleur)` : ""}`);
+    if (ch.oce) todo.push(`${IC.ocean} <b>Retournez ${ch.oce} tuile${ch.oce > 1 ? "s" : ""} océan</b> et notez leur bonus ci-dessous`);
+    if (ch.nt) todo.push(`${IC.nt} <b>NT de l'automa +${ch.nt}</b> (${st.a.nt} → ${r.a.nt})`);
+    body = `${banner(ph, "Il convertit ses ressources, puis achète sa cible.")}
+      ${chose ? `<p class="bonus"><b>Bonus</b>Il a choisi la phase : +5 MC avant ses dépenses (déjà compté).</p>` : ""}
+      <div class="todo"><span class="lab">À faire sur le plateau</span>${todo.length ? `<ul>${todo.map(t => `<li>${t}</li>`).join("")}</ul>` : `<p>Rien cette fois : il n'a pas assez de ressources.</p>`}
+      <p style="font-size:14px;color:var(--muted)">Cible : ${CIB[effCible(st.cible, st.p)].nom}. Il dépense ${ch.spent} MC et garde ${r.a.mc} MC, ${r.a.plantes} plantes, ${r.a.chaleur} chaleur.</p></div>
+      ${ch.oce ? `<div class="fcard"><span class="lab">Bonus des tuiles océan retournées (total)</span><div class="fgrid">
+        <div class="field"><label for="o-mc">${IC.mc} MC</label><input type="number" id="o-mc" min="0" value="0" inputmode="numeric"></div>
+        <div class="field"><label for="o-pl">${IC.plantes} Plantes</label><input type="number" id="o-pl" min="0" value="0" inputmode="numeric"></div>
+        <div class="field"><label for="o-ch">${IC.chaleur} Chaleur</label><input type="number" id="o-ch" min="0" value="0" inputmode="numeric"></div>
+        <div class="field"><label for="o-ca">${IC.cartes} Cartes (3 MC)</label><input type="number" id="o-ca" min="0" value="0" inputmode="numeric"></div></div></div>` : ""}
+      ${allMax(r.p) ? `<p class="note"><b>Dernier tour</b> Tous les paramètres sont au maximum : il dépense ses MC en forêts pour leurs PV.</p>` : ""}`;
+  } else if (ph === "IV") {
+    const g = computeProd(st, chose);
+    body = `${banner(ph, "Il produit comme un joueur.")}
+      <div class="todo"><span class="lab">Il gagne</span><ul>
+        <li>${IC.mc} <b>${g.mc} MC</b> : production ${st.a.prod.mc} + NT ${st.a.nt}${g.cartesMc ? ` + ${g.cartesMc} (production de cartes)` : ""}${g.bonus ? " + 4 (bonus)" : ""}</li>
+        ${g.cartesMc ? `<li class="why">Production de cartes ${st.a.prod.cartes} : il devrait piocher ${st.a.prod.cartes > 1 ? st.a.prod.cartes + " cartes" : "1 carte"}, mais il n'a pas de main, donc chaque carte vaut 3 MC.</li>` : ""}
+        <li>${IC.chaleur} <b>${g.chaleur} chaleur</b> · ${IC.plantes} <b>${g.plantes} plantes</b></li></ul></div>
+      ${chose ? `<p class="bonus"><b>Bonus</b>Il a choisi la phase : +4 MC (déjà compté).</p>` : ""}`;
+  } else {
+    body = `${banner(ph, "Il gagne 3 MC.")}
+      <div class="todo"><span class="lab">Il gagne</span><ul><li>${IC.mc} <b>${chose ? 6 : 3} MC</b>${chose ? " (3 + 3 de bonus)" : ""}</li></ul></div>`;
+  }
+  return `<section class="panel">
+    <div class="steps">${chips}</div>
+    ${body}
+    <p style="font-size:14px;color:var(--muted)">${you}</p>
+    <div class="row"><button type="button" class="cta" data-act="apply">${ph === "I" || ph === "II" ? "Enregistrer" : "C'est fait"}</button></div>
+  </section>`;
+}
+function lastPNT(st){ const tr = (st.track || []).filter(x => x.p != null); return tr.length ? tr[tr.length - 1].p : 5; }
+function recordTurn(st){
+  const el = document.getElementById("e-nt"); let p = null;
+  if (el && el.value !== "") { const v = parseInt(el.value, 10); if (!isNaN(v)) p = v; }
+  st.track = (st.track || []).filter(x => x.t !== st.turn);
+  st.track.push({t:st.turn, a:st.a.nt, p});
+}
+function curveSVG(track, w, h){
+  const pts = (track || []).filter(x => x && x.t);
+  if (pts.length < 2) return "";
+  const vals = pts.flatMap(x => [x.a, x.p]).filter(v => v != null);
+  const lo = Math.min(...vals), hi = Math.max(...vals, lo + 1), t0 = pts[0].t, t1 = pts[pts.length - 1].t;
+  const pad = 4, X = t => pad + (t - t0) / Math.max(1, t1 - t0) * (w - 2 * pad), Y = v => h - pad - (v - lo) / (hi - lo) * (h - 2 * pad);
+  const line = (k, col, dash) => { const q = pts.filter(x => x[k] != null); return q.length > 1 ? `<polyline fill="none" stroke="${col}" stroke-width="2" ${dash ? 'stroke-dasharray="4 3"' : ""} stroke-linejoin="round" points="${q.map(x => `${X(x.t).toFixed(1)},${Y(x[k]).toFixed(1)}`).join(" ")}"/>` : ""; };
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="max-width:100%;height:auto" role="img" aria-label="NT par tour : vous en orange, l'automa en pointillés">${line("a", "var(--muted)", true)}${line("p", "var(--p4)")}</svg>`;
+}
+function curveBlock(track){
+  const svg = curveSVG(track, 320, 110); if (!svg) return "";
+  const last = track[track.length - 1];
+  return `<div class="fcard"><span class="lab">NT par tour</span>${svg}
+    <p style="font-size:13px;color:var(--muted)"><span style="color:var(--p4);font-weight:700">━ Vous</span>${last.p != null ? ` (${last.p})` : ""} · <span style="font-weight:700">┅ Automa</span> (${last.a}) · tours ${track[0].t} à ${last.t}</p></div>`;
+}
+function renderEndTurn(){
+  const st = S.state;
+  return `<section class="panel">
+    <h2 style="font-size:28px;font-style:italic;text-transform:uppercase">Fin du tour ${st.turn}</h2>
+    <div class="todo"><span class="lab">Avant le tour suivant</span><ul>
+      <li><b>Vous</b> : plus de 10 cartes en main ? Défaussez jusqu'à 10, comme d'habitude.</li>
+      <li><b>L'automa</b> : rien à faire, il n'a pas de main.</li>
+      <li><b>Sa carte du tour</b> : ${st.pioche === "cartes" ? `posez-la dans sa défausse. Quand sa pioche est vide, remélangez les 15 cartes (il en reste ${st.deck.length}).` : `l'assistant la met de côté. Elle ne reviendra qu'une fois toute sa pioche utilisée (il en reste ${st.deck.length}).`}</li></ul></div>
+    <div class="fcard"><span class="lab">Votre progression · facultatif</span>
+      <div class="fgrid"><div class="field"><label for="e-nt">${IC.nt} Votre NT</label><input type="number" id="e-nt" min="0" max="99" inputmode="numeric" value="${lastPNT(st)}"></div>
+      <p style="font-size:13px;color:var(--muted);align-self:end">L'automa est à ${st.a.nt}. Votre NT sert à tracer la courbe de la partie.</p></div></div>
+    <div class="row"><button type="button" class="cta" data-act="next">Tour suivant</button>
+    <button type="button" class="ghost" data-act="end">Terminer la partie</button></div>
+  </section>`;
+}
+function renderEnd(){
+  const st = S.state, sc = scoreAutoma(st.a);
+  return `<section class="panel">
+    <h2 style="font-size:32px;font-style:italic;text-transform:uppercase">Décompte final</h2>
+    <p>${allMax(st.p) ? "Tous les paramètres sont au maximum." : "Partie arrêtée avant la fin des paramètres."} Comptez vos points : 1 PV par point de NT, plus vos PV de forêt et de cartes.</p>
+    <div class="scroll"><table><thead><tr><th>Automa</th><th class="n">PV</th></tr></thead><tbody>
+      <tr><td>${IC.nt} NT</td><td class="n">${sc.nt}</td></tr>
+      <tr><td>${IC.foret} Forêts</td><td class="n">${sc.forets}</td></tr>
+      <tr><td>${IC.cartes} Cartes projet (${st.a.cartes.length})</td><td class="n">${sc.pv}</td></tr>
+      <tr><td><b>Total</b></td><td class="n"><b>${sc.total}</b></td></tr></tbody></table></div>
+    ${curveBlock(st.track)}
+    <div class="fgrid">
+      <div class="field"><label for="e-score">Votre score</label><input type="number" data-nostep id="e-score" min="0" inputmode="numeric" value="${st.playerScore ?? ""}"></div>
+      <div class="field" style="grid-column:span 2"><label for="e-rem">Remarques (équilibrage, ressenti)</label><input type="text" id="e-rem" maxlength="300" value="${esc(st.remark || "")}"></div>
+    </div>
+    <div class="row"><button type="button" class="cta" data-act="saveGame" ${st.saved ? "disabled" : ""}>${st.saved ? "Partie enregistrée" : "Enregistrer la partie"}</button>
+    ${st.saved ? "" : `<button type="button" class="ghost" data-act="resume">Reprendre la partie</button>`}</div>
+    ${S.toast ? `<p class="toast">${esc(S.toast)}</p>` : ""}
+  </section>`;
+}
+function renderSetup(){
+  const s = S.setup;
+  const lv = ["facile","standard","difficile"].map(k => { const p = PROD0[k];
+    return `<button type="button" data-act="lvl" data-k="${k}" aria-pressed="${s.niveau === k}"><b>${NIV[k]}</b><span>Production : ${p.mc} MC · ${p.chaleur} chaleur · ${p.plantes} plantes</span></button>`; }).join("");
+  return `<section class="panel">
+    <h2 style="font-size:30px;font-style:italic;text-transform:uppercase">Nouvelle partie</h2>
+    <p>L'assistant joue l'automa : il tire ses cartes, tient ses comptes et vous dit quoi faire sur le plateau. Vous gardez le plateau et les cartes projet sur la table.</p>
+    <div><span class="lab">Niveau</span><div class="lvl" style="margin-top:6px">${lv}</div></div>
+    <div><span class="lab">Pioche de l'automa</span><div class="lvl two" style="margin-top:6px">
+      <button type="button" data-act="pioche" data-k="app" aria-pressed="${s.pioche !== "cartes"}"><b>L'appli tire</b><span>L'assistant tire la carte automa au hasard.</span></button>
+      <button type="button" data-act="pioche" data-k="cartes" aria-pressed="${s.pioche === "cartes"}"><b>Vos cartes</b><span>Vous retournez la carte imprimée et indiquez son numéro.</span></button></div></div>
+    <div class="note"><b>Mise en place</b> Donnez à l'automa un plateau joueur, ses cubes et un marqueur sur le 5 de la piste de NT, puis réglez ses pistes de production selon le niveau. Il n'a ni corporation ni main.</div>
+    <div class="row"><button type="button" class="cta" data-act="begin">Commencer la partie</button></div>
+  </section>`;
+}
+function renderHist(){
+  const rows = S.hist.map(h => `<tr><td>${new Date(h.date).toLocaleDateString("fr-FR")}</td><td>${NIV[h.niveau] || h.niveau}</td><td class="n">${h.tours}</td><td class="n">${h.scoreJoueur ?? "—"}</td><td class="n">${h.scoreAutoma}</td><td>${h.scoreJoueur == null ? "—" : h.scoreJoueur > h.scoreAutoma ? "Vous" : h.scoreJoueur < h.scoreAutoma ? "Automa" : "Égalité"}</td><td>${curveSVG(h.courbe, 120, 40) || "—"}</td><td style="min-width:160px">${esc(h.remarque || "")}</td></tr>`).join("");
+  const won = S.hist.filter(h => h.scoreJoueur != null && h.scoreJoueur > h.scoreAutoma).length;
+  return `<section class="panel">
+    <div class="row" style="justify-content:space-between"><h2 style="font-size:28px;font-style:italic;text-transform:uppercase">Historique</h2><button type="button" class="ghost" data-act="back">Retour à la partie</button></div>
+    ${S.hist.length ? `<p>${S.hist.length} partie${S.hist.length > 1 ? "s" : ""} · ${won} victoire${won > 1 ? "s" : ""} contre l'automa.</p>
+    <div class="scroll"><table><thead><tr><th>Date</th><th>Niveau</th><th class="n">Tours</th><th class="n">Vous</th><th class="n">Automa</th><th>Gagnant</th><th>NT par tour</th><th>Remarques</th></tr></thead><tbody>${rows}</tbody></table></div>`
+    : `<p>Aucune partie enregistrée pour l'instant. À la fin d'une partie, enregistrez-la depuis l'écran de décompte : elle apparaîtra ici.</p>`}
+  </section>`;
+}
+function render(){
+  document.getElementById("btn-undo").disabled = !S.undo.length || S.view !== "game";
+  const bn = document.getElementById("btn-new");
+  bn.textContent = S.confirmNew ? "Confirmer ?" : "Nouvelle partie"; bn.classList.toggle("warn", S.confirmNew);
+  if (S.view === "hist") { $app.innerHTML = renderHist(); return; }
+  const st = S.state;
+  if (!st) { $app.innerHTML = renderSetup(); return; }
+  let main = "";
+  if (st.status === "ended") main = renderEnd();
+  else if (st.step === "plan") main = renderPlan();
+  else if (st.step === "reveal") main = renderReveal();
+  else if (st.step === "phase") main = renderPhase();
+  else main = renderEndTurn();
+  const logHtml = st.log.length ? `<details class="panel"><summary>Journal (${st.log.length})</summary><ol class="log" reversed>${st.log.map(l => `<li>${esc(l)}</li>`).join("")}</ol></details>` : "";
+  $app.innerHTML = `<div style="display:flex;flex-direction:column;gap:14px">${main}${renderStatus()}${renderParams()}${logHtml}</div>`;
+  addSteppers();
+}
+function addSteppers(){
+  $app.querySelectorAll('input[type="number"]').forEach(inp => {
+    if (inp.hasAttribute("data-nostep") || inp.parentElement.classList.contains("stepper")) return;
+    const w = document.createElement("div"); w.className = "stepper";
+    inp.replaceWith(w);
+    const lab = (inp.closest(".field")?.querySelector("label")?.textContent || "").trim();
+    const mk = d => { const b = document.createElement("button"); b.type = "button"; b.textContent = d < 0 ? "−" : "+"; b.dataset.act = "step"; b.dataset.for = inp.id; b.dataset.d = d; b.setAttribute("aria-label", `${d < 0 ? "Moins" : "Plus"} : ${lab}`); return b; };
+    w.append(mk(-1), inp, mk(1));
+  });
+}
+
+/* ---------- Actions ---------- */
+const num = id => { const el = document.getElementById(id); const v = el ? parseInt(el.value, 10) : 0; return isNaN(v) ? 0 : v; };
+function applyPhase(){
+  const st = S.state, ph = st.queue[st.qi], chose = st.automaPhase === ph;
+  commit();
+  const mc0 = st.a.mc;
+  if (ph === "I" || ph === "II") {
+    const n = chose ? 2 : 1;
+    for (let i = 0; i < n; i++) {
+      const col = document.getElementById(`c${i}-col`).value, pv = num(`c${i}-pv`), pre = document.getElementById(`c${i}-pre`).checked;
+      const prod = col === "verte" ? {mc:num(`c${i}-pmc`), chaleur:num(`c${i}-pch`), plantes:num(`c${i}-ppl`), cartes:num(`c${i}-pca`)} : null;
+      st.a.cartes.push({couleur:col, pv, prereq:pre, prod});
+      if (pre) st.a.mc = Math.max(0, st.a.mc - 5);
+      if (prod) for (const k of ["mc","chaleur","plantes","cartes"]) st.a.prod[k] = Math.max(0, st.a.prod[k] + prod[k]);
+      log(`${PH[ph].nom} : carte ${col}, ${pv} PV${pre ? `, prérequis (−5 MC → ${st.a.mc} MC)` : ""}${prod ? `, prod. +${prod.mc} MC +${prod.chaleur} chaleur +${prod.plantes} plantes +${prod.cartes} cartes` : ""}`);
+    }
+    if (ph === "II") { st.a.mc += 2; log(`Construction : +2 MC → ${st.a.mc} MC`); }
+  } else if (ph === "III") {
+    const r = computeAction(st, chose);
+    st.a = r.a; st.p = r.p;
+    if (r.ch.oce) { st.a.mc += num("o-mc") + 3 * num("o-ca"); st.a.plantes += num("o-pl"); st.a.chaleur += num("o-ch"); }
+    const c = r.ch, oMc = r.ch.oce ? num("o-mc") + 3 * num("o-ca") : 0;
+    log(`Action : ${c.bonus ? `+${c.bonus} MC (bonus), ` : ""}${c.fPl + c.fMc} forêt(s), +${c.tCh + c.tMc} température, ${c.oce} océan(s), NT +${c.nt}, ${c.spent} MC dépensés${oMc ? `, +${oMc} MC (bonus océans)` : ""} → ${st.a.mc} MC (avant : ${mc0})`);
+  } else if (ph === "IV") {
+    const g = computeProd(st, chose); st.a.mc += g.mc; st.a.chaleur += g.chaleur; st.a.plantes += g.plantes;
+    const parts = [`prod. ${st.a.prod.mc}`, `NT ${st.a.nt}`]; if (g.cartesMc) parts.push(`cartes ${g.cartesMc}`); if (g.bonus) parts.push(`bonus ${g.bonus}`);
+    log(`Production : +${g.mc} MC (${parts.join(" + ")}) → ${st.a.mc} MC, +${g.chaleur} chaleur, +${g.plantes} plantes`);
+  } else { st.a.mc += chose ? 6 : 3; log(`Recherche : +${chose ? "6 MC (3 + 3 bonus)" : "3 MC"} → ${st.a.mc} MC`); }
+  st.qi++;
+  if (allMax(st.p)) { st.status = "ended"; st.track = (st.track || []).filter(x => x.t !== st.turn); st.track.push({t:st.turn, a:st.a.nt, p:null}); log("Tous les paramètres sont au maximum : fin de partie."); }
+  else if (st.qi >= st.queue.length) st.step = "endturn";
+  save(); render(); window.scrollTo({top:0, behavior:"smooth"});
+}
+document.addEventListener("click", async ev => {
+  const b = ev.target.closest("[data-act]"); if (!b) return;
+  const act = b.dataset.act, st = S.state;
+  if (act !== "askNew" && S.confirmNew) S.confirmNew = false;
+  switch (act) {
+    case "askNew":
+      if (!S.confirmNew && st && st.status !== "ended") { S.confirmNew = true; render(); setTimeout(() => { if (S.confirmNew) { S.confirmNew = false; render(); } }, 4000); return; }
+      S.confirmNew = false; S.state = null; S.undo = []; S.view = "game"; S.toast = "";
+      try { localStorage.removeItem(LS_STATE); } catch (e) {}
+      if (db) { try { await db.doc("partie/courante").delete(); } catch (e) {} }
+      break;
+    case "lvl": S.setup.niveau = b.dataset.k; break;
+    case "pioche": S.setup.pioche = b.dataset.k; break;
+    case "step": {
+      const inp = document.getElementById(b.dataset.for); if (!inp) return;
+      let v = (parseInt(inp.value, 10) || 0) + +b.dataset.d;
+      if (inp.min !== "") v = Math.max(+inp.min, v); if (inp.max !== "") v = Math.min(+inp.max, v);
+      inp.value = v; inp.dispatchEvent(new Event("change", {bubbles:true})); return; }
+    case "begin": S.state = newGame(); S.undo = []; log(`Nouvelle partie, niveau ${NIV[S.state.niveau]}`); save(); break;
+    case "pick": st.playerPhase = b.dataset.ph; save(); break;
+    case "draw": {
+      commit();
+      if (!st.deck.length) { st.deck = shuffle(st.discard); st.discard = []; log("Pioche automa remélangée"); }
+      if (b.dataset.n) { const n = +b.dataset.n; st.card = n; st.deck = st.deck.filter(x => x !== n); st.discard = st.discard.filter(x => x !== n); }
+      else st.card = st.deck.pop();
+      const r = resolveCard(st); st.automaPhase = r.phase; st.cible = r.cible; st.why = r.why;
+      st.queue = ORDER.filter(ph => ph === st.playerPhase || ph === st.automaPhase); st.qi = 0; st.step = "reveal";
+      log(`Carte ${st.card} : ${PH[st.automaPhase].nom}, cible ${CIB[st.cible].nom.toLowerCase()} (vous : ${PH[st.playerPhase].nom})`);
+      save(); break; }
+    case "start": commit(); st.step = "phase"; save(); break;
+    case "apply": applyPhase(); return;
+    case "next": commit(); recordTurn(st); st.discard.push(st.card); st.card = null; st.lastPlayerPhase = st.playerPhase; st.playerPhase = null; st.turn++; st.step = "plan"; save(); break;
+    case "end": commit(); recordTurn(st); st.status = "ended"; log("Partie terminée à la demande"); save(); break;
+    case "resume": commit(); st.status = "playing"; save(); break;
+    case "saveGame": {
+      st.playerScore = document.getElementById("e-score").value === "" ? null : num("e-score");
+      st.remark = document.getElementById("e-rem").value.trim();
+      const sc = scoreAutoma(st.a);
+      const rec = {date:new Date().toISOString(), createdAt:st.createdAt, niveau:st.niveau, tours:st.turn, scoreJoueur:st.playerScore, scoreAutoma:sc.total,
+        detail:{nt:sc.nt, forets:sc.forets, pvCartes:sc.pv, nbCartes:st.a.cartes.length, prod:st.a.prod, mcFin:st.a.mc}, params:st.p, remarque:st.remark, courbe:st.track || [], pioche:st.pioche || "app", version:"0.3"};
+      const remote = await saveGameRecord(rec);
+      st.saved = true; S.toast = remote ? "Partie enregistrée dans l'historique." : "Partie enregistrée dans ce navigateur."; save(); break; }
+    case "hist": S.view = "hist"; await loadHist(); break;
+    case "back": S.view = "game"; break;
+    case "undo": if (S.undo.length) { S.state = JSON.parse(S.undo.pop()); save(); } break;
+    case "edit": S.edit = !S.edit; break;
+    case "adj": {
+      commit(); const k = b.dataset.k, d = +b.dataset.d;
+      const get = () => k.startsWith("prod.") ? st.a.prod[k.slice(5)] : st.a[k], old = get();
+      if (k.startsWith("prod.")) { const f = k.slice(5); st.a.prod[f] = Math.max(0, st.a.prod[f] + d); } else st.a[k] = Math.max(0, st.a[k] + d);
+      const NOMS = {mc:"MC", chaleur:"chaleur", plantes:"plantes", nt:"NT", forets:"forêts", "prod.mc":"prod. MC", "prod.chaleur":"prod. chaleur", "prod.plantes":"prod. plantes", "prod.cartes":"prod. cartes"};
+      const head = `T${st.turn} · Correction ${NOMS[k] || k} : `, prev = st.log[0] || "";
+      if (prev.startsWith(head)) { const from = prev.slice(head.length).split(" → ")[0]; st.log[0] = `${head}${from} → ${get()}`; } else log(`Correction ${NOMS[k] || k} : ${old} → ${get()}`);
+      save(); break; }
+    case "par": {
+      commit(); const k = b.dataset.k; st.p[k] = Math.min(MAX[k], Math.max(0, st.p[k] + +b.dataset.d)); save(); break; }
+    default: return;
+  }
+  render();
+});
+document.addEventListener("change", ev => {
+  const t = ev.target; if (t.dataset && t.dataset.act === "colchg") { const box = document.getElementById(`c${t.dataset.i}-prod`); if (box) box.hidden = t.value !== "verte"; }
+});
+
+/* ---------- Démarrage ---------- */
+S.state = loadLocal();
+render();
+(async () => {
+  const use = window.claude && window.claude.use;
+  if (!use) return;
+  try { db = await window.claude.use("db"); } catch (e) { db = null; }
+  if (!db) return;
+  try {
+    const snap = await db.doc("partie/courante").get();
+    if (snap.exists) { const d = snap.data(); if (d && d.state && (!S.state || (d.savedAt || 0) > (S.state.savedAt || 0))) { S.state = clone(d.state); render(); } }
+    else if (S.state) save();
+  } catch (e) {}
+})();
+})();
+</script>

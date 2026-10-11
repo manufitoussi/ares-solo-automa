@@ -1,0 +1,14 @@
+{
+  "name": "Ares Solo Automa",
+  "short_name": "Ares Automa",
+  "description": "Automa solo non officiel pour Terraforming Mars: Ares Expedition.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1b1513",
+  "theme_color": "#b5441b",
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
