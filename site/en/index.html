@@ -5,16 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ares Solo Automa — a solo automa for Ares Expedition</title>
   <meta name="description" content="Unofficial solo automa for Terraforming Mars: Ares Expedition: rulebook, print &amp; play cards and app.">
-  <meta name="theme-color" content="#b5441b">
+  <meta name="theme-color" content="#12202b">
   <link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
   <link rel="alternate" hreflang="fr" href="../fr/">
   <!-- <link rel="manifest" href="../manifest.webmanifest"> -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,800&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;display=swap">
   <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
-  <header>
+  <header class="top">
     <div class="wrap">
-      <a class="brand" href="../"><img src="../assets/icon.svg" alt="">Ares Solo Automa</a>
+      <a class="brand" href="../"><img src="../assets/icon.svg" alt=""><span><b>Ares Solo Automa</b><small>Ares Expedition · solo</small></span></a>
       <nav aria-label="Language">
         <ul class="lang">
           <li><a href="../fr/" hreflang="fr" lang="fr">FR</a></li>
@@ -25,39 +27,57 @@
   </header>
 
   <main class="wrap">
-    <h1>Play Ares Expedition solo</h1>
-    <p class="lead">An automa to face one or more simulated opponents in <em>Terraforming Mars: Ares Expedition</em>. The automa has no corporation and no hand: a small deck of 15 cards decides its phases and its goals.</p>
-    <p>The rules are being designed and playtested, in French first; the English version will follow. Playtest feedback is welcome on <a href="https://github.com/manufitoussi/ares-solo-automa/issues/new/choose">GitHub</a>.</p>
+    <section class="hero">
+      <div>
+        <p class="kicker">Terraforming Mars · Ares Expedition</p>
+        <h1><span class="big">Automa</span> <span class="sub">hybrid</span></h1>
+        <p class="tagline">An opponent that plays almost like a player.</p>
+        <p class="tags"><span class="tag teal">15 automa cards</span><span class="tag rust">Version 0.4</span></p>
+        <p class="lead">An automa to play <em>Terraforming Mars: Ares Expedition</em> solo. It takes project cards, raises its production and terraforms Mars; a small deck of 15 cards decides its phases and its targets. It has no hand and asks you to make almost no decisions.</p>
+      </div>
+      <img class="mars" src="../assets/mars.svg" alt="">
+    </section>
 
-    <div class="cards">
-      <section class="card">
-        <h2>Download the rules</h2>
-        <p>The automa rulebook, as a PDF.</p>
+    <div class="sec"><span class="num">01</span><h2>Rules and cards</h2></div>
+    <div class="grid">
+      <section class="tile">
+        <span class="big">8</span>
+        <h3>Rulebook pages</h3>
+        <p>The automa rulebook, as an A4 PDF. The rules are written in French first; the English version will follow.</p>
         <!-- downloads rules/en -->
         <p><span class="soon">Coming soon</span></p>
         <!-- /downloads -->
       </section>
 
-      <section class="card">
-        <h2>Print &amp; play cards</h2>
-        <p>The 15-card automa deck, reference cards and solo phase cards, as A4 PDF files.</p>
+      <section class="tile">
+        <span class="big">15</span>
+        <h3>Automa cards</h3>
+        <p>The print &amp; play automa deck, reference cards and solo phase cards, as A4 PDF files.</p>
         <!-- downloads cards/en -->
         <p><span class="soon">Coming soon</span></p>
         <!-- /downloads -->
       </section>
+    </div>
 
-      <section class="card">
-        <h2>App</h2>
-        <p>An app to draw the automa cards, compute their income and purchases, and keep the scores, even offline.</p>
-        <p><a href="../app/">Open the prototype</a> <span class="size">in French, works offline</span></p>
+    <div class="sec"><span class="num">02</span><h2>The app</h2></div>
+    <div class="grid">
+      <section class="tile">
+        <h3>Game assistant</h3>
+        <p>It draws the automa cards, computes its income, the price of its cards and its purchases, and keeps the scores. It works offline, on a phone, a tablet or a computer. In French for now.</p>
+        <a class="button" href="../app/">Open the app</a>
       </section>
+      <div class="note sand" style="margin-top:0">
+        <p class="bt">Prototype v0.4</p>
+        <p>The values (card prices, levels, fixed income) are being tested. Note your games and share them on <a href="https://github.com/manufitoussi/ares-solo-automa/issues/new/choose">GitHub</a>: they will help tune them.</p>
+      </div>
     </div>
   </main>
 
   <footer>
     <div class="wrap">
+      <p class="ft">Terraforming Mars · Ares Expedition</p>
       <p>Unofficial fan-made project, not affiliated with FryxGames or Stronghold Games. Terraforming Mars is a trademark of FryxGames. Requires the original game.</p>
-      <p>Rules and cards licensed under CC BY-NC-SA 4.0 · <a href="https://github.com/manufitoussi/ares-solo-automa">GitHub</a></p>
+      <p>Rules and cards under the CC BY-NC-SA 4.0 licence · <a href="https://github.com/manufitoussi/ares-solo-automa">GitHub</a></p>
     </div>
   </footer>
 </body>
