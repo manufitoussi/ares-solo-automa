@@ -46,7 +46,7 @@ button{cursor:pointer}
 
 /* top bar */
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:3px solid var(--cyan);margin-inline:-16px;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.brand{display:flex;flex-direction:column;margin-right:auto}
+.brand{display:flex;flex-direction:column;margin-right:auto;color:inherit;text-decoration:none}
 .brand b{font-family:var(--display);font-style:italic;font-weight:800;font-size:24px;text-transform:uppercase;line-height:1}
 .brand span{font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan-ink)}
 .tb{border:1.5px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 12px;min-height:40px;font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:.06em;text-transform:uppercase}
@@ -190,7 +190,7 @@ details summary{cursor:pointer;font-family:var(--display);font-weight:700;letter
 
 <div class="wrap" id="root">
   <header class="top">
-    <div class="brand"><b>Automa hybride</b><span id="sub">Assistant de partie · v0.4 brouillon</span></div>
+    <a class="brand" href="../" title="Retour au site"><b>Automa hybride</b><span id="sub">Assistant de partie · v0.4 brouillon</span></a>
     <button class="tb" id="btn-undo" data-act="undo" aria-label="Annuler" disabled><span class="full">Annuler</span><span class="short" aria-hidden="true">↶</span></button>
     <button class="tb" id="btn-hist" data-act="hist" aria-label="Historique"><span class="full">Historique</span><span class="short" aria-hidden="true">Parties</span></button>
     <button class="tb" id="btn-new" data-act="askNew" aria-label="Nouvelle partie"><span class="full">Nouvelle partie</span><span class="short" aria-hidden="true">Nouvelle</span></button>
@@ -198,6 +198,7 @@ details summary{cursor:pointer;font-family:var(--display);font-weight:700;letter
   <div id="app"><p class="note">Chargement…</p></div>
   <footer style="border-top:1px solid var(--line);padding-top:12px;font-size:13px;color:var(--muted)">
     <p>Projet de fans non officiel, non affilié à FryxGames ni à Stronghold Games. Terraforming Mars est une marque de FryxGames. Nécessite le jeu original.</p>
+    <p><a href="../" style="color:inherit">← Retour au site</a> : livret de règles et cartes à imprimer.</p>
     <p>Règles et cartes sous licence CC BY-NC-SA 4.0 · <a href="https://github.com/manufitoussi/ares-solo-automa" style="color:inherit">GitHub</a></p>
   </footer>
 </div>
