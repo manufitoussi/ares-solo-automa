@@ -5,17 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ares Solo Automa</title>
   <meta name="description" content="Automa solo non officiel pour Terraforming Mars: Ares Expedition. Unofficial solo automa for Terraforming Mars: Ares Expedition.">
-  <meta name="theme-color" content="#b5441b">
+  <meta name="theme-color" content="#12202b">
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="alternate" hreflang="fr" href="fr/">
   <link rel="alternate" hreflang="en" href="en/">
   <!-- <link rel="manifest" href="manifest.webmanifest"> -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,800&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;display=swap">
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-  <header>
+  <header class="top">
     <div class="wrap">
-      <a class="brand" href="./"><img src="assets/icon.svg" alt="">Ares Solo Automa</a>
+      <a class="brand" href="./"><img src="assets/icon.svg" alt=""><span><b>Ares Solo Automa</b><small>Expédition Arès · solo</small></span></a>
       <nav aria-label="Langue / Language">
         <ul class="lang">
           <li><a href="fr/" hreflang="fr" lang="fr">FR</a></li>
@@ -26,43 +28,54 @@
   </header>
 
   <main class="wrap">
-    <h1>Ares Solo Automa</h1>
-    <p class="lead">Un automa pour jouer en solo à <em>Terraforming Mars: Ares Expedition</em>.<br>
-      <span lang="en">A solo automa for <em>Terraforming Mars: Ares Expedition</em>.</span></p>
+    <section class="hero">
+      <div>
+        <p class="kicker">Terraforming Mars · Ares Expedition</p>
+        <h1><span class="big">Automa</span> <span class="sub">hybride</span></h1>
+        <p class="tagline">Un adversaire qui joue presque comme un joueur.<br><span lang="en">An opponent that plays almost like a player.</span></p>
+        <p class="tags"><span class="tag teal">Solo</span><span class="tag rust">Version 0.4</span></p>
+      </div>
+      <img class="mars" src="assets/mars.svg" alt="">
+    </section>
 
-    <div class="langs">
-      <section class="card" lang="fr">
+    <div class="panels">
+      <section class="panel" lang="fr">
         <h2>Français</h2>
-        <p>Le livret de règles, les cartes à imprimer et, bientôt, une appli pour jouer contre un ou plusieurs automas.</p>
-        <h3>Télécharger les règles</h3>
-        <!-- downloads rules/fr -->
-        <p><span class="soon">Bientôt</span></p>
-        <!-- /downloads -->
-        <h3>Cartes à imprimer</h3>
-        <!-- downloads cards/fr -->
-        <p><span class="soon">Bientôt</span></p>
-        <!-- /downloads -->
-        <p><a class="button" href="fr/">En français</a></p>
+        <div>
+          <p>Le livret de règles, les cartes à imprimer et une appli pour jouer contre l'automa.</p>
+          <h3>Livret de règles</h3>
+          <!-- downloads rules/fr -->
+          <p><span class="soon">Bientôt</span></p>
+          <!-- /downloads -->
+          <h3>Cartes à imprimer</h3>
+          <!-- downloads cards/fr -->
+          <p><span class="soon">Bientôt</span></p>
+          <!-- /downloads -->
+          <a class="button" href="fr/">En français</a>
+        </div>
       </section>
 
-      <section class="card" lang="en">
+      <section class="panel rust" lang="en">
         <h2>English</h2>
-        <p>The rulebook, the print &amp; play cards and, soon, an app to play against one or more automas.</p>
-        <h3>Download the rules</h3>
-        <!-- downloads rules/en -->
-        <p><span class="soon">Coming soon</span></p>
-        <!-- /downloads -->
-        <h3>Print &amp; play cards</h3>
-        <!-- downloads cards/en -->
-        <p><span class="soon">Coming soon</span></p>
-        <!-- /downloads -->
-        <p><a class="button" href="en/">In English</a></p>
+        <div>
+          <p>The rulebook, the print &amp; play cards and an app to play against the automa.</p>
+          <h3>Rulebook</h3>
+          <!-- downloads rules/en -->
+          <p><span class="soon">Coming soon</span></p>
+          <!-- /downloads -->
+          <h3>Print &amp; play cards</h3>
+          <!-- downloads cards/en -->
+          <p><span class="soon">Coming soon</span></p>
+          <!-- /downloads -->
+          <a class="button" href="en/">In English</a>
+        </div>
       </section>
     </div>
   </main>
 
   <footer>
     <div class="wrap">
+      <p class="ft">Terraforming Mars · Expédition Arès</p>
       <p lang="fr">Projet de fans non officiel, non affilié à FryxGames ni à Stronghold Games. Terraforming Mars est une marque de FryxGames. Nécessite le jeu original.</p>
       <p lang="en">Unofficial fan-made project, not affiliated with FryxGames or Stronghold Games. Terraforming Mars is a trademark of FryxGames. Requires the original game.</p>
       <p><a href="https://github.com/manufitoussi/ares-solo-automa">GitHub</a></p>
