@@ -17,12 +17,12 @@ Un automa pour jouer en solo à *Terraforming Mars: Ares Expedition* contre un o
 Le projet a trois volets :
 
 1. **Le livret de règles**, à télécharger, en français d'abord puis en anglais.
-2. **Les cartes à imprimer** (PDF A4) : le paquet automa de 15 cartes, les aides-mémoire et les cartes de phase solo.
+2. **Les cartes à imprimer** (PDF A4) : le paquet automa de 15 cartes, les aides-mémoire et les cartes de phase joueur.
 3. **Une appli web (PWA)**, *en préparation* : elle jouera un ou plusieurs automas (tirage des cartes, gains, achats, scores) et pourra, en option, tenir leur plateau. Elle fonctionnera hors ligne, sur une tablette ou un téléphone posé sur la table.
 
 ### État
 
-Les règles (v0.4) sont en cours de conception et de test. Le livret, les cartes et le prototype de l'appli sont sur le [site](https://manufitoussi.github.io/ares-solo-automa/).
+Les règles (v0.5) sont en cours de conception et de test. Le livret, les cartes et le prototype de l'appli sont sur le [site](https://manufitoussi.github.io/ares-solo-automa/).
 
 ### Organisation du dépôt
 
@@ -56,12 +56,12 @@ An automa to play *Terraforming Mars: Ares Expedition* solo against one or more 
 The project has three parts:
 
 1. **The rulebook**, to download, in French first, then in English.
-2. **The print & play cards** (A4 PDF): the 15-card automa deck, the reference cards and the solo phase cards.
+2. **The print & play cards** (A4 PDF): the 15-card automa deck, the reference cards and the player phase cards.
 3. **A web app (PWA)**, *in preparation*: it will play one or more automas (card draws, income, purchases, scores) and may, optionally, keep track of their boards. It will work offline, on a tablet or a phone lying on the table.
 
 ### Status
 
-The rules (v0.4) are being designed and playtested. The rulebook, the cards and the app prototype are on the [website](https://manufitoussi.github.io/ares-solo-automa/).
+The rules (v0.5) are being designed and playtested. The rulebook, the cards and the app prototype are on the [website](https://manufitoussi.github.io/ares-solo-automa/).
 
 ### Repository layout
 

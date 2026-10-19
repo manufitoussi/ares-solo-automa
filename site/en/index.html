@@ -16,7 +16,7 @@
 <body>
   <header class="top">
     <div class="wrap">
-      <a class="brand" href="../"><img src="../assets/icon.svg" alt=""><span><b>Ares Solo Automa</b><small>Ares Expedition · solo</small></span></a>
+      <a class="brand" href="./"><img src="../assets/icon.svg" alt=""><span><b>Ares Solo Automa</b><small>Ares Expedition · solo</small></span></a>
       <nav aria-label="Language">
         <ul class="lang">
           <li><a href="../fr/" hreflang="fr" lang="fr">FR</a></li>
@@ -32,18 +32,132 @@
         <p class="kicker">Terraforming Mars · Ares Expedition</p>
         <h1><span class="big">Automa</span> <span class="sub">hybrid</span></h1>
         <p class="tagline">An opponent that plays almost like a player.</p>
-        <p class="tags"><span class="tag teal">15 automa cards</span><span class="tag rust">Version 0.4</span></p>
-        <p class="lead">An automa to play <em>Terraforming Mars: Ares Expedition</em> solo. It takes project cards, raises its production and terraforms Mars; a small deck of 15 cards decides its phases and its targets. It has no hand and asks you to make almost no decisions.</p>
+        <p class="tags"><span class="tag teal">15 automa cards</span><span class="tag rust">Version 0.5</span></p>
+        <p class="lead">An automa to play <em>Terraforming Mars: Ares Expedition</em> solo. It builds up its engine, terraforms Mars and scores points; a small deck of 15 cards decides its phases and its targets. Everything runs on cubes: its turn needs no arithmetic and asks the player for almost no decisions.</p>
       </div>
       <img class="mars" src="../assets/mars.svg" alt="">
     </section>
 
-    <div class="sec"><span class="num">01</span><h2>Rules and cards</h2></div>
+    <div class="sec"><span class="num">01</span><h2>How it plays</h2></div>
+    <div class="grid four">
+      <section class="tile">
+        <div class="illus"><div class="mcard" style="transform:rotate(-6deg) translateX(.6rem)" aria-hidden="true">
+          <span class="kb" style="background:#B84D18"><i>IV</i><span>Production</span></span>
+          <span class="mt"><span>Automa</span><span>01 / 15</span></span>
+          <span class="au" style="background:#F6DCCB">+1 <svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg>, then as many <svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg> as its engine.</span>
+          <span class="sp"></span><span class="cb"><svg class="pi" width="12" height="12" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5L16.5 12H3.5Z" fill="#3D8A3A" stroke="#22521F" stroke-width="1.2" stroke-linejoin="round"/><path d="M10 6L15 14.5H5Z" fill="#4FA048" stroke="#22521F" stroke-width="1.2" stroke-linejoin="round"/><rect x="8.8" y="14.5" width="2.4" height="4" fill="#6B4423"/></svg>Forest<b>3<svg class="pi" width="9" height="9" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></b></span>
+          <span class="jo"><b>Player</b> produces.</span>
+        </div><div class="mcard" style="transform:rotate(5deg) translateX(-.6rem);z-index:1" aria-hidden="true">
+          <span class="kb" style="background:#24719E"><i>III</i><span>Action</span></span>
+          <span class="mt"><span>Automa</span><span>05 / 15</span></span>
+          <span class="au" style="background:#D6E9F3">+1 <svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg>, then all its <svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg> by 3 on its target.</span>
+          <span class="sp"></span><span class="cb"><svg class="pi" width="12" height="12" viewBox="0 0 20 20" aria-hidden="true"><rect x="7.5" y="1.5" width="5" height="12" rx="2.5" fill="#FFFFFF" stroke="#7A1F18" stroke-width="1.2"/><rect x="9" y="6" width="2" height="8" fill="#C2362B"/><circle cx="10" cy="15" r="3.8" fill="#C2362B" stroke="#7A1F18" stroke-width="1.2"/></svg>Temp.<b>3<svg class="pi" width="9" height="9" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></b></span>
+          <span class="jo"><b>Player</b> uses its actions.</span>
+        </div></div>
+        <h3>One card per round</h3>
+        <p>While the player picks a phase, the automa flips a card: it gives its phase and its target. Its deck gives it a style, with plenty of Production and Action, and three reactive cards: it strikes back, seizes the moment, or rushes the lagging parameter.</p>
+      </section>
+      <section class="tile">
+        <div class="illus"><div class="cubes" aria-hidden="true"><svg class="pi" width="30" height="30" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg><svg class="pi" width="30" height="30" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg><svg class="pi" width="30" height="30" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg><span class="arr">→</span><svg class="pi" width="34" height="34" viewBox="0 0 20 20" aria-hidden="true"><rect x="7.5" y="1.5" width="5" height="12" rx="2.5" fill="#FFFFFF" stroke="#7A1F18" stroke-width="1.2"/><rect x="9" y="6" width="2" height="8" fill="#C2362B"/><circle cx="10" cy="15" r="3.8" fill="#C2362B" stroke="#7A1F18" stroke-width="1.2"/></svg><span class="lbl">+1 step</span></div></div>
+        <h3>Cubes, no arithmetic</h3>
+        <p>Every revealed phase earns it one cube. Everything costs 3 cubes: a temperature step, an ocean, a forest or an engine step. Its turn takes seconds, without counting a single MC.</p>
+      </section>
+      <section class="tile">
+        <div class="illus"><div class="mcard" style="transform:rotate(-4deg)" aria-hidden="true">
+          <span class="kb" style="background:#3D7A47"><i>I</i><span>Development</span></span>
+          <span class="mt"><span>Automa</span><span>09 / 15</span></span>
+          <span class="au" style="background:#DCEADB">+1 <svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg>, then 3 <svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg>: <b>engine +1</b>.</span>
+          <span class="sp"></span><span class="cb"><svg class="pi" width="12" height="12" viewBox="0 0 20 20" aria-hidden="true"><polygon points="10,1 17.8,5.5 17.8,14.5 10,19 2.2,14.5 2.2,5.5" fill="#2E6FA8" stroke="#183F66" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.5 11c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0" stroke="#FFFFFF" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>Ocean<b>3<svg class="pi" width="9" height="9" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></b></span>
+          <span class="jo"><b>Player</b> plays 1 green card.</span>
+        </div><svg class="engine" width="96" height="60" viewBox="0 0 96 60" aria-hidden="true"><rect x="6" y="44" width="11" height="10" rx="2" fill="#B84D18"/><rect x="21" y="36" width="11" height="18" rx="2" fill="#B84D18"/><rect x="36" y="28" width="11" height="26" rx="2" fill="#B84D18"/><rect x="51" y="20" width="11" height="34" rx="2" fill="#E7D5C8"/><rect x="66" y="12" width="11" height="42" rx="2" fill="#E7D5C8"/><rect x="81" y="4" width="11" height="50" rx="2" fill="#E7D5C8"/><path d="M40 8l6 6-6 6" fill="none" stroke="#12202B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>An engine that speeds up</h3>
+        <p>In Development, it invests 3 cubes in its engine; in Production, its engine pays back that many cubes. Slow at first, it gains power as the game goes on, like a real player. But every engine step costs 3 cubes that do not terraform.</p>
+      </section>
+      <section class="tile">
+        <div class="illus"><div class="mcard" style="transform:rotate(-3deg)" aria-hidden="true">
+          <span class="kb" style="background:#12202B"><i style="color:#8FE3E8">?</i><span>Course</span></span>
+          <span class="mt"><span>Automa</span><span>15 / 15</span></span>
+          <span class="au" style="background:#E3F2F3">Action, on the least advanced parameter.</span>
+          <span class="sp"></span><span class="cb"><svg class="pi" width="10" height="10" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5L16.5 12H3.5Z" fill="#3D8A3A" stroke="#22521F" stroke-width="1.2" stroke-linejoin="round"/><path d="M10 6L15 14.5H5Z" fill="#4FA048" stroke="#22521F" stroke-width="1.2" stroke-linejoin="round"/><rect x="8.8" y="14.5" width="2.4" height="4" fill="#6B4423"/></svg><svg class="pi" width="10" height="10" viewBox="0 0 20 20" aria-hidden="true"><rect x="7.5" y="1.5" width="5" height="12" rx="2.5" fill="#FFFFFF" stroke="#7A1F18" stroke-width="1.2"/><rect x="9" y="6" width="2" height="8" fill="#C2362B"/><circle cx="10" cy="15" r="3.8" fill="#C2362B" stroke="#7A1F18" stroke-width="1.2"/></svg><svg class="pi" width="10" height="10" viewBox="0 0 20 20" aria-hidden="true"><polygon points="10,1 17.8,5.5 17.8,14.5 10,19 2.2,14.5 2.2,5.5" fill="#2E6FA8" stroke="#183F66" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.5 11c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0" stroke="#FFFFFF" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>Least advanced</span>
+          <span class="jo"><b>Player</b> uses its actions.</span>
+        </div><div class="params" aria-hidden="true"><span><svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5L16.5 12H3.5Z" fill="#3D8A3A" stroke="#22521F" stroke-width="1.2" stroke-linejoin="round"/><path d="M10 6L15 14.5H5Z" fill="#4FA048" stroke="#22521F" stroke-width="1.2" stroke-linejoin="round"/><rect x="8.8" y="14.5" width="2.4" height="4" fill="#6B4423"/></svg><i style="--w:64%"></i></span><span><svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><rect x="7.5" y="1.5" width="5" height="12" rx="2.5" fill="#FFFFFF" stroke="#7A1F18" stroke-width="1.2"/><rect x="9" y="6" width="2" height="8" fill="#C2362B"/><circle cx="10" cy="15" r="3.8" fill="#C2362B" stroke="#7A1F18" stroke-width="1.2"/></svg><i style="--w:21%"></i></span><span><svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><polygon points="10,1 17.8,5.5 17.8,14.5 10,19 2.2,14.5 2.2,5.5" fill="#2E6FA8" stroke="#183F66" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.5 11c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0" stroke="#FFFFFF" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg><i style="--w:44%"></i></span></div></div>
+        <h3>It races the player for Mars</h3>
+        <p>It raises oxygen, temperature and oceans, gains TR, plants forests and scores VP in Construction. It terraforms alongside the player but plays to finish ahead, and it can end the game before the player is ready.</p>
+      </section>
+    </div>
+    <div class="note cyan">
+      <p class="bt">A round, for example</p>
+      <p>Before the round, the automa has 2 cubes in its reserve and an engine at 1.</p>
+      <ol class="round">
+        <li>
+          <span class="rh">Planning</span>
+          <div class="duo">
+            <div class="rp"><span class="who">Player</span><div class="mcard pcard" aria-hidden="true">
+          <span class="kb" style="background:#3D7A47"><i>I</i><span>Development</span></span>
+          <span class="mt"><span>Player + automa</span><span>Phase</span></span>
+          <span class="cp"><b>Ability</b><span>May play 1&nbsp;<svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="1.5" width="12" height="17" rx="2" fill="#FFFFFF" stroke="#1F1A24" stroke-width="1.2"/><rect x="5.5" y="3" width="9" height="4" fill="#3D7A47"/></svg>&nbsp;green card.</span></span>
+          <span class="bn"><b>Bonus</b>−3&nbsp;<svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><rect x="1.5" y="1.5" width="17" height="17" rx="4" fill="#E2BE2C" stroke="#8A6D0B" stroke-width="1.2"/><text x="10" y="13.6" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="700" font-size="9" fill="#3A2C00">MC</text></svg></span>
+          <span class="au" style="background:#DCEADB"><b class="tg">Automa</b>+1 <svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg>, then 3 <svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg>: engine +1.</span>
+        </div></div>
+            <div class="rp"><span class="who">Automa</span><div class="mcard" aria-hidden="true">
+          <span class="kb" style="background:#B84D18"><i>IV</i><span>Production</span></span>
+          <span class="mt"><span>Automa</span><span>02 / 15</span></span>
+          <span class="au" style="background:#F6DCCB">+1 <svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg>, then as many <svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg> as its engine.</span>
+          <span class="sp"></span><span class="cb"><svg class="pi" width="12" height="12" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5L16.5 12H3.5Z" fill="#3D8A3A" stroke="#22521F" stroke-width="1.2" stroke-linejoin="round"/><path d="M10 6L15 14.5H5Z" fill="#4FA048" stroke="#22521F" stroke-width="1.2" stroke-linejoin="round"/><rect x="8.8" y="14.5" width="2.4" height="4" fill="#6B4423"/></svg>Forest<b>3<svg class="pi" width="9" height="9" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></b></span>
+          <span class="jo"><b>Player</b> produces.</span>
+        </div></div>
+          </div>
+        </li>
+        <li>
+          <span class="rh"><span class="chip" style="background:#3D7A47;"><i>I</i>Development</span></span>
+          <div class="rr"><span class="cu"><svg class="pi" width="26" height="26" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></span><span class="cu"><svg class="pi" width="26" height="26" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></span><span class="cu new"><svg class="pi" width="26" height="26" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></span></div>
+          <p>+1 cube: it now has 3.</p>
+          <div class="rr"><span class="out"><span class="cu"><svg class="pi" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></span><span class="cu"><svg class="pi" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></span><span class="cu"><svg class="pi" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></span><b>−3</b></span><span class="arr">→</span><svg class="eng" width="58" height="42" viewBox="0 0 58 42" aria-hidden="true"><rect x="2" y="34" width="8" height="6" rx="1.5" fill="#B84D18"/><rect x="13" y="28" width="8" height="12" rx="1.5" fill="#B84D18" class="up"/><rect x="24" y="22" width="8" height="18" rx="1.5" fill="#E7D5C8"/><rect x="35" y="16" width="8" height="24" rx="1.5" fill="#E7D5C8"/><rect x="46" y="10" width="8" height="30" rx="1.5" fill="#E7D5C8"/></svg></div>
+          <p>It spends them: engine 2, empty reserve.</p>
+        </li>
+        <li>
+          <span class="rh"><span class="chip" style="background:#B84D18;"><i>IV</i>Production</span></span>
+          <div class="rr"><span class="cu new"><svg class="pi" width="26" height="26" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></span><span class="plus">+</span><svg class="eng" width="58" height="42" viewBox="0 0 58 42" aria-hidden="true"><rect x="2" y="34" width="8" height="6" rx="1.5" fill="#B84D18"/><rect x="13" y="28" width="8" height="12" rx="1.5" fill="#B84D18"/><rect x="24" y="22" width="8" height="18" rx="1.5" fill="#E7D5C8"/><rect x="35" y="16" width="8" height="24" rx="1.5" fill="#E7D5C8"/><rect x="46" y="10" width="8" height="30" rx="1.5" fill="#E7D5C8"/></svg><span class="arr">→</span><span class="cu new"><svg class="pi" width="26" height="26" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></span><span class="cu new"><svg class="pi" width="26" height="26" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></span></div>
+          <p>+1 cube, then 2 from its engine.</p>
+          <div class="rr"><span class="cu"><svg class="pi" width="26" height="26" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></span><span class="cu"><svg class="pi" width="26" height="26" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></span><span class="cu"><svg class="pi" width="26" height="26" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></span></div>
+          <p>Reserve: 3 cubes, ready for its next Action.</p>
+        </li>
+      </ol>
+      <p>Three moves, no arithmetic. Easy, Standard or Hard: only its starting production changes (0, 1 or 2).</p>
+    </div>
+
+    <div class="sec"><span class="num">02</span><h2>What you need</h2></div>
     <div class="grid">
       <section class="tile">
-        <span class="big">8</span>
+        <h3>With the printed cards</h3>
+        <ul class="need">
+          <li>The base game <em>Terraforming Mars: Ares Expedition</em>, with a player board and bronze cubes for the automa.</li>
+          <li><b>The automa cards</b>: 3 A4 sheets (15 cards, 3 reference cards and their backs).</li>
+          <li><b>The player phase cards</b>: 1 A4 sheet (5 cards), instead of the game's phase cards.</li>
+          <li>The rulebook, for the first game.</li>
+        </ul>
+      </section>
+      <section class="tile">
+        <h3>Or with the app</h3>
+        <ul class="need">
+          <li>The base game, with its usual phase cards.</li>
+          <li>A phone, a tablet or a computer: the app draws the automa cards, counts its cubes and tells what to do on its board.</li>
+          <li>Nothing to print.</li>
+        </ul>
+        <a class="button" href="../app/">Open the app</a>
+      </section>
+    </div>
+    <div class="note cyan">
+      <p class="bt">Why player phase cards?</p>
+      <p>They replace the game's phase cards. For the player, they say the same thing in our own words: the ability and the bonus. On top of that, each one shows what the automa does when the phase is revealed. During the game, everything is on the table: no need to open the rulebook.</p>
+    </div>
+
+    <div class="sec"><span class="num">03</span><h2>Rules and cards</h2></div>
+    <div class="grid">
+      <section class="tile">
+        <span class="big">6</span>
         <h3>Rulebook pages</h3>
-        <p>The automa rulebook, as an A4 PDF. The rules are written in French first; the English version will follow.</p>
+        <p>The automa rulebook, as an A4 PDF: 6 pages of rules plus a reference page. The rules are written in French first; the English version will follow.</p>
         <!-- downloads rules/en -->
         <p><span class="soon">Coming soon</span></p>
         <!-- /downloads -->
@@ -51,24 +165,24 @@
 
       <section class="tile">
         <span class="big">15</span>
-        <h3>Automa cards</h3>
-        <p>The print &amp; play automa deck, reference cards and solo phase cards, as A4 PDF files.</p>
+        <h3>Print &amp; play cards</h3>
+        <p>The automa deck and its reference cards, and the 5 player phase cards, as A4 PDF files.</p>
         <!-- downloads cards/en -->
         <p><span class="soon">Coming soon</span></p>
         <!-- /downloads -->
       </section>
     </div>
 
-    <div class="sec"><span class="num">02</span><h2>The app</h2></div>
+    <div class="sec"><span class="num">04</span><h2>The app</h2></div>
     <div class="grid">
       <section class="tile">
         <h3>Game assistant</h3>
-        <p>It draws the automa cards, computes its income, the price of its cards and its purchases, and keeps the scores. It works offline, on a phone, a tablet or a computer. In French for now.</p>
+        <p>It draws the automa cards, counts its cubes, tells what to do on its board and keeps the scores. It works on a phone, a tablet or a computer. In French for now.</p>
         <a class="button" href="../app/">Open the app</a>
       </section>
       <div class="note sand" style="margin-top:0">
-        <p class="bt">Prototype v0.4</p>
-        <p>The values (card prices, levels, fixed income) are being tested. Note your games and share them on <a href="https://github.com/manufitoussi/ares-solo-automa/issues/new/choose">GitHub</a>: they will help tune them.</p>
+        <p class="bt">Prototype v0.5</p>
+        <p>The values (3 cubes per step, starting engine by level) are being tested. Game reports, shared on <a href="https://github.com/manufitoussi/ares-solo-automa/issues/new/choose">GitHub</a>, will help tune them.</p>
       </div>
     </div>
   </main>
@@ -80,5 +194,10 @@
       <p>Rules and cards under the CC BY-NC-SA 4.0 licence · <a href="https://github.com/manufitoussi/ares-solo-automa">GitHub</a></p>
     </div>
   </footer>
+  <script>
+    document.querySelectorAll(".lang a[hreflang]").forEach(function (a) {
+      a.addEventListener("click", function () { try { localStorage.setItem("lang", a.getAttribute("hreflang")); } catch (e) {} });
+    });
+  </script>
 </body>
 </html>
