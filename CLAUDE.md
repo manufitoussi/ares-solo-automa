@@ -8,7 +8,7 @@ Un automa solo **non officiel**, créé par des fans, pour le jeu de société *
 
 **La conception se fait dans le dépôt privé `ares-solo-automa-lab`**, cloné à côté (`../ares-solo-automa-lab`) : résumé des règles, décisions, comptes rendus de parties, backlog, charte visuelle, sources des cartes et du livret, PDF de travail. Son CLAUDE.md est la source de vérité. **Ce dépôt public ne reçoit que le résultat publié** :
 
-1. **L'appli** : le prototype `app/prototype/assistant-automa.html` (règles v0.4, brouillon), publié sous `site/app/index.html`, puis la future PWA dans `site/app/`. Elle joue un ou plusieurs automas contre un joueur solo (tirage des cartes automa, calcul de leurs gains et achats, suivi des scores) et, en option, tient le plateau de chaque automa.
+1. **L'appli** : le prototype `app/prototype/assistant-automa.html` (règles v0.5, brouillon), publié sous `site/app/index.html`, puis la future PWA dans `site/app/`. Elle joue un ou plusieurs automas contre un joueur solo (tirage des cartes automa, calcul de leurs gains et achats, suivi des scores) et, en option, tient le plateau de chaque automa.
 2. **Le livret de règles** publié, en PDF, dans `rules/<langue>/` : français d'abord, puis anglais.
 3. **Les cartes à imprimer** publiées (PDF A4), dans `cards/<langue>/`.
 
@@ -18,7 +18,7 @@ Le livret et les cartes sont générés dans le lab et copiés ici par son scrip
 
 ## Organisation
 
-- `site/` : ce que GitHub Pages publie, HTML et CSS statiques qui fonctionnent sans JS. `index.html` (accueil FR + EN), `fr/`, `en/`, `assets/`, `app/`, `manifest.webmanifest` (le `<link rel="manifest">` est en commentaire dans les pages, à activer avec la PWA).
+- `site/` : ce que GitHub Pages publie, HTML et CSS statiques qui fonctionnent sans JS. `index.html` (redirige vers `fr/` ou `en/` selon le choix enregistré ou la langue du navigateur ; sans JS, deux liens), `fr/`, `en/`, `assets/`, `app/`, `manifest.webmanifest` (le `<link rel="manifest">` est en commentaire dans les pages, à activer avec la PWA).
 - `app/` : les sources de l'appli (pour l'instant, le prototype).
 - `scripts/build-site.mjs` : copie `site/` dans `_site/`, copie les PDF de `rules/<langue>/` et `cards/<langue>/` dans `_site/downloads/rules|cards/<langue>/`, et remplace dans les pages les blocs `<!-- downloads <dossier> -->` … `<!-- /downloads -->` par la liste des fichiers (sinon la mention « bientôt » reste).
 - `.github/workflows/pages.yml` : build et déploiement sur GitHub Pages à chaque push sur `main`.

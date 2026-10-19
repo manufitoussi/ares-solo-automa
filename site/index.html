@@ -13,6 +13,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,800&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;display=swap">
   <link rel="stylesheet" href="assets/style.css">
+  <script>
+    /* one language at a time: go to the saved choice, else to the browser language (English unless French) */
+    (function () {
+      var l = null;
+      try { l = localStorage.getItem("lang"); } catch (e) {}
+      if (l !== "fr" && l !== "en") l = /^fr\b/i.test((navigator.languages && navigator.languages[0]) || navigator.language || "") ? "fr" : "en";
+      location.replace(l + "/");
+    })();
+  </script>
 </head>
 <body>
   <header class="top">
@@ -32,45 +41,16 @@
       <div>
         <p class="kicker">Terraforming Mars · Ares Expedition</p>
         <h1><span class="big">Automa</span> <span class="sub">hybride</span></h1>
-        <p class="tagline">Un adversaire qui joue presque comme un joueur.<br><span lang="en">An opponent that plays almost like a player.</span></p>
-        <p class="tags"><span class="tag teal">Solo</span><span class="tag rust">Version 0.4</span></p>
+        
+        <p class="tags"><span class="tag teal">Solo</span><span class="tag rust">Version 0.5</span></p>
       </div>
       <img class="mars" src="assets/mars.svg" alt="">
     </section>
 
-    <div class="panels">
-      <section class="panel" lang="fr">
-        <h2>Français</h2>
-        <div>
-          <p>Le livret de règles, les cartes à imprimer et une appli pour jouer contre l'automa.</p>
-          <h3>Livret de règles</h3>
-          <!-- downloads rules/fr -->
-          <p><span class="soon">Bientôt</span></p>
-          <!-- /downloads -->
-          <h3>Cartes à imprimer</h3>
-          <!-- downloads cards/fr -->
-          <p><span class="soon">Bientôt</span></p>
-          <!-- /downloads -->
-          <a class="button" href="fr/">En français</a>
-        </div>
-      </section>
-
-      <section class="panel rust" lang="en">
-        <h2>English</h2>
-        <div>
-          <p>The rulebook, the print &amp; play cards and an app to play against the automa.</p>
-          <h3>Rulebook</h3>
-          <!-- downloads rules/en -->
-          <p><span class="soon">Coming soon</span></p>
-          <!-- /downloads -->
-          <h3>Print &amp; play cards</h3>
-          <!-- downloads cards/en -->
-          <p><span class="soon">Coming soon</span></p>
-          <!-- /downloads -->
-          <a class="button" href="en/">In English</a>
-        </div>
-      </section>
-    </div>
+    <nav class="choose" aria-label="Langue / Language">
+      <a class="button" href="fr/" hreflang="fr" lang="fr">Français</a>
+      <a class="button" href="en/" hreflang="en" lang="en">English</a>
+    </nav>
   </main>
 
   <footer>

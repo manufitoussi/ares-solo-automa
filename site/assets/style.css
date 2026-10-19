@@ -183,6 +183,8 @@ h1, h2, h3 { margin: 0; font-family: var(--display); line-height: 1.05; text-wra
   grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
 }
 
+.grid.four { grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); }
+
 .tile {
   display: flex;
   flex-direction: column;
@@ -280,3 +282,58 @@ footer .wrap {
 }
 
 footer .ft { font-family: var(--display); font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; font-size: 0.8rem; }
+
+/* home page without JS: one link per language */
+.choose { display: flex; flex-wrap: wrap; gap: 1rem; }
+
+/* drawings of automa cards in "how it plays" (printed cards stay white in dark mode) */
+.illus { display: flex; align-items: center; justify-content: center; gap: 0.75rem; min-height: 10.5rem; padding: 0.25rem 0 0.5rem; }
+.mcard { position: relative; width: 8.4rem; aspect-ratio: 63 / 88; flex-shrink: 0; background: #ffffff; color: #1f1a24; border: 1px solid #bdbdbd; border-radius: 0.4rem; padding: 0.3rem; display: flex; flex-direction: column; gap: 0.2rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18); font-family: var(--text); font-size: 0.6rem; line-height: 1.25; overflow: hidden; }
+.mcard .kb { display: flex; flex-shrink: 0; height: 1.5rem; color: #ffffff; clip-path: polygon(0 0, calc(100% - 0.4rem) 0, 100% 0.4rem, 100% 100%, 0.25rem 100%, 0 calc(100% - 0.25rem)); }
+.mcard .kb i { width: 1.15rem; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.26); font-family: var(--display); font-style: italic; font-weight: 800; font-size: 0.9rem; }
+.mcard .kb span { display: flex; align-items: center; padding: 0 0.3rem; font-family: var(--display); font-style: italic; font-weight: 800; font-size: 0.72rem; text-transform: uppercase; white-space: nowrap; }
+.mcard .mt { display: flex; justify-content: space-between; font-family: var(--display); font-weight: 600; font-size: 0.45rem; letter-spacing: 0.14em; text-transform: uppercase; color: #1b5a7e; border-bottom: 1px solid #2fb6c0; }
+.mcard .au { border-radius: 0.2rem; padding: 0.3rem; font-size: 0.6rem; }
+.mcard .sp { flex: 1; }
+.mcard .cb { display: flex; align-items: center; gap: 0.15rem; border: 1px solid #2fb6c0; border-radius: 0.2rem; padding: 0.15rem 0.25rem; font-family: var(--display); font-style: italic; font-weight: 800; font-size: 0.6rem; min-width: 0; overflow: hidden; text-transform: uppercase; white-space: nowrap; }
+.mcard .cb b { margin-left: auto; display: flex; align-items: center; font-style: normal; }
+.mcard .jo { border-top: 1px dashed #b9a48c; padding-top: 0.15rem; font-size: 0.5rem; color: #33302e; }
+.mcard .jo b { font-family: var(--display); font-style: italic; font-weight: 800; text-transform: uppercase; background: #e2be2c; padding: 0 0.2rem; }
+.mcard .pi { vertical-align: -1px; }
+.cubes { display: flex; align-items: center; gap: 0.3rem; }
+.cubes .arr { font-family: var(--display); font-weight: 800; font-size: 1.8rem; color: var(--cyan-ink); margin: 0 0.2rem; }
+.cubes .lbl { font-family: var(--display); font-style: italic; font-weight: 800; font-size: 1.3rem; text-transform: uppercase; color: var(--ink); }
+.illus .params { display: flex; flex-direction: column; gap: 0.5rem; width: 7rem; }
+.illus .params span { display: flex; align-items: center; gap: 0.4rem; }
+.illus .params i { flex: 1; height: 0.45rem; border-radius: 0.3rem; background: linear-gradient(90deg, var(--cyan) var(--w), var(--line, #cfe0e2) var(--w)); }
+.illus .engine path { stroke: var(--ink); }
+
+/* illustrated example round */
+.round { list-style: none; margin: 0.5rem 0; padding: 0; display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13.5rem), 1fr)); counter-reset: step; }
+.round li { background: var(--bg); border-radius: 0.6rem; padding: 0.75rem 0.9rem; display: flex; flex-direction: column; align-items: center; gap: 0.45rem; text-align: center; }
+.round li p { font-size: 0.95rem; color: var(--muted); }
+.round .rh { font-family: var(--display); font-weight: 700; font-size: 0.95rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cyan-ink); }
+.round .duo { display: flex; justify-content: center; gap: 0.5rem; }
+.round .rp { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
+.round .who { font-family: var(--display); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.round .rr { display: flex; align-items: center; justify-content: center; gap: 0.3rem; flex-wrap: wrap; min-height: 2.6rem; }
+.round .cu { display: inline-flex; }
+.round .out .cu { opacity: 0.45; }
+.round .cu.new { border-radius: 0.35rem; outline: 2px solid var(--cyan); outline-offset: 1px; }
+.round .arr, .round .plus { font-family: var(--display); font-weight: 800; font-size: 1.5rem; color: var(--cyan-ink); }
+.round .out { font-family: var(--display); font-weight: 800; font-size: 1.4rem; color: var(--rust); display: inline-flex; align-items: center; gap: 0.2rem; }
+.round .eng .up { stroke: var(--cyan); stroke-width: 2; }
+.round .mcard { width: 6.6rem; transform: rotate(3deg); }
+.round .mcard.pcard { transform: rotate(-3deg); }
+.chip { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--display); font-style: italic; font-weight: 800; font-size: 0.95rem; text-transform: uppercase; color: #ffffff; padding: 0.2rem 0.7rem 0.25rem 0; clip-path: polygon(0 0, calc(100% - 0.5rem) 0, 100% 0.5rem, 100% 100%, 0 100%); }
+.chip i { background: rgba(0, 0, 0, 0.26); padding: 0.2rem 0.5rem 0.25rem; margin: -0.2rem 0 -0.25rem; }
+.mcard.pcard .cp { flex: 1; display: flex; flex-direction: column; justify-content: center; text-align: center; font-size: 0.5rem; line-height: 1.2; padding: 0 0.1rem; }
+.mcard.pcard .cp b { font-family: var(--display); font-weight: 700; font-size: 0.42rem; letter-spacing: 0.16em; text-transform: uppercase; color: #6e625a; }
+.mcard.pcard .bn { background: #12202b; color: #ffffff; border-radius: 0.2rem; padding: 0.2rem 0.25rem; font-size: 0.48rem; display: flex; gap: 0.25rem; align-items: center; }
+.mcard.pcard .bn b { font-family: var(--display); font-style: italic; font-weight: 800; text-transform: uppercase; color: #e2be2c; }
+.mcard.pcard .au { font-size: 0.46rem; line-height: 1.2; padding: 0.2rem; }
+.mcard.pcard .au .tg { font-family: var(--display); font-style: italic; font-weight: 800; font-size: 0.5rem; text-transform: uppercase; background: #12202b; color: #8fe3e8; padding: 0 0.25rem; margin-right: 0.2rem; }
+
+/* what you need to play */
+.need { margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; color: var(--muted); }
+.need b { color: var(--ink); }
