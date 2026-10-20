@@ -41,5 +41,6 @@ Côté appli (les questions de règles sont suivies dans le lab) :
 ## Pièges
 
 - Le prototype existe en deux copies identiques, `app/prototype/assistant-automa.html` et `site/app/index.html` : ne le modifier que pour corriger un défaut, dans les deux fichiers.
+- `site/app/` est une PWA minimale autour du prototype : `manifest.webmanifest`, `sw.js` (service worker, cache hors ligne), `icons/` et `fonts/` (polices SIL OFL servies avec l'appli). **Monter `VERSION` dans `sw.js` à chaque changement de l'appli**, sinon les appareils gardent l'ancienne version en cache pour les polices et icônes (la page elle-même est rechargée dès qu'il y a du réseau).
 - Ne pas déposer de PDF dans `site/downloads/` (ignoré par git) : les PDF publiés vivent dans `rules/` et `cards/`.
 - Les liens des pages sont relatifs (le site est servi sous `/ares-solo-automa/`, pas à la racine du domaine).
