@@ -22,7 +22,7 @@ Le projet a trois volets :
 
 ### État
 
-Les règles (v0.5) sont en cours de conception et de test. Le livret, les cartes et le prototype de l'appli sont sur le [site](https://manufitoussi.github.io/ares-solo-automa/).
+Les règles (v0.6) sont en cours de conception et de test. Le livret, les cartes et le prototype de l'appli sont sur le [site](https://manufitoussi.github.io/ares-solo-automa/).
 
 ### Organisation du dépôt
 
@@ -61,7 +61,7 @@ The project has three parts:
 
 ### Status
 
-The rules (v0.5) are being designed and playtested. The rulebook, the cards and the app prototype are on the [website](https://manufitoussi.github.io/ares-solo-automa/).
+The rules (v0.6) are being designed and playtested. The rulebook, the cards and the app prototype are on the [website](https://manufitoussi.github.io/ares-solo-automa/).
 
 ### Repository layout
 
