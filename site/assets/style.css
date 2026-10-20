@@ -302,7 +302,7 @@ footer .ft { font-family: var(--display); font-weight: 600; letter-spacing: 0.16
 .mcard .pi { vertical-align: -1px; }
 .cubes { display: flex; align-items: center; gap: 0.3rem; }
 .cubes .arr { font-family: var(--display); font-weight: 800; font-size: 1.8rem; color: var(--cyan-ink); margin: 0 0.2rem; }
-.cubes .lbl { font-family: var(--display); font-style: italic; font-weight: 800; font-size: 1.3rem; text-transform: uppercase; color: var(--ink); }
+.cubes .lbl { font-family: var(--display); font-style: italic; font-weight: 800; font-size: 1.6rem; text-transform: uppercase; color: var(--ink); }
 .illus .params { display: flex; flex-direction: column; gap: 0.5rem; width: 7rem; }
 .illus .params span { display: flex; align-items: center; gap: 0.4rem; }
 .illus .params i { flex: 1; height: 0.45rem; border-radius: 0.3rem; background: linear-gradient(90deg, var(--cyan) var(--w), var(--line, #cfe0e2) var(--w)); }
@@ -337,3 +337,12 @@ footer .ft { font-family: var(--display); font-weight: 600; letter-spacing: 0.16
 /* what you need to play */
 .need { margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; color: var(--muted); }
 .need b { color: var(--ink); }
+.cubes { flex-wrap: wrap; justify-content: center; }
+.cubes .five { display: inline-flex; flex-wrap: wrap; width: 5.4rem; gap: 0.15rem; justify-content: center; }
+
+/* a tile title with its number on the same line */
+.tile h3.count { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+
+/* justified body text, with hyphenation (the pages declare their language) */
+.tile p, .note p:not(.bt), .lead, .need li, .round li p { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+.round li p { text-align: center; }
