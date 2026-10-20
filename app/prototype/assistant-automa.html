@@ -191,7 +191,7 @@ details summary{cursor:pointer;font-family:var(--display);font-weight:700;letter
 
 <div class="wrap" id="root">
   <header class="top">
-    <a class="brand" href="../" title="Retour au site"><b>Automa hybride</b><span id="sub">Assistant de partie · v0.5 brouillon</span></a>
+    <a class="brand" href="../" title="Retour au site"><b>Automa hybride</b><span id="sub">Assistant de partie · v0.6 brouillon</span></a>
     <button class="tb" id="btn-undo" data-act="undo" aria-label="Annuler" disabled><span class="full">Annuler</span><span class="short" aria-hidden="true">↶</span></button>
     <button class="tb" id="btn-hist" data-act="hist" aria-label="Historique"><span class="full">Historique</span><span class="short" aria-hidden="true">Parties</span></button>
     <button class="tb" id="btn-new" data-act="askNew" aria-label="Nouvelle partie"><span class="full">Nouvelle partie</span><span class="short" aria-hidden="true">Nouvelle</span></button>
@@ -216,20 +216,22 @@ const PH = {
   V:{n:5,nom:"Recherche",court:"Rech.",col:"var(--p5)",dark:true}
 };
 const ORDER = ["I","II","III","IV","V"];
-const CIB = {foret:{nom:"Forêt",col:"#3D7A47"},temp:{nom:"Température",col:"#C2362B"},ocean:{nom:"Océan",col:"#2E6FA8"}};
+const CIB = {oxy:{nom:"Oxygène",col:"#A33B33"},temp:{nom:"Température",col:"#C2362B"},ocean:{nom:"Océan",col:"#2E6FA8"}};
 const CARDS = [
-  {n:1,ph:"IV",c:"foret"},{n:2,ph:"IV",c:"temp"},{n:3,ph:"IV",c:"ocean"},
-  {n:4,ph:"III",c:"foret"},{n:5,ph:"III",c:"temp"},{n:6,ph:"III",c:"ocean"},
-  {n:7,ph:"I",c:"foret"},{n:8,ph:"I",c:"temp"},{n:9,ph:"I",c:"ocean"},
-  {n:10,ph:"II",c:"foret"},{n:11,ph:"II",c:"temp"},{n:12,ph:"V",c:"ocean"},
-  {n:13,react:"Riposte",c:"foret"},{n:14,react:"Opportuniste",c:"temp"},{n:15,react:"Course",c:"low"}
+  {n:1,ph:"IV",c:"oxy"},{n:2,ph:"IV",c:"temp"},{n:3,ph:"IV",c:"ocean"},
+  {n:4,ph:"III",c:"oxy"},{n:5,ph:"III",c:"temp"},{n:6,ph:"III",c:"ocean"},
+  {n:7,ph:"I",c:"oxy"},{n:8,ph:"I",c:"temp"},{n:9,ph:"I",c:"ocean"},
+  {n:10,ph:"II",c:"oxy"},{n:11,ph:"II",c:"temp"},{n:12,ph:"V",c:"ocean"},
+  {n:13,react:"Riposte",c:"oxy"},{n:14,react:"Opportuniste",c:"temp"},{n:15,react:"Course",c:"low"}
 ];
-/* v0.5 cube engine: everything costs 3 cubes; the level only sets the starting engine (Expert is not decided yet) */
-const COST = 3;
-const NIV = {facile:"Facile", standard:"Standard", difficile:"Difficile", expert:"Expert"};
-const MOTEUR0 = {facile:0, standard:1, difficile:2};
-const NIV_TXT = {facile:"Moteur de départ : 0.", standard:"Moteur de départ : 1.", difficile:"Moteur de départ : 2.", expert:"À définir."};
-const NIV_OK = ["facile", "standard", "difficile"];
+/* v0.6 engine: copper cubes, 5 copper = 1 silver, everything costs 1 silver; the level sets the starting engine.
+   The reserve is kept as a number of copper units: silver = floor(cubes / 5), copper = cubes % 5. */
+const COST = 5;
+const LEVELS = ["tresfacile", "facile", "normal", "difficile", "tresdifficile"];
+const NIV = {tresfacile:"Très facile", facile:"Facile", normal:"Normal", difficile:"Difficile", tresdifficile:"Très difficile"};
+const MOTEUR0 = {tresfacile:1, facile:2, normal:3, difficile:4, tresdifficile:5};
+const NIV_TXT = Object.fromEntries(LEVELS.map(k => [k, `Moteur de départ : ${MOTEUR0[k]}.`]));
+const NIV_OK = LEVELS;
 const MAX = {oxy:14,temp:19,oce:9};
 
 /* ---------- Pictos ---------- */
@@ -238,18 +240,21 @@ const IC = {
   chaleur:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5c.6 3.2 5 5.2 5 10.2a5 5 0 0 1-10 0c0-2.6 1.4-4.1 2.6-5.1.1 1.7.8 2.8 1.9 3.2-.1-3.2-.4-5.8.5-8.3z" fill="#E0702E" stroke="#8F3A10" stroke-width="1.2" stroke-linejoin="round"/></svg>',
   plantes:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17C3 8.5 8.5 3 17 3c0 8.5-5.5 14-14 14z" fill="#5A9A3C" stroke="#2F5F1E" stroke-width="1.2" stroke-linejoin="round"/><path d="M4.5 15.5L12.5 7.5" stroke="#2F5F1E" stroke-width="1.2"/></svg>',
   cartes:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="1.5" width="12" height="17" rx="2" fill="#FFFFFF" stroke="#1F1A24" stroke-width="1.2"/><rect x="5.5" y="3" width="9" height="4" fill="#6E625A"/></svg>',
-  foret:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5L16.5 12H3.5Z" fill="#3D8A3A" stroke="#22521F" stroke-width="1.2" stroke-linejoin="round"/><path d="M10 6L15 14.5H5Z" fill="#4FA048" stroke="#22521F" stroke-width="1.2" stroke-linejoin="round"/><rect x="8.8" y="14.5" width="2.4" height="4" fill="#6B4423"/></svg>',
   temp:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><rect x="7.5" y="1.5" width="5" height="12" rx="2.5" fill="#FFFFFF" stroke="#7A1F18" stroke-width="1.2"/><rect x="9" y="6" width="2" height="8" fill="#C2362B"/><circle cx="10" cy="15" r="3.8" fill="#C2362B" stroke="#7A1F18" stroke-width="1.2"/></svg>',
   ocean:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><polygon points="10,1 17.8,5.5 17.8,14.5 10,19 2.2,14.5 2.2,5.5" fill="#2E6FA8" stroke="#183F66" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.5 11c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0" stroke="#FFFFFF" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>',
+  oxy:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="6.8" cy="11" r="5" fill="#D9534A" stroke="#7A1F18" stroke-width="1.2"/><circle cx="13.2" cy="9" r="5" fill="#E8776D" stroke="#7A1F18" stroke-width="1.2"/><path d="M11 6.6a2.6 2.6 0 0 1 2.2-1" stroke="#FFFFFF" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>',
   nt:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#C4572E" stroke="#7A2E14" stroke-width="1.2"/><path d="M5 9h10M6.5 13h7" stroke="#FCE3C6" stroke-width="1.2"/></svg>',
   cube:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg>',
+  argent:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#AEB6BD"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#E4E9ED"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#4F5B62" stroke-width="1.1" stroke-linejoin="round"/></svg>',
   moteur:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="11" width="4" height="7" rx="1" fill="#B84D18"/><rect x="8" y="7" width="4" height="11" rx="1" fill="#B84D18"/><rect x="14" y="3" width="4" height="15" rx="1" fill="#B84D18"/></svg>',
   pv:'<svg class="pi" width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.8l2.4 5 5.4.7-4 3.8 1 5.4L10 14.1l-4.8 2.6 1-5.4-4-3.8 5.4-.7z" fill="#E2BE2C" stroke="#8A6D0B" stroke-width="1.2" stroke-linejoin="round"/></svg>'
 };
 const big = (svg, s) => svg.replace(/width="18" height="18"/, `width="${s}" height="${s}"`);
 const sm = svg => big(svg, 14);
 const cardIc = col => sm(IC.cartes.replace('fill="#6E625A"', `fill="${col}"`));
-const CU = sm(IC.cube);
+const CU = sm(IC.cube), AG = sm(IC.argent);
+const ag = n => Math.floor(n / COST), cu = n => n % COST;
+const purse = n => `${plural(ag(n), "argent")} et ${plural(cu(n), "cuivre")}`;
 const TINT = {I:"#DCEADB", II:"linear-gradient(100deg,#DAE3EF,#F3DCD8)", III:"#D6E9F3", IV:"#F6DCCB", V:"#F6EBBF"};
 /* what the player does in the phase (third person, as on the printed cards) */
 const JOUEUR = {
@@ -260,15 +265,15 @@ const JOUEUR = {
   V:`pioche 2 ${sm(IC.cartes)} cartes et en garde&nbsp;1.`
 };
 const EFFECT = {
-  I:`+1 ${CU}. Puis, s'il a 3 ${CU}, il les dépense&nbsp;: <b>moteur +1</b>.`,
+  I:`+1 ${CU}. Puis, s'il a 1 ${AG}, il le dépense&nbsp;: <b>moteur +1</b>.`,
   II:`+1 ${CU}. Puis il pose 1 ${CU} sur son <b>compteur de PV</b>.`,
-  III:`+1 ${CU}. Puis il dépense <b>tous ses ${CU} par 3</b> sur sa cible : 1 cran par 3 ${CU}.`,
+  III:`+1 ${CU}. Puis il dépense <b>tous ses ${AG}</b> sur sa cible : 1 cran par ${AG}.`,
   IV:`+1 ${CU}. Puis il gagne <b>autant de ${CU} que son moteur</b>.`,
   V:`+1 ${CU}. Rien de plus.`
 };
 
 /* ---------- État ---------- */
-const S = { state:null, undo:[], view:"game", hist:[], confirmNew:false, setup:{niveau:"standard", pioche:"app", oxy:0, temp:0, oce:0}, toast:"" };
+const S = { state:null, undo:[], view:"game", hist:[], confirmNew:false, setup:{niveau:"normal", pioche:"app", oxy:0, temp:0, oce:0}, toast:"" };
 const LS_STATE = "automa-hybride-partie", LS_HIST = "automa-hybride-historique";
 let db = null;
 
@@ -277,19 +282,19 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const allMax = p => p.oxy >= MAX.oxy && p.temp >= MAX.temp && p.oce >= MAX.oce;
 const tempC = step => -30 + 2 * step;
-const paramOf = c => c === "foret" ? "oxy" : c === "temp" ? "temp" : "oce";
+const paramOf = c => c === "oxy" ? "oxy" : c === "temp" ? "temp" : "oce";
 const card = n => CARDS.find(c => c.n === n);
 const plural = (n, w) => `${n} ${w}${n > 1 ? "s" : ""}`;
 
-/* v:2 = cube engine (v0.5); a saved v0.4 game (v:1) is not loaded */
+/* v:3 = copper and silver (v0.6); a saved v0.5 (v:2) or v0.4 (v:1) game is not loaded */
 function newGame(){
   const s = S.setup;
   return {
-    v:2, status:"playing", niveau:s.niveau, pioche:s.pioche || "app", createdAt:Date.now(), savedAt:Date.now(), turn:1,
+    v:3, status:"playing", niveau:s.niveau, pioche:s.pioche || "app", createdAt:Date.now(), savedAt:Date.now(), turn:1,
     deck:shuffle(CARDS.map(c => c.n)), discard:[], card:null, step:"plan",
     playerPhase:null, automaPhase:null, cible:null, why:"", queue:[], qi:0, lastPlayerPhase:null,
-    rules:"0.5",
-    a:{cubes:0, moteur:MOTEUR0[s.niveau] ?? 1, compteur:0, nt:5, forets:0},
+    rules:"0.6",
+    a:{cubes:0, moteur:MOTEUR0[s.niveau] ?? 3, compteur:0, nt:5, pvFin:0},
     p:{oxy:+s.oxy||0, temp:+s.temp||0, oce:+s.oce||0},
     log:[]
   };
@@ -299,41 +304,43 @@ function commit(){ S.undo.push(JSON.stringify(S.state)); if (S.undo.length > 30)
 
 /* ---------- Règles ---------- */
 function leastAdvanced(p){
-  const f = [["foret", p.oxy / MAX.oxy], ["temp", p.temp / MAX.temp], ["ocean", p.oce / MAX.oce]];
+  const f = [["oxy", p.oxy / MAX.oxy], ["temp", p.temp / MAX.temp], ["ocean", p.oce / MAX.oce]];
   let best = f[0]; for (const x of f) if (x[1] < best[1]) best = x; return best[0];
 }
 function effCible(c, p){
-  const order = ["foret","temp","ocean"]; let i = order.indexOf(c);
+  const order = ["oxy","temp","ocean"]; let i = order.indexOf(c);
   for (let k = 0; k < 3; k++) { const x = order[(i + k) % 3]; if (p[paramOf(x)] < MAX[paramOf(x)]) return x; }
-  return "foret";
+  return "oxy";
 }
 function resolveCard(st){
   const cd = card(st.card); let phase = cd.ph, why = "", cible = cd.c;
   if (cd.react === "Riposte") { phase = st.lastPlayerPhase || "IV"; why = st.lastPlayerPhase ? `Phase du joueur au tour précédent : ${PH[phase].nom}.` : "Premier tour : Production."; }
-  if (cd.react === "Opportuniste") { phase = st.a.cubes >= COST ? "III" : "IV"; why = st.a.cubes >= COST ? `Il a ${plural(st.a.cubes, "cube")} (3 ou plus) : il dépense en Action.` : `Il n'a que ${plural(st.a.cubes, "cube")} (moins de 3) : il produit.`; }
+  if (cd.react === "Opportuniste") { phase = st.a.cubes >= COST ? "III" : "IV"; why = st.a.cubes >= COST ? `Il a ${plural(ag(st.a.cubes), "argent")} : il dépense en Action.` : `Il n'a aucun argent : il produit.`; }
   if (cd.react === "Course") { phase = "III"; cible = leastAdvanced(st.p); why = `Paramètre le moins avancé : ${CIB[cible].nom.toLowerCase()}.`; }
   return {phase, cible, why};
 }
 /* one phase for the automa: always +1 cube first, then the phase effect; never a bonus */
 function computePhase(st, ph){
-  const a = clone(st.a), p = {...st.p}, ch = {gain:1, moteur:0, compteur:0, prod:0, foret:0, temp:0, oce:0, oxy:0, nt:0, spent:0};
+  const a = clone(st.a), p = {...st.p}, ch = {gain:1, moteur:0, compteur:0, prod:0, temp:0, oce:0, oxy:0, nt:0, spent:0};
   a.cubes += 1;
   if (ph === "I") { if (a.cubes >= COST) { a.cubes -= COST; a.moteur++; ch.moteur = 1; ch.spent = COST; } }
   else if (ph === "II") { a.compteur++; ch.compteur = 1; }
   else if (ph === "IV") { a.cubes += a.moteur; ch.prod = a.moteur; }
   else if (ph === "III") {
-    for (let g = 0; g < 200 && a.cubes >= COST; g++) {
-      const c = allMax(p) ? "foret" : effCible(st.cible, p);
+    /* v0.6: no forests, the oxygen target raises oxygen directly */
+    for (let g = 0; g < 200 && a.cubes >= COST && !allMax(p); g++) {
+      const c = effCible(st.cible, p);
       a.cubes -= COST; ch.spent += COST;
-      if (c === "foret") { a.forets++; ch.foret++; if (p.oxy < MAX.oxy) { p.oxy++; a.nt++; ch.nt++; ch.oxy++; } }
+      if (c === "oxy") { p.oxy++; a.nt++; ch.nt++; ch.oxy++; }
       else if (c === "temp") { p.temp++; a.nt++; ch.nt++; ch.temp++; }
       else { p.oce++; a.nt++; ch.nt++; ch.oce++; a.cubes += 1; /* ocean tile bonus: +1 cube, whatever is printed */ }
     }
   }
   return {a, p, ch};
 }
-const vpOf = a => Math.floor(a.compteur / COST);
-function scoreAutoma(a){ const pv = vpOf(a); return {nt:a.nt, forets:a.forets, pv, total:a.nt + a.forets + pv}; }
+const vpOf = a => a.compteur;
+/* last round: once all parameters are maxed, each silver left is worth 1 VP (set when the game ends) */
+function scoreAutoma(a){ const pv = vpOf(a), fin = a.pvFin || 0; return {nt:a.nt, pv, fin, total:a.nt + pv + fin}; }
 
 /* ---------- Persistance ---------- */
 let saveTimer = null;
@@ -344,7 +351,7 @@ function save(){
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => { if (!db) return; try { await db.doc("partie/courante").set({state:S.state, savedAt:S.state.savedAt}); } catch (e) {} }, 500);
 }
-function loadLocal(){ try { const s = JSON.parse(localStorage.getItem(LS_STATE)); return s && s.v === 2 ? s : null; } catch (e) { return null; } }
+function loadLocal(){ try { const s = JSON.parse(localStorage.getItem(LS_STATE)); return s && s.v === 3 ? s : null; } catch (e) { return null; } }
 async function loadHist(){
   if (db) { try { const q = await db.collection("parties").orderBy("date", "desc").limit(100).get(); S.hist = q.docs.map(d => d.data()); return; } catch (e) {} }
   try { S.hist = JSON.parse(localStorage.getItem(LS_HIST)) || []; } catch (e) { S.hist = []; }
@@ -369,10 +376,10 @@ function renderStatus(){
     <div class="row" style="justify-content:space-between"><span class="lab">Automa · ${NIV[st.niveau]} · tour ${st.turn}</span>
     <button type="button" class="ghost" data-act="edit" style="min-height:36px;padding:4px 12px">${S.edit ? "Terminer" : "Corriger"}</button></div>
     <div class="stats">
-      ${stat("Réserve", a.cubes, IC.cube, "cubes", "zone des MC")}${stat("Moteur", a.moteur, IC.moteur, "moteur", "production des MC")}${stat("Compteur", `${a.compteur} <small>${vpOf(a)} PV</small>`, IC.pv, "compteur", "zone des plantes")}
-      ${stat("NT", a.nt, IC.nt, "nt")}${stat("Forêts", a.forets, IC.foret, "forets")}
+      ${stat("Réserve", `${ag(a.cubes)}${sm(IC.argent)} <small>+</small> ${cu(a.cubes)}${sm(IC.cube)}`, "", "cubes", "argents et cuivres, zone des MC")}${stat("Moteur", a.moteur, IC.moteur, "moteur", "production des MC")}${stat("Compteur", `${a.compteur} <small>${vpOf(a)} PV</small>`, IC.pv, "compteur", "zone des plantes")}
+      ${stat("NT", a.nt, IC.nt, "nt")}
     </div>
-    ${(st.track || []).length >= 2 ? curveBlock(st.track) : `<p style="font-size:13px;color:var(--muted)">La courbe de progression apparaîtra ici après 2 tours (entrez le NT du joueur en fin de tour).</p>`}
+    ${(st.track || []).length >= 2 ? curveBlock(st.track) : `<p style="font-size:13px;color:var(--muted)">La courbe de progression apparaîtra ici après 2 tours (le NT du joueur se règle dans le panneau Mars).</p>`}
   </section>`;
 }
 function renderParams(){
@@ -384,7 +391,10 @@ function renderParams(){
     <div class="adj"><button type="button" data-act="par" data-k="${k}" data-d="-1" aria-label="Baisser ${ARIA[k]}">−</button><button type="button" data-act="par" data-k="${k}" data-d="1" aria-label="Monter ${ARIA[k]}">+</button></div></div>`;
   return `<section class="panel" aria-label="Paramètres de Mars">
     <span class="lab">Mars · à mettre à jour quand le joueur augmente un paramètre</span>
-    <div class="params">${one("oxy", "Oxygène", p.oxy + " %", IC.foret, MAX.oxy)}${one("temp", '<span class="full">Température</span><span class="short">Temp.</span>', (tempC(p.temp) > 0 ? "+" : "") + tempC(p.temp) + " °C", IC.temp, MAX.temp)}${one("oce", "Océans", p.oce + " / 9", IC.ocean, MAX.oce)}</div>
+    <div class="params">${one("oxy", "Oxygène", p.oxy + " %", IC.oxy, MAX.oxy)}${one("temp", '<span class="full">Température</span><span class="short">Temp.</span>', (tempC(p.temp) > 0 ? "+" : "") + tempC(p.temp) + " °C", IC.temp, MAX.temp)}${one("oce", "Océans", p.oce + " / 9", IC.ocean, MAX.oce)}</div>
+    <div class="param" style="flex-direction:row;align-items:center;justify-content:space-between;gap:10px">
+      <span class="lab" style="display:flex;align-items:center;gap:5px">${IC.nt}NT du joueur</span><span class="v num">${pntOf(S.state)}</span>
+      <div class="adj"><button type="button" data-act="pnt" data-d="-1" aria-label="Baisser le NT du joueur">−</button><button type="button" data-act="pnt" data-d="1" aria-label="Monter le NT du joueur">+</button></div></div>
   </section>`;
 }
 function automaCardHTML(st, still){
@@ -398,7 +408,7 @@ function automaCardHTML(st, still){
     ${cd.react ? `<div class="why">Il joue : <b>${P.nom}</b>. ${esc(st.why)}</div>` : ""}
     <div class="au" style="background:${TINT[ph]}"><p>${EFFECT[ph]}</p></div>
     <div class="sp"></div>
-    <div class="cib" style="border-color:${C.col}"><span class="l">Cible</span>${big(IC[st.cible], 24)}<span class="cn">${C.nom}</span><span class="cc">3 ${CU}</span></div>
+    <div class="cib" style="border-color:${C.col}"><span class="l">Cible</span>${big(IC[st.cible], 24)}<span class="cn">${C.nom}</span><span class="cc">1 ${AG}</span></div>
     <div class="vous"><span class="t">Joueur</span><p>${JOUEUR[ph]}</p></div>
   </div>`;
 }
@@ -427,10 +437,10 @@ function renderPlan(){
 function phaseLine(st, ph){
   const who = [st.playerPhase === ph ? "phase du joueur" : "", st.automaPhase === ph ? "phase de l'automa" : ""].filter(Boolean).join(" et ");
   const c = computePhase(st, ph).ch;
-  let what = `+1 cube`;
-  if (ph === "I") what += st.a.cubes + 1 >= COST ? ", puis moteur +1 pour 3 cubes" : " : pas assez de cubes pour le moteur";
+  let what = `+1 cuivre`;
+  if (ph === "I") what += st.a.cubes + 1 >= COST ? ", puis moteur +1 pour 1 argent" : " : pas d'argent pour le moteur";
   else if (ph === "II") what += ", puis 1 cube sur son compteur de PV";
-  else if (ph === "III") what += c.nt ? `, puis environ ${plural(c.nt, "cran")} sur sa cible` : " : pas assez de cubes pour sa cible";
+  else if (ph === "III") what += c.nt ? `, puis environ ${plural(c.nt, "cran")} sur sa cible` : " : pas d'argent pour sa cible";
   else if (ph === "IV") what += `, puis ${plural(st.a.moteur, "cube")} (moteur)`;
   return `<li>${phaseChip(ph)} <span style="font-size:13px;color:var(--muted)">(${who})</span><br>${what}.</li>`;
 }
@@ -454,22 +464,23 @@ function renderPhase(){
   const st = S.state, ph = st.queue[st.qi], r = computePhase(st, ph), ch = r.ch, a0 = st.a;
   const chips = st.queue.map((x, i) => phaseChip(x, i < st.qi ? "done" : i === st.qi ? "cur" : "")).join("");
   const player = st.playerPhase === ph ? "Le joueur a choisi cette phase : il prend son bonus." : "Le joueur joue aussi cette phase, sans bonus.";
-  const todo = [`${IC.cube} <b>+1 cube</b> dans sa réserve`];
-  if (ph === "I") todo.push(ch.moteur ? `${IC.moteur} <b>Retirer 3 cubes</b> et monter son moteur : ${a0.moteur} → ${r.a.moteur}` : `${IC.moteur} Moins de 3 cubes : il garde ses cubes, le moteur reste à ${a0.moteur}`);
-  if (ph === "II") todo.push(`${IC.pv} <b>1 cube sur son compteur de PV</b> (${r.a.compteur} cube${r.a.compteur > 1 ? "s" : ""}, ${vpOf(r.a)} PV)`);
-  if (ph === "IV") todo.push(ch.prod ? `${IC.cube} <b>+${plural(ch.prod, "cube")}</b> grâce à son moteur` : `${IC.moteur} Moteur à 0 : rien de plus`);
+  const todo = [`${IC.cube} <b>+1 cuivre</b> dans sa réserve${cu(a0.cubes) === COST - 1 ? " : avec 5 cuivres, l'échanger contre 1 argent" : ""}`];
+  if (ph === "I") todo.push(ch.moteur ? `${IC.argent} <b>Dépenser 1 argent</b> et monter son moteur : ${a0.moteur} → ${r.a.moteur}` : `${IC.moteur} Aucun argent : le moteur reste à ${a0.moteur}`);
+  if (ph === "II") todo.push(`${IC.pv} <b>1 cube sur son compteur de PV</b> (${plural(r.a.compteur, "cube")}, ${vpOf(r.a)} PV)`);
+  if (ph === "IV") todo.push(ch.prod ? `${IC.cube} <b>+${plural(ch.prod, "cuivre")}</b> grâce à son moteur` : `${IC.moteur} Moteur à 0 : rien de plus`);
   if (ph === "III") {
-    if (ch.foret) todo.push(`${IC.foret} <b>${plural(ch.foret, "forêt")}</b>${ch.oxy ? ` : oxygène +${ch.oxy}` : " (oxygène au maximum)"}`);
+    if (ch.oxy) todo.push(`${IC.oxy} <b>Oxygène +${plural(ch.oxy, "cran")}</b> (sans forêt)`);
     if (ch.temp) todo.push(`${IC.temp} <b>Température +${plural(ch.temp, "cran")}</b>`);
-    if (ch.oce) todo.push(`${IC.ocean} <b>Retourner ${ch.oce} tuile${ch.oce > 1 ? "s" : ""} océan</b> : +1 cube par tuile, quel que soit le bonus imprimé (déjà compté)`);
+    if (ch.oce) todo.push(`${IC.ocean} <b>Retourner ${ch.oce} tuile${ch.oce > 1 ? "s" : ""} océan</b> : +1 cuivre par tuile, quel que soit le bonus imprimé (déjà compté)`);
     if (ch.nt) todo.push(`${IC.nt} <b>NT de l'automa +${ch.nt}</b> (${a0.nt} → ${r.a.nt})`);
-    if (!ch.spent) todo.push(`Moins de 3 cubes : rien sur sa cible`);
+    if (!ch.spent) todo.push(`Aucun argent : rien sur sa cible`);
   }
-  const tags = {I:"+1 cube, puis moteur +1 pour 3 cubes.", II:"+1 cube, puis 1 cube sur son compteur de PV.", III:"+1 cube, puis tous ses cubes par 3 sur sa cible.", IV:"+1 cube, puis autant de cubes que son moteur.", V:"+1 cube. Rien de plus."};
+  const tags = {I:"+1 cuivre, puis moteur +1 pour 1 argent.", II:"+1 cuivre, puis 1 cube sur son compteur de PV.", III:"+1 cuivre, puis tous ses argents sur sa cible.", IV:"+1 cuivre, puis autant de cuivres que son moteur.", V:"+1 cuivre. Rien de plus."};
   const body = `${banner(ph, tags[ph])}
     <div class="todo"><span class="lab">À faire sur son plateau</span><ul>${todo.map(t => `<li>${t}</li>`).join("")}</ul>
-    <p style="font-size:14px;color:var(--muted)">Réserve : ${a0.cubes} → ${r.a.cubes} cube${r.a.cubes > 1 ? "s" : ""}.${ph === "III" ? ` Cible : ${CIB[effCible(st.cible, st.p)].nom}.` : ""} Pas de bonus pour l'automa.</p></div>
-    ${ph === "III" && allMax(r.p) ? `<p class="note"><b>Dernier tour</b> Tous les paramètres sont au maximum : il dépense ses cubes en forêts pour leurs PV.</p>` : ""}`;
+    <p style="font-size:14px;color:var(--muted)">Réserve : ${purse(a0.cubes)} → ${purse(r.a.cubes)} (5 cuivres = 1 argent).${ph === "III" ? ` Cible : ${CIB[st.cible].nom}${effCible(st.cible, st.p) !== st.cible ? ` au maximum, il passe à ${CIB[effCible(st.cible, st.p)].nom.toLowerCase()}` : ""}.` : ""} Pas de bonus pour l'automa.</p></div>
+    ${ph === "III" ? `<p class="note"><b>Mars en direct</b> Ce plan suit les paramètres de Mars. Si le joueur vient d'en monter un, le mettre à jour dans le panneau Mars : le plan se recalcule.</p>` : ""}
+    ${ph === "III" && allMax(r.p) ? `<p class="note"><b>Dernier tour</b> Tous les paramètres sont au maximum : chaque argent qu'il lui reste vaut 1 PV.</p>` : ""}`;
   return `<section class="panel">
     <div class="steps">${chips}</div>
     <div class="reveal">${automaCardHTML(st, true)}
@@ -481,9 +492,10 @@ function renderPhase(){
   </section>`;
 }
 function lastPNT(st){ const tr = (st.track || []).filter(x => x.p != null); return tr.length ? tr[tr.length - 1].p : 5; }
+/* the player's TR can be changed at any time from the Mars panel; it is recorded at the end of each round for the curve */
+const pntOf = st => st.pnt ?? lastPNT(st);
 function recordTurn(st){
-  const el = document.getElementById("e-nt"); let p = null;
-  if (el && el.value !== "") { const v = parseInt(el.value, 10); if (!isNaN(v)) p = v; }
+  const p = pntOf(st);
   st.track = (st.track || []).filter(x => x.t !== st.turn);
   st.track.push({t:st.turn, a:st.a.nt, p});
 }
@@ -510,9 +522,7 @@ function renderEndTurn(){
       <li><b>Le joueur</b> : plus de 10 cartes en main ? Il défausse jusqu'à 10, comme d'habitude.</li>
       <li><b>L'automa</b> : rien à faire, il n'a pas de main.</li>
       <li><b>Sa carte du tour</b> : ${st.pioche === "cartes" ? `dans sa défausse. Quand sa pioche est vide, remélanger les 15 cartes (il en reste ${st.deck.length}).` : `l'assistant la met de côté. Elle ne reviendra qu'une fois toute sa pioche utilisée (il en reste ${st.deck.length}).`}</li></ul></div>
-    <div class="fcard"><span class="lab">Progression du joueur · facultatif</span>
-      <div class="fgrid"><div class="field"><label for="e-nt">${IC.nt} NT du joueur</label><input type="number" id="e-nt" min="0" max="99" inputmode="numeric" value="${lastPNT(st)}"></div>
-      <p style="font-size:13px;color:var(--muted);align-self:end">L'automa est à ${st.a.nt}. Le NT du joueur sert à tracer la courbe de la partie.</p></div></div>
+    <p class="note"><b>NT du joueur</b> ${pntOf(st)}, contre ${st.a.nt} pour l'automa. Il se règle à tout moment dans le panneau Mars et sert à tracer la courbe de la partie.</p>
     <div class="row"><button type="button" class="cta" data-act="next">Tour suivant</button>
     <button type="button" class="ghost" data-act="end">Terminer la partie</button></div>
   </section>`;
@@ -521,11 +531,11 @@ function renderEnd(){
   const st = S.state, sc = scoreAutoma(st.a);
   return `<section class="panel">
     <h2 style="font-size:32px;font-style:italic;text-transform:uppercase">Décompte final</h2>
-    <p>${allMax(st.p) ? "Tous les paramètres sont au maximum." : "Partie arrêtée avant la fin des paramètres."} Le joueur compte comme d'habitude : 1 PV par point de NT, plus ses PV de forêt et de cartes.</p>
+    <p>${allMax(st.p) ? "Tous les paramètres sont au maximum." : "Partie arrêtée avant la fin des paramètres."} Le joueur compte comme d'habitude : 1 PV par point de NT, plus ses PV de forêt et de cartes. L'automa n'a pas de forêt.</p>
     <div class="scroll"><table><thead><tr><th>Automa</th><th class="n">PV</th></tr></thead><tbody>
       <tr><td>${IC.nt} NT</td><td class="n">${sc.nt}</td></tr>
-      <tr><td>${IC.foret} Forêts</td><td class="n">${sc.forets}</td></tr>
-      <tr><td>${IC.pv} Compteur de PV (${st.a.compteur} cubes, 1 PV par 3)</td><td class="n">${sc.pv}</td></tr>
+      <tr><td>${sm(IC.argent)} Argents restants au dernier tour</td><td class="n">${sc.fin}</td></tr>
+      <tr><td>${IC.pv} Compteur de PV (1 PV par cube)</td><td class="n">${sc.pv}</td></tr>
       <tr><td><b>Total</b></td><td class="n"><b>${sc.total}</b></td></tr></tbody></table></div>
     ${curveBlock(st.track)}
     <div class="fgrid">
@@ -539,16 +549,16 @@ function renderEnd(){
 }
 function renderSetup(){
   const s = S.setup;
-  const lv = ["facile","standard","difficile","expert"].map(k =>
+  const lv = LEVELS.map(k =>
     `<button type="button" data-act="lvl" data-k="${k}" aria-pressed="${s.niveau === k}" ${NIV_OK.includes(k) ? "" : "disabled"}><b>${NIV[k]}</b><span>${NIV_TXT[k]}</span></button>`).join("");
   return `<section class="panel">
     <h2 style="font-size:30px;font-style:italic;text-transform:uppercase">Nouvelle partie</h2>
-    <p>L'assistant joue l'automa : il tire ses cartes, compte ses cubes et dit quoi faire sur son plateau. Le plateau et les cartes projet restent sur la table.</p>
-    <div><span class="lab">Niveau</span><div class="lvl two" style="margin-top:6px">${lv}</div></div>
+    <p>L'assistant joue l'automa : il tire ses cartes, compte ses cuivres et ses argents et dit quoi faire sur son plateau. Le plateau et les cartes projet restent sur la table.</p>
+    <div><span class="lab">Niveau</span><div class="lvl" style="margin-top:6px">${lv}</div></div>
     <div><span class="lab">Pioche de l'automa</span><div class="lvl two" style="margin-top:6px">
       <button type="button" data-act="pioche" data-k="app" aria-pressed="${s.pioche !== "cartes"}"><b>L'appli tire</b><span>L'assistant tire la carte automa au hasard.</span></button>
       <button type="button" data-act="pioche" data-k="cartes" aria-pressed="${s.pioche === "cartes"}"><b>Cartes imprimées</b><span>Le joueur retourne la carte imprimée et indique son numéro.</span></button></div></div>
-    <div class="note"><b>Mise en place</b> Un plateau joueur pour l'automa, un marqueur sur le 5 de la piste de NT, le marqueur de production des MC sur ${MOTEUR0[s.niveau] ?? 1} (son moteur), une provision de cubes de bronze. Réserve et compteur de PV vides. Ni corporation, ni main.</div>
+    <div class="note"><b>Mise en place</b> Un plateau joueur pour l'automa, un marqueur sur le 5 de la piste de NT, le marqueur de production des MC sur ${MOTEUR0[s.niveau] ?? 1} (son moteur), des cubes cuivre et argent. Réserve et compteur de PV vides. Ni corporation, ni main.</div>
     <div class="row"><button type="button" class="cta" data-act="begin">Commencer la partie</button></div>
   </section>`;
 }
@@ -599,14 +609,14 @@ function applyPhase(){
   const c0 = st.a.cubes, r = computePhase(st, ph), c = r.ch;
   st.a = r.a; st.p = r.p;
   let what = "";
-  if (ph === "I") what = c.moteur ? `moteur ${st.a.moteur} (3 cubes)` : "moteur inchangé, moins de 3 cubes";
+  if (ph === "I") what = c.moteur ? `moteur ${st.a.moteur} (1 argent)` : "moteur inchangé, aucun argent";
   else if (ph === "II") what = `compteur de PV ${st.a.compteur}`;
-  else if (ph === "III") what = `${c.foret} forêt(s), +${c.temp} température, ${c.oce} océan(s), NT +${c.nt}, ${c.spent} cubes dépensés${c.oce ? `, +${c.oce} (bonus océans)` : ""}`;
+  else if (ph === "III") what = `+${c.oxy} oxygène, +${c.temp} température, ${c.oce} océan(s), NT +${c.nt}, ${plural(c.spent / COST, "argent")} dépensé${c.spent > COST ? "s" : ""}${c.oce ? `, +${c.oce} cuivre(s) (bonus océans)` : ""}`;
   else if (ph === "IV") what = `+${c.prod} (moteur)`;
   else what = "rien de plus";
-  log(`${PH[ph].nom} : +1 cube, ${what} → réserve ${st.a.cubes} (avant : ${c0})`);
+  log(`${PH[ph].nom} : +1 cuivre, ${what} → ${purse(st.a.cubes)} (avant : ${purse(c0)})`);
   st.qi++;
-  if (allMax(st.p)) { st.status = "ended"; st.track = (st.track || []).filter(x => x.t !== st.turn); st.track.push({t:st.turn, a:st.a.nt, p:null}); log("Tous les paramètres sont au maximum : fin de partie."); }
+  if (allMax(st.p)) { st.a.pvFin = ag(st.a.cubes); if (st.a.pvFin) log(`Dernier tour : ${plural(st.a.pvFin, "argent")} restant = ${st.a.pvFin} PV`); st.status = "ended"; st.track = (st.track || []).filter(x => x.t !== st.turn); st.track.push({t:st.turn, a:st.a.nt, p:null}); log("Tous les paramètres sont au maximum : fin de partie."); }
   else if (st.qi >= st.queue.length) st.step = "endturn";
   save(); render(); window.scrollTo({top:0, behavior:"smooth"});
 }
@@ -629,7 +639,7 @@ document.addEventListener("click", async ev => {
       if (inp.min !== "") v = Math.max(+inp.min, v); if (inp.max !== "") v = Math.min(+inp.max, v);
       inp.value = v; inp.dispatchEvent(new Event("change", {bubbles:true})); return; }
     case "begin": { S.state = newGame(); S.undo = [];
-      log(`Nouvelle partie (règles v0.5), niveau ${NIV[S.state.niveau]}, moteur de départ ${S.state.a.moteur}`); save(); break; }
+      log(`Nouvelle partie (règles v0.6), niveau ${NIV[S.state.niveau]}, moteur de départ ${S.state.a.moteur}`); save(); break; }
     case "pick": st.playerPhase = b.dataset.ph; save(); break;
     case "draw": {
       commit();
@@ -650,7 +660,7 @@ document.addEventListener("click", async ev => {
       st.remark = document.getElementById("e-rem").value.trim();
       const sc = scoreAutoma(st.a);
       const rec = {date:new Date().toISOString(), createdAt:st.createdAt, niveau:st.niveau, tours:st.turn, scoreJoueur:st.playerScore, scoreAutoma:sc.total,
-        detail:{nt:sc.nt, forets:sc.forets, pvCompteur:sc.pv, compteur:st.a.compteur, moteur:st.a.moteur, cubesFin:st.a.cubes}, params:st.p, remarque:st.remark, courbe:st.track || [], pioche:st.pioche || "app", version:"0.5"};
+        detail:{nt:sc.nt, pvFin:sc.fin, pvCompteur:sc.pv, compteur:st.a.compteur, moteur:st.a.moteur, cubesFin:st.a.cubes}, params:st.p, remarque:st.remark, courbe:st.track || [], pioche:st.pioche || "app", version:"0.6"};
       const remote = await saveGameRecord(rec);
       st.saved = true; S.toast = remote ? "Partie enregistrée dans l'historique." : "Partie enregistrée dans ce navigateur."; save(); break; }
     case "hist": S.view = "hist"; await loadHist(); break;
@@ -660,10 +670,11 @@ document.addEventListener("click", async ev => {
     case "adj": {
       commit(); const k = b.dataset.k, d = +b.dataset.d, old = st.a[k];
       st.a[k] = Math.max(0, st.a[k] + d);
-      const NOMS = {cubes:"réserve", moteur:"moteur", compteur:"compteur de PV", nt:"NT", forets:"forêts"};
+      const NOMS = {cubes:"réserve", moteur:"moteur", compteur:"compteur de PV", nt:"NT"};
       const head = `T${st.turn} · Correction ${NOMS[k] || k} : `, prev = st.log[0] || "";
       if (prev.startsWith(head)) { const from = prev.slice(head.length).split(" → ")[0]; st.log[0] = `${head}${from} → ${st.a[k]}`; } else log(`Correction ${NOMS[k] || k} : ${old} → ${st.a[k]}`);
       save(); break; }
+    case "pnt": commit(); st.pnt = Math.max(0, pntOf(st) + +b.dataset.d); save(); break;
     case "par": {
       commit(); const k = b.dataset.k; st.p[k] = Math.min(MAX[k], Math.max(0, st.p[k] + +b.dataset.d)); save(); break; }
     default: return;
@@ -681,7 +692,7 @@ render();
   if (!db) return;
   try {
     const snap = await db.doc("partie/courante").get();
-    if (snap.exists) { const d = snap.data(); if (d && d.state && d.state.v === 2 && (!S.state || (d.savedAt || 0) > (S.state.savedAt || 0))) { S.state = clone(d.state); render(); } }
+    if (snap.exists) { const d = snap.data(); if (d && d.state && d.state.v === 3 && (!S.state || (d.savedAt || 0) > (S.state.savedAt || 0))) { S.state = clone(d.state); render(); } }
     else if (S.state) save();
   } catch (e) {}
 })();
