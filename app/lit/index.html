@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Automa hybride · Lit</title>
+<meta name="theme-color" content="#12202B">
+<link rel="stylesheet" href="styles.css">
+<!-- No build step: the import map tells the browser where the bare specifier "lit" lives.
+     vendor/lit-all.min.js is the official all-in-one bundle (Lit 3.3.1, core and directives),
+     kept in the repository so the app never needs the network to load. -->
+<script type="importmap">{ "imports": { "lit": "./vendor/lit-all.min.js" } }</script>
+<script type="module" src="components/automa-app.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <automa-app></automa-app>
+  <footer style="border-top:1px solid var(--line);padding-top:12px;font-size:13px;color:var(--muted)">
+    <p>Projet de fans non officiel, non affilié à FryxGames ni à Stronghold Games. Terraforming Mars est une marque de FryxGames. Nécessite le jeu original.</p>
+    <p>Expérience : l'appli réécrite avec Lit. <a href="../prototype/assistant-automa.html" style="color:inherit">Comparer avec le prototype</a>.</p>
+    <p>Règles et cartes sous licence CC BY-NC-SA 4.0 · <a href="https://github.com/manufitoussi/ares-solo-automa" style="color:inherit">GitHub</a></p>
+  </footer>
+</div>
+</body>
+</html>
