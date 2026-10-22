@@ -157,20 +157,26 @@ const en = {
     title: "History", back: "Back to the game",
     summary: (n, won) => `${pl(n, "game", "games")} · ${pl(won, "win", "wins")} of the player against the automa.`,
     empty: "No saved game yet. At the end of a game, save it from the scoring screen: it will show here.",
-    cols: ["Date", "Level", "Rules", "Rounds", "Player", "Player TR", "Steps / Action", "Automa", "Winner", "TR per round", "Steps", "Remarks"],
-    winner: { player: "Player", automa: "Automa", tie: "Tie" }
+    cols: ["Game", "Date", "Level", "Rules", "Rounds", "Player", "Player TR", "Steps / Action", "Automa", "Winner", "TR per round", "Steps", "Remarks"],
+    winner: { player: "Player", automa: "Automa", tie: "Tie" },
+    current: "In progress", unsaved: "Ended, not saved",
+    export: "Export", copy: "Copy", delete: "Delete",
+    actionAria: (action, date) => `${action} the game of ${date}`,
+    confirmDelete: "Delete this game from the history?",
+    confirmAbandon: "Abandon the game in progress? It will be lost (export it first to keep it).",
+    deleted: "Game deleted."
   },
 
   transfer: {
     title: "Backup",
-    intro: "To go on with another device or keep a copy: export a file (or copy the text) with the game in progress and the history, then import it (or paste it) on the other device. The imported history is added to this one.",
-    export: "Export", import: "Import", copy: "Copy", paste: "Paste",
+    intro: "To go on with another device or keep a copy: each game is exported as a file or copied from its row; “Export all” and “Copy all” take the game in progress and the whole history. On the other device, import the file or paste the text: the games are added to the history, and a game in progress replaces the device's one.",
+    exportAll: "Export all", import: "Import", copyAll: "Copy all", paste: "Paste",
     pasteLabel: "Paste the text of a backup here", importText: "Import the text",
-    copied: "Backup copied: paste it in the app of the other device (History, Paste).",
+    copied: "Copied: paste it in the app of the other device (History, Paste).",
     copyFailed: "Copying did not work: use Export instead.",
-    fileName: date => `automa-backup-${date}.json`,
+    fileName: (date, all) => `automa-${all ? "backup" : "game"}-${date}.json`,
     replace: "Replace the game in progress with the one in the backup?",
-    done: (game, added) => `Imported: ${game ? "the game in progress, and " : ""}${pl(added, "game added", "games added")} to the history.`,
+    done: (game, added) => `Imported: ${[game ? "the game in progress" : "", added || !game ? `${pl(added, "game added", "games added")} to the history` : ""].filter(Boolean).join(", and ")}.`,
     kept: "The game in progress on this device is kept.",
     error: { json: "This backup cannot be read.", format: "This backup does not come from this app.", empty: "This backup has no game and no history." }
   },

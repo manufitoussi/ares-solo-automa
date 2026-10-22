@@ -11,7 +11,7 @@ import "./end-turn-screen.js";
 import "./end-screen.js";
 import "./history-screen.js";
 import { loadGame, saveGame, addToHistory, loadHistory, saveHistory } from "../storage.js";
-import { exportData, parseImport, mergeHistory, ImportError } from "../transfer.js";
+import { exportData, parseImport, mergeHistory, recordKey, ImportError } from "../transfer.js";
 import { t, lang, setLang } from "../i18n.js";
 /** @typedef {import("../engine.js").Game} Game */
 /** @typedef {import("../engine.js").Setup} Setup */
@@ -104,26 +104,51 @@ export class AutomaApp extends LightElement {
     this.view = "history";
   }
 
-  /* the game in progress and the history, as a file to save */
-  exportFile() {
-    const data = exportData({ game: this.game, history: loadHistory() });
+  /** what to back up: everything, the game in progress (whole), or one saved game
+      @param {import("./history-screen.js").Which} which */
+  backupOf(which) {
+    if (which === "all") return exportData({ game: this.game, history: loadHistory() });
+    if (which === "current") return exportData({ game: this.game, history: [] });
+    return exportData({ game: null, history: loadHistory().filter(r => recordKey(r) === which) });
+  }
+
+  /** as a file to save @param {CustomEvent<import("./history-screen.js").Which>} e */
+  exportFile(e) {
+    const data = this.backupOf(e.detail);
     this.notice = null;
     const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
-    const a = Object.assign(document.createElement("a"), { href: url, download: t.transfer.fileName(data.exportedAt.slice(0, 10)) });
+    const a = Object.assign(document.createElement("a"), { href: url, download: t.transfer.fileName(data.exportedAt.slice(0, 10), e.detail === "all") });
     document.body.append(a);
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  /* the same, as text in the clipboard (the clipboard needs https, or localhost) */
-  async copyText() {
+  /** as text in the clipboard (the clipboard needs https, or localhost)
+      @param {CustomEvent<import("./history-screen.js").Which>} e */
+  async copyText(e) {
     try {
-      await navigator.clipboard.writeText(JSON.stringify(exportData({ game: this.game, history: loadHistory() })));
+      await navigator.clipboard.writeText(JSON.stringify(this.backupOf(e.detail)));
       this.notice = { error: false, text: t.transfer.copied };
     } catch {
       this.notice = { error: true, text: t.transfer.copyFailed };
     }
+  }
+
+  /** a saved game leaves the history; the game in progress is abandoned, once confirmed
+      @param {CustomEvent<import("./history-screen.js").Which>} e */
+  deleteGame(e) {
+    const H = t.history;
+    if (e.detail === "current") {
+      if (!window.confirm(H.confirmAbandon)) return;
+      this.game = null;
+      this.undo = [];
+    } else {
+      if (!window.confirm(H.confirmDelete)) return;
+      this.history = loadHistory().filter(r => recordKey(r) !== e.detail);
+      saveHistory(this.history);
+    }
+    this.notice = { error: false, text: H.deleted };
   }
 
   /** @param {CustomEvent<File>} e */
@@ -226,8 +251,9 @@ export class AutomaApp extends LightElement {
     return html`
       ${this.renderTop()}
       ${this.view === "history" ? html`
-        <history-screen .games=${this.history} .notice=${this.notice} ?canExport=${!!this.game || this.history.length > 0}
-          @back=${() => { this.view = "game"; }} @export=${this.exportFile} @copy=${this.copyText} @import=${this.importFile} @import-text=${this.importPasted}></history-screen>`
+        <history-screen .games=${this.history} .game=${this.game} .notice=${this.notice}
+          @back=${() => { this.view = "game"; }} @export=${this.exportFile} @copy=${this.copyText} @delete=${this.deleteGame}
+          @import=${this.importFile} @import-text=${this.importPasted}></history-screen>`
       : this.game ? this.renderGame(this.game) : html`
         <div class="solo"><setup-screen @begin=${this.begin}></setup-screen></div>`}`;
   }

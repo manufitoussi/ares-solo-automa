@@ -198,22 +198,29 @@ const fr = {
     /** @param {number} n @param {number} won */
     summary: (n, won) => `${pl(n, "partie", "parties")} · ${pl(won, "victoire", "victoires")} du joueur contre l'automa.`,
     empty: "Aucune partie enregistrée pour l'instant. À la fin d'une partie, l'enregistrer depuis l'écran de décompte : elle apparaîtra ici.",
-    cols: ["Date", "Niveau", "Règles", "Tours", "Joueur", "NT joueur", "Crans / Action", "Automa", "Gagnant", "NT par tour", "Crans", "Remarques"],
-    winner: { player: "Joueur", automa: "Automa", tie: "Égalité" }
+    cols: ["Partie", "Date", "Niveau", "Règles", "Tours", "Joueur", "NT joueur", "Crans / Action", "Automa", "Gagnant", "NT par tour", "Crans", "Remarques"],
+    winner: { player: "Joueur", automa: "Automa", tie: "Égalité" },
+    current: "En cours", unsaved: "Terminée, non enregistrée",
+    export: "Exporter", copy: "Copier", delete: "Supprimer",
+    /** @param {string} action @param {string} date */
+    actionAria: (action, date) => `${action} la partie du ${date}`,
+    confirmDelete: "Supprimer cette partie de l'historique ?",
+    confirmAbandon: "Abandonner la partie en cours ? Elle sera perdue (l'exporter avant pour la garder).",
+    deleted: "Partie supprimée."
   },
 
   transfer: {
     title: "Sauvegarde",
-    intro: "Pour continuer sur un autre appareil ou garder une copie : exporter un fichier (ou copier le texte) avec la partie en cours et l'historique, puis l'importer (ou le coller) sur l'autre appareil. L'historique importé s'ajoute à celui-ci.",
-    export: "Exporter", import: "Importer", copy: "Copier", paste: "Coller",
+    intro: "Pour continuer sur un autre appareil ou garder une copie : chaque partie s'exporte en fichier ou se copie depuis sa ligne ; « Tout exporter » et « Tout copier » prennent la partie en cours et tout l'historique. Sur l'autre appareil, importer le fichier ou coller le texte : les parties s'ajoutent à l'historique, et une partie en cours remplace celle de l'appareil.",
+    exportAll: "Tout exporter", import: "Importer", copyAll: "Tout copier", paste: "Coller",
     pasteLabel: "Coller ici le texte d'une sauvegarde", importText: "Importer le texte",
-    copied: "Sauvegarde copiée : la coller dans l'appli de l'autre appareil (Historique, Coller).",
+    copied: "Copié : le coller dans l'appli de l'autre appareil (Historique, Coller).",
     copyFailed: "La copie n'a pas marché : utiliser Exporter.",
-    /** @param {string} date */
-    fileName: date => `automa-sauvegarde-${date}.json`,
+    /** @param {string} date @param {boolean} all */
+    fileName: (date, all) => `automa-${all ? "sauvegarde" : "partie"}-${date}.json`,
     replace: "Remplacer la partie en cours par celle de la sauvegarde ?",
     /** @param {boolean} game @param {number} added */
-    done: (game, added) => `Importé : ${game ? "la partie en cours, et " : ""}${pl(added, "partie ajoutée", "parties ajoutées")} à l'historique.`,
+    done: (game, added) => `Importé : ${[game ? "la partie en cours" : "", added || !game ? `${pl(added, "partie ajoutée", "parties ajoutées")} à l'historique` : ""].filter(Boolean).join(", et ")}.`,
     kept: "La partie en cours de cet appareil est gardée.",
     error: { json: "Cette sauvegarde n'est pas lisible.", format: "Cette sauvegarde ne vient pas de cette appli.", empty: "Cette sauvegarde ne contient ni partie ni historique." }
   },

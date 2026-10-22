@@ -1,8 +1,12 @@
 import { html, nothing } from "lit";
 import { LightElement } from "./light-element.js";
+import { gameRecord, pntOf } from "../engine.js";
+import { recordKey } from "../transfer.js";
 import { t } from "../i18n.js";
 import "./tr-curve.js";
+/** @typedef {import("../engine.js").Game} Game */
 /** @typedef {import("../engine.js").GameRecord} GameRecord */
+/** @typedef {"all" | "current" | string} Which  everything, the game in progress, or a saved game (its key) */
 
 /** @param {GameRecord} h */
 const winner = h => h.scoreJoueur == null ? "—"
@@ -14,14 +18,15 @@ const stepsPerAction = h => {
   return per?.length ? t.decimal(per.reduce((s, x) => s + x, 0) / per.length) : "—";
 };
 
-/* The saved games of this browser, most recent first, and the backup of the data.
-   Reports `back` to return to the game, `export`, `copy`, `import` (detail: the chosen file)
-   and `import-text` (detail: the pasted text);
-   `notice` is the result of the last import, set by the parent. */
+/* The games of this browser: the game in progress first (unless it is already saved), then
+   the saved ones, most recent first; and the backup of the data.
+   Each game reports `export`, `copy` and `delete` (detail: which game); the backup section
+   reports them for "all", plus `import` (detail: the chosen file) and `import-text` (detail:
+   the pasted text). `back` returns to the game; `notice` is the result of the last action. */
 export class HistoryScreen extends LightElement {
   static properties = {
     games: { attribute: false },
-    canExport: { type: Boolean },
+    game: { attribute: false },
     notice: { attribute: false },
     pasting: { state: true },
     pasted: { state: true }
@@ -30,16 +35,50 @@ export class HistoryScreen extends LightElement {
   constructor() {
     super();
     this.games = /** @type {GameRecord[]} */ ([]);
-    this.canExport = false;
+    this.game = /** @type {Game | null} */ (null);
     this.notice = /** @type {{ error: boolean, text: string } | null} */ (null);
     this.pasting = false;
     this.pasted = "";
   }
 
-  importText() {
-    this.emit("import-text", this.pasted);
-    this.pasted = "";
-    this.pasting = false;
+  /** the game in progress, as a row of the history, unless it is already saved @returns {GameRecord | null} */
+  get current() {
+    const g = this.game;
+    if (!g || g.saved) return null;
+    const player = g.playerFinal ?? { nt: pntOf(g), forets: 0, cartes: 0, autres: 0 };
+    return gameRecord(g, { playerScore: g.playerScore ?? null, remark: g.remark ?? "", date: new Date(g.savedAt).toISOString(), player });
+  }
+
+  /** @param {Which} which @param {string} date */
+  actions(which, date) {
+    const H = t.history;
+    /** @param {string} name @param {string} label */
+    const button = (name, label) => html`
+      <button type="button" class="ghost" style="min-height:36px;padding:4px 10px;font-size:13px" aria-label=${H.actionAria(label, date)}
+        @click=${() => this.emit(name, which)}>${label}</button>`;
+    return html`<div class="row" style="flex-wrap:nowrap;gap:4px">${button("export", H.export)}${button("copy", H.copy)}${button("delete", H.delete)}</div>`;
+  }
+
+  /** @param {GameRecord} h @param {boolean} [current] */
+  row(h, current = false) {
+    const date = new Date(h.date).toLocaleDateString(t.locale);
+    const state = current ? (this.game?.status === "ended" ? t.history.unsaved : t.history.current) : winner(h);
+    return html`
+      <tr style=${current ? "background:var(--panel2)" : ""}>
+        <td>${this.actions(current ? "current" : recordKey(h), date)}</td>
+        <td>${date}</td>
+        <td>${t.level[h.niveau] || h.niveau}</td>
+        <td>${h.version || "—"}</td>
+        <td class="n">${h.tours}</td>
+        <td class="n">${h.scoreJoueur ?? "—"}</td>
+        <td class="n">${h.joueur ? h.joueur.nt : "—"}</td>
+        <td class="n">${stepsPerAction(h)}</td>
+        <td class="n">${h.scoreAutoma}</td>
+        <td>${current ? html`<b>${state}</b>` : state}</td>
+        <td><tr-curve .track=${h.courbe} width="120" height="40"></tr-curve></td>
+        <td><tr-curve kind="crans" .track=${h.courbe} width="120" height="40"></tr-curve></td>
+        <td style="min-width:160px">${h.remarque || ""}</td>
+      </tr>`;
   }
 
   /** the file input is hidden: the Import button opens it */
@@ -52,17 +91,23 @@ export class HistoryScreen extends LightElement {
     input.value = "";
   }
 
+  importText() {
+    this.emit("import-text", this.pasted);
+    this.pasted = "";
+    this.pasting = false;
+  }
+
   backup() {
-    const T = t.transfer, n = this.notice;
+    const T = t.transfer, n = this.notice, any = !!this.game || this.games.length > 0;
     return html`
       <div class="fcard">
         <span class="lab">${T.title}</span>
         <p style="font-size:14px">${T.intro}</p>
         <div class="row">
-          <button type="button" class="ghost" ?disabled=${!this.canExport} @click=${() => this.emit("export")}>${T.export}</button>
+          <button type="button" class="ghost" ?disabled=${!any} @click=${() => this.emit("export", "all")}>${T.exportAll}</button>
+          <button type="button" class="ghost" ?disabled=${!any} @click=${() => this.emit("copy", "all")}>${T.copyAll}</button>
           <button type="button" class="ghost" @click=${this.pickFile}>${T.import}</button>
           <input type="file" id="import-file" accept=".json,application/json" hidden @change=${this.onFile}>
-          <button type="button" class="ghost" ?disabled=${!this.canExport} @click=${() => this.emit("copy")}>${T.copy}</button>
           <button type="button" class="ghost" aria-expanded=${this.pasting} @click=${() => { this.pasting = !this.pasting; }}>${T.paste}</button>
         </div>
         ${this.pasting ? html`
@@ -70,31 +115,11 @@ export class HistoryScreen extends LightElement {
             <textarea id="paste-text" rows="4" .value=${this.pasted} style="border:1.5px solid var(--line);background:var(--panel);border-radius:8px;padding:8px 10px;width:100%;font:inherit;font-size:13px"
               @input=${(/** @type {InputEvent} */ e) => { this.pasted = /** @type {HTMLTextAreaElement} */ (e.target).value; }}></textarea></div>
           <div class="row"><button type="button" class="cta" ?disabled=${!this.pasted.trim()} @click=${this.importText}>${T.importText}</button></div>` : nothing}
-        ${n ? html`<p class="toast" role="status" style=${n.error ? "color:var(--danger)" : ""}>${n.text}</p>` : nothing}
       </div>`;
   }
 
-  /** @param {GameRecord} h */
-  row(h) {
-    return html`
-      <tr>
-        <td>${new Date(h.date).toLocaleDateString(t.locale)}</td>
-        <td>${t.level[h.niveau] || h.niveau}</td>
-        <td>${h.version || "—"}</td>
-        <td class="n">${h.tours}</td>
-        <td class="n">${h.scoreJoueur ?? "—"}</td>
-        <td class="n">${h.joueur ? h.joueur.nt : "—"}</td>
-        <td class="n">${stepsPerAction(h)}</td>
-        <td class="n">${h.scoreAutoma}</td>
-        <td>${winner(h)}</td>
-        <td><tr-curve .track=${h.courbe} width="120" height="40"></tr-curve></td>
-        <td><tr-curve kind="crans" .track=${h.courbe} width="120" height="40"></tr-curve></td>
-        <td style="min-width:160px">${h.remarque || ""}</td>
-      </tr>`;
-  }
-
   render() {
-    const games = this.games, n = games.length;
+    const games = this.games, n = games.length, current = this.current;
     const won = games.filter(h => h.scoreJoueur != null && h.scoreJoueur > h.scoreAutoma).length;
     return html`
       <section class="panel">
@@ -102,13 +127,13 @@ export class HistoryScreen extends LightElement {
           <h2 style="font-size:28px;font-style:italic;text-transform:uppercase">${t.history.title}</h2>
           <button type="button" class="ghost" @click=${() => this.emit("back")}>${t.history.back}</button>
         </div>
-        ${n ? html`
-          <p>${t.history.summary(n, won)}</p>
+        ${n ? html`<p>${t.history.summary(n, won)}</p>` : html`<p>${t.history.empty}</p>`}
+        ${this.notice ? html`<p class="toast" role="status" style=${this.notice.error ? "color:var(--danger)" : ""}>${this.notice.text}</p>` : nothing}
+        ${n || current ? html`
           <div class="scroll"><table>
-            <thead><tr>${t.history.cols.map((c, i) => html`<th class=${[3, 4, 5, 6, 7].includes(i) ? "n" : ""}>${c}</th>`)}</tr></thead>
-            <tbody>${games.map(h => this.row(h))}</tbody>
-          </table></div>`
-        : html`<p>${t.history.empty}</p>`}
+            <thead><tr>${t.history.cols.map((c, i) => html`<th class=${[4, 5, 6, 7, 8].includes(i) ? "n" : ""}>${c}</th>`)}</tr></thead>
+            <tbody>${current ? this.row(current, true) : nothing}${games.map(h => this.row(h))}</tbody>
+          </table></div>` : nothing}
         ${this.backup()}
       </section>`;
   }

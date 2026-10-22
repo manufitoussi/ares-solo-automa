@@ -40,7 +40,7 @@ export function parseImport(text) {
 }
 
 /** the same saved game, whatever the file it comes from @param {GameRecord} r */
-const recordKey = r => `${r.createdAt}|${r.date}`;
+export const recordKey = r => `${r.createdAt}|${r.date}`;
 
 /** Adds the imported records to the history, without duplicates, most recent first.
     @param {GameRecord[]} current @param {GameRecord[]} incoming @returns {{ history: GameRecord[], added: number }} */
