@@ -163,13 +163,16 @@ const en = {
 
   transfer: {
     title: "Backup",
-    intro: "To go on with another device or keep a copy: export a file with the game in progress and the history, then import it on the other device. The imported history is added to this one.",
-    export: "Export", import: "Import",
+    intro: "To go on with another device or keep a copy: export a file (or copy the text) with the game in progress and the history, then import it (or paste it) on the other device. The imported history is added to this one.",
+    export: "Export", import: "Import", copy: "Copy", paste: "Paste",
+    pasteLabel: "Paste the text of a backup here", importText: "Import the text",
+    copied: "Backup copied: paste it in the app of the other device (History, Paste).",
+    copyFailed: "Copying did not work: use Export instead.",
     fileName: date => `automa-backup-${date}.json`,
-    replace: "Replace the game in progress with the one in the file?",
+    replace: "Replace the game in progress with the one in the backup?",
     done: (game, added) => `Imported: ${game ? "the game in progress, and " : ""}${pl(added, "game added", "games added")} to the history.`,
     kept: "The game in progress on this device is kept.",
-    error: { json: "This file cannot be read.", format: "This file does not come from this app.", empty: "This file has no game and no history." }
+    error: { json: "This backup cannot be read.", format: "This backup does not come from this app.", empty: "This backup has no game and no history." }
   },
 
   curve: {

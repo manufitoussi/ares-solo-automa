@@ -15,13 +15,16 @@ const stepsPerAction = h => {
 };
 
 /* The saved games of this browser, most recent first, and the backup of the data.
-   Reports `back` to return to the game, `export`, and `import` (detail: the chosen file);
+   Reports `back` to return to the game, `export`, `copy`, `import` (detail: the chosen file)
+   and `import-text` (detail: the pasted text);
    `notice` is the result of the last import, set by the parent. */
 export class HistoryScreen extends LightElement {
   static properties = {
     games: { attribute: false },
     canExport: { type: Boolean },
-    notice: { attribute: false }
+    notice: { attribute: false },
+    pasting: { state: true },
+    pasted: { state: true }
   };
 
   constructor() {
@@ -29,6 +32,14 @@ export class HistoryScreen extends LightElement {
     this.games = /** @type {GameRecord[]} */ ([]);
     this.canExport = false;
     this.notice = /** @type {{ error: boolean, text: string } | null} */ (null);
+    this.pasting = false;
+    this.pasted = "";
+  }
+
+  importText() {
+    this.emit("import-text", this.pasted);
+    this.pasted = "";
+    this.pasting = false;
   }
 
   /** the file input is hidden: the Import button opens it */
@@ -51,7 +62,14 @@ export class HistoryScreen extends LightElement {
           <button type="button" class="ghost" ?disabled=${!this.canExport} @click=${() => this.emit("export")}>${T.export}</button>
           <button type="button" class="ghost" @click=${this.pickFile}>${T.import}</button>
           <input type="file" id="import-file" accept=".json,application/json" hidden @change=${this.onFile}>
+          <button type="button" class="ghost" ?disabled=${!this.canExport} @click=${() => this.emit("copy")}>${T.copy}</button>
+          <button type="button" class="ghost" aria-expanded=${this.pasting} @click=${() => { this.pasting = !this.pasting; }}>${T.paste}</button>
         </div>
+        ${this.pasting ? html`
+          <div class="field"><label for="paste-text">${T.pasteLabel}</label>
+            <textarea id="paste-text" rows="4" .value=${this.pasted} style="border:1.5px solid var(--line);background:var(--panel);border-radius:8px;padding:8px 10px;width:100%;font:inherit;font-size:13px"
+              @input=${(/** @type {InputEvent} */ e) => { this.pasted = /** @type {HTMLTextAreaElement} */ (e.target).value; }}></textarea></div>
+          <div class="row"><button type="button" class="cta" ?disabled=${!this.pasted.trim()} @click=${this.importText}>${T.importText}</button></div>` : nothing}
         ${n ? html`<p class="toast" role="status" style=${n.error ? "color:var(--danger)" : ""}>${n.text}</p>` : nothing}
       </div>`;
   }

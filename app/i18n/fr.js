@@ -204,15 +204,18 @@ const fr = {
 
   transfer: {
     title: "Sauvegarde",
-    intro: "Pour continuer sur un autre appareil ou garder une copie : exporter un fichier avec la partie en cours et l'historique, puis l'importer sur l'autre appareil. L'historique importé s'ajoute à celui-ci.",
-    export: "Exporter", import: "Importer",
+    intro: "Pour continuer sur un autre appareil ou garder une copie : exporter un fichier (ou copier le texte) avec la partie en cours et l'historique, puis l'importer (ou le coller) sur l'autre appareil. L'historique importé s'ajoute à celui-ci.",
+    export: "Exporter", import: "Importer", copy: "Copier", paste: "Coller",
+    pasteLabel: "Coller ici le texte d'une sauvegarde", importText: "Importer le texte",
+    copied: "Sauvegarde copiée : la coller dans l'appli de l'autre appareil (Historique, Coller).",
+    copyFailed: "La copie n'a pas marché : utiliser Exporter.",
     /** @param {string} date */
     fileName: date => `automa-sauvegarde-${date}.json`,
-    replace: "Remplacer la partie en cours par celle du fichier ?",
+    replace: "Remplacer la partie en cours par celle de la sauvegarde ?",
     /** @param {boolean} game @param {number} added */
     done: (game, added) => `Importé : ${game ? "la partie en cours, et " : ""}${pl(added, "partie ajoutée", "parties ajoutées")} à l'historique.`,
     kept: "La partie en cours de cet appareil est gardée.",
-    error: { json: "Ce fichier n'est pas lisible.", format: "Ce fichier ne vient pas de cette appli.", empty: "Ce fichier ne contient ni partie ni historique." }
+    error: { json: "Cette sauvegarde n'est pas lisible.", format: "Cette sauvegarde ne vient pas de cette appli.", empty: "Cette sauvegarde ne contient ni partie ni historique." }
   },
 
   curve: {

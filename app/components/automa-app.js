@@ -107,6 +107,7 @@ export class AutomaApp extends LightElement {
   /* the game in progress and the history, as a file to save */
   exportFile() {
     const data = exportData({ game: this.game, history: loadHistory() });
+    this.notice = null;
     const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
     const a = Object.assign(document.createElement("a"), { href: url, download: t.transfer.fileName(data.exportedAt.slice(0, 10)) });
     document.body.append(a);
@@ -115,12 +116,27 @@ export class AutomaApp extends LightElement {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  /** the history of the file is added; its game replaces the one in progress, once confirmed
-      @param {CustomEvent<File>} e */
-  async importFile(e) {
+  /* the same, as text in the clipboard (the clipboard needs https, or localhost) */
+  async copyText() {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(exportData({ game: this.game, history: loadHistory() })));
+      this.notice = { error: false, text: t.transfer.copied };
+    } catch {
+      this.notice = { error: true, text: t.transfer.copyFailed };
+    }
+  }
+
+  /** @param {CustomEvent<File>} e */
+  async importFile(e) { this.importText(await e.detail.text()); }
+  /** @param {CustomEvent<string>} e */
+  importPasted(e) { this.importText(e.detail); }
+
+  /** the history of the backup is added; its game replaces the one in progress, once confirmed
+      @param {string} text */
+  importText(text) {
     const T = t.transfer;
     try {
-      const data = parseImport(await e.detail.text());
+      const data = parseImport(text);
       const { history, added } = mergeHistory(loadHistory(), data.history);
       saveHistory(history);
       this.history = history;
@@ -211,7 +227,7 @@ export class AutomaApp extends LightElement {
       ${this.renderTop()}
       ${this.view === "history" ? html`
         <history-screen .games=${this.history} .notice=${this.notice} ?canExport=${!!this.game || this.history.length > 0}
-          @back=${() => { this.view = "game"; }} @export=${this.exportFile} @import=${this.importFile}></history-screen>`
+          @back=${() => { this.view = "game"; }} @export=${this.exportFile} @copy=${this.copyText} @import=${this.importFile} @import-text=${this.importPasted}></history-screen>`
       : this.game ? this.renderGame(this.game) : html`
         <div class="solo"><setup-screen @begin=${this.begin}></setup-screen></div>`}`;
   }
