@@ -35,6 +35,13 @@ export class AutomaApp extends LightElement {
     this.history = [];
   }
 
+  /* The tag holds the start screen of index.html: clear it before the first render,
+     otherwise Lit would render next to it (in the light DOM, it adds, it does not replace). */
+  createRenderRoot() {
+    this.replaceChildren();
+    return this;
+  }
+
   /* updated runs after each render, with the properties that changed: saving here covers
      every way the game can change (a move, undo, a new game) in one place. */
   updated(changed) {
