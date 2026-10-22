@@ -325,6 +325,11 @@ footer .ft { font-family: var(--display); font-weight: 600; letter-spacing: 0.16
 .round .eng .up { stroke: var(--cyan); stroke-width: 2; }
 .round .mcard { width: 6.6rem; transform: rotate(3deg); }
 .round .mcard.pcard { transform: rotate(-3deg); }
+/* the automa card component (app/components/automa-card.js): the hand-drawn card inside is its
+   no-JS fallback, so the rotation goes on the component */
+automa-card { display: inline-block; position: relative; flex-shrink: 0; vertical-align: top; }
+.round automa-card > .mcard, automa-card > .mcard { transform: none; }
+.round automa-card { --automa-card-width: 6.6rem; transform: rotate(3deg); }
 .chip { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--display); font-style: italic; font-weight: 800; font-size: 0.95rem; text-transform: uppercase; color: #ffffff; padding: 0.2rem 0.7rem 0.25rem 0; clip-path: polygon(0 0, calc(100% - 0.5rem) 0, 100% 0.5rem, 100% 100%, 0 100%); }
 .chip i { background: rgba(0, 0, 0, 0.26); padding: 0.2rem 0.5rem 0.25rem; margin: -0.2rem 0 -0.25rem; }
 .mcard.pcard .cp { flex: 1; display: flex; flex-direction: column; justify-content: center; text-align: center; font-size: 0.5rem; line-height: 1.2; padding: 0 0.1rem; }

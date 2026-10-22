@@ -1,6 +1,8 @@
 import { LitElement, html, css, nothing, styleMap } from "lit";
 import { PH, CIB, card } from "../engine.js";
-import { PHASE_COLOR, REACT_COLOR, PHASE_TINT, TARGET_COLOR, EFFECT, PLAYER, EFFECT_SHORT, PLAYER_SHORT, TARGET_SHORT, REACT_RULE, icon } from "./ui.js";
+import { PHASE_COLOR, REACT_COLOR, PHASE_TINT, TARGET_COLOR, icon } from "./ui.js";
+import { cardTextFor } from "./card-text.js";
+/** @typedef {import("./card-text.js").CardText} CardText */
 /** @typedef {import("../engine.js").Phase} Phase */
 /** @typedef {import("../engine.js").Target} Target */
 /** @typedef {import("../engine.js").Card} Card */
@@ -13,6 +15,7 @@ import { PHASE_COLOR, REACT_COLOR, PHASE_TINT, TARGET_COLOR, EFFECT, PLAYER, EFF
    `phase` and `target` default to the ones printed on the card. A reactive card (13 to 15)
    depends on the game: without `phase`, it shows its general rule.
    `still` turns off the flip animation, for when the card stays on screen.
+   Its texts follow the language of the page (the closest lang attribute): French or English.
 
    What a page can still change from outside:
    - `size`: tiny (8.4rem, shorter texts, for an illustration), small (200px), normal (260px)
@@ -116,34 +119,34 @@ export class AutomaCard extends LitElement {
   }
 
   /** the target box; Course shown outside a game has no target yet: the least advanced one
-      @param {Target | null} target @param {boolean} tiny */
-  targetBox(target, tiny) {
+      @param {CardText} T @param {Target | null} target @param {boolean} tiny */
+  targetBox(T, target, tiny) {
     if (!target) return html`
       <div class="cib" part="target" style="border-color:#2FB6C0">
-        <span class="ti">${icon("oxy", 24)}${icon("temp", 24)}${icon("ocean", 24)}</span><span class="cn">Le moins avancé</span>
+        <span class="ti">${icon("oxy", 24)}${icon("temp", 24)}${icon("ocean", 24)}</span><span class="cn">${T.label.least}</span>
       </div>`;
     return html`
       <div class="cib" part="target" style=${styleMap({ borderColor: TARGET_COLOR[target] })}>
-        <span class="l">Cible</span><span class="ti">${icon(target, 24)}</span>
-        <span class="cn">${tiny ? TARGET_SHORT[target] : CIB[target].nom}</span>
+        <span class="l">${T.label.target}</span><span class="ti">${icon(target, 24)}</span>
+        <span class="cn">${(tiny ? T.targetShort : T.target)[target]}</span>
         <span class="cc">1 ${icon("argent", 14)}</span>
       </div>`;
   }
 
   /** what the card says the automa does: its effect, or the general rule of a reactive card
-      shown outside a game @param {Card} cd @param {Phase | null} ph @param {boolean} tiny */
-  effect(cd, ph, tiny) {
+      shown outside a game @param {CardText} T @param {Card} cd @param {Phase | null} ph @param {boolean} tiny */
+  effect(T, cd, ph, tiny) {
     if (!ph || (cd.react && !this.phase)) return html`
-      <div class="au" part="effect" style="background:#E3F2F3"><p>${cd.react ? REACT_RULE[cd.react] : ""}</p></div>`;
+      <div class="au" part="effect" style="background:#E3F2F3"><p>${cd.react ? T.rule[cd.react] : ""}</p></div>`;
     return html`
-      ${cd.react ? html`<div class="why">Il joue : <b>${PH[ph].nom}</b>. ${this.why}</div>` : nothing}
-      <div class="au" part="effect" style=${styleMap({ background: PHASE_TINT[ph] })}><p>${(tiny ? EFFECT_SHORT : EFFECT)[ph]}</p></div>`;
+      ${cd.react ? html`<div class="why">${T.label.plays} <b>${T.phase[ph]}</b>. ${this.why}</div>` : nothing}
+      <div class="au" part="effect" style=${styleMap({ background: PHASE_TINT[ph] })}><p>${(tiny ? T.effectShort : T.effect)[ph]}</p></div>`;
   }
 
   render() {
     const cd = this.number == null ? undefined : card(this.number);
     if (!cd) return nothing;
-    const tiny = this.size === "tiny";
+    const tiny = this.size === "tiny", T = cardTextFor(this);
     /* The attributes come from any HTML page: an unknown phase or target draws nothing.
        Course always plays Action, so its phase is known even outside a game. */
     /** @type {Phase | null} */
@@ -156,17 +159,17 @@ export class AutomaCard extends LitElement {
       ? { background: REACT_COLOR, color: null }
       : { background: C.col, color: C.dark ? "#1F1A24" : null };
     return html`
-      <div class="card" part="card" role="img" aria-label="Carte automa ${cd.n}">
+      <div class="card" part="card" role="img" aria-label="${T.label.automa} ${cd.n}">
         <div class="kban" part="banner" style=${styleMap(banner)}>
           ${cd.react || !ph
             ? html`<span class="r" style="color:#8FE3E8">?</span><span class="nm">${cd.react}</span>`
-            : html`<span class="r">${ph}</span><span class="nm">${PH[ph].nom}</span>`}
+            : html`<span class="r">${ph}</span><span class="nm">${T.phase[ph]}</span>`}
         </div>
-        <div class="meta"><span>Automa${cd.react && !tiny ? " · réactive" : ""}</span><span>${String(cd.n).padStart(2, "0")} / 15</span></div>
-        ${this.effect(cd, ph, tiny)}
+        <div class="meta"><span>${T.label.automa}${cd.react && !tiny ? ` · ${T.label.reactive}` : ""}</span><span>${String(cd.n).padStart(2, "0")} / 15</span></div>
+        ${this.effect(T, cd, ph, tiny)}
         <div class="sp"></div>
-        ${this.targetBox(target, tiny)}
-        ${ph ? html`<div class="vous" part="player"><span class="t">Joueur</span><p>${(tiny ? PLAYER_SHORT : PLAYER)[ph]}</p></div>` : nothing}
+        ${this.targetBox(T, target, tiny)}
+        ${ph ? html`<div class="vous" part="player"><span class="t">${T.label.player}</span><p>${(tiny ? T.playerShort : T.player)[ph]}</p></div>` : nothing}
       </div>`;
   }
 }

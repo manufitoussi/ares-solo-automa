@@ -4,7 +4,6 @@ import { MOTEUR0, PH } from "../engine.js";
 /** @typedef {import("../engine.js").Phase} Phase */
 /** @typedef {import("../engine.js").Target} Target */
 /** @typedef {import("../engine.js").Level} Level */
-/** @typedef {import("../engine.js").Reaction} Reaction */
 
 /* What only the interface needs: colours, icons and help texts. The rules stay in engine.js. */
 
@@ -49,49 +48,8 @@ export const cardIcon = (col, size = 14) =>
 export const TARGET_COLOR = { oxy: "#A33B33", temp: "#C2362B", ocean: "#2E6FA8" };
 /** @type {Record<Phase, string>} */
 export const PHASE_TINT = { I: "#DCEADB", II: "linear-gradient(100deg,#DAE3EF,#F3DCD8)", III: "#D6E9F3", IV: "#F6DCCB", V: "#F6EBBF" };
-const CU = icon("cube", 14), AG = icon("argent", 14);
-/** what the automa does in the phase @type {Record<Phase, TemplateResult>} */
-export const EFFECT = {
-  I: html`+1 ${CU}. Puis, s'il a 1 ${AG}, il le dépense&nbsp;: <b>moteur +1</b>.`,
-  II: html`+1 ${CU}. Puis il pose 1 ${CU} sur son <b>compteur de PV</b>.`,
-  III: html`+1 ${CU}. Puis il dépense <b>tous ses ${AG}</b> sur sa cible : 1 cran par ${AG}.`,
-  IV: html`+1 ${CU}. Puis il gagne <b>autant de ${CU} que son moteur</b>.`,
-  V: html`+1 ${CU}. Rien de plus.`
-};
-/** what the player does in the phase (third person, as on the printed cards) @type {Record<Phase, TemplateResult>} */
-export const PLAYER = {
-  I: html`peut jouer 1 ${cardIcon("#3D7A47")} carte verte.`,
-  II: html`peut jouer 1 ${cardIcon("#2E5A8A")} carte bleue ou 1 ${cardIcon("#B5342A")} rouge.`,
-  III: html`active ses « Action : » et les actions standard de son choix.`,
-  IV: html`produit : ${icon("mc", 14)} production + NT, ${icon("chaleur", 14)} chaleur, ${icon("plantes", 14)} plantes, ${icon("cartes", 14)} cartes.`,
-  V: html`pioche 2 ${icon("cartes", 14)} cartes et en garde&nbsp;1.`
-};
-
 /** a small phase label, as in the list of the phases of the round @param {Phase} ph @param {string} [cls] */
 export const phaseChip = (ph, cls = "") => {
   const C = PHASE_COLOR[ph];
   return html`<span class="chip ${cls}" style="background:${C.col};${C.dark ? "color:#1F1A24" : ""}"><i>${ph}</i>${PH[ph].nom}</span>`;
-};
-
-/* Shorter texts for the tiny card, as on the landing page */
-/** @type {Record<Phase, TemplateResult>} */
-export const EFFECT_SHORT = {
-  I: html`+1 ${CU}, puis 1 ${AG} : <b>moteur +1</b>.`,
-  II: html`+1 ${CU}, puis 1 ${CU} sur son <b>compteur de PV</b>.`,
-  III: html`+1 ${CU}, puis tous ses ${AG} sur sa cible.`,
-  IV: html`+1 ${CU}, puis autant de ${CU} que son moteur.`,
-  V: html`+1 ${CU}. Rien de plus.`
-};
-/** @type {Record<Phase, string>} */
-export const PLAYER_SHORT = {
-  I: "joue 1 carte verte.", II: "joue 1 carte bleue ou rouge.", III: "active ses actions.",
-  IV: "produit.", V: "pioche 2 cartes, en garde 1."
-};
-/** @type {Record<Target, string>} */
-export const TARGET_SHORT = { oxy: "Oxygène", temp: "Temp.", ocean: "Océan" };
-/** what a reactive card does, when it is shown outside a game (no phase chosen yet) @type {Record<Reaction, string>} */
-export const REACT_RULE = {
-  Riposte: "Il joue la phase du joueur au tour précédent (Production au premier tour).",
-  Opportuniste: "Action s'il a un argent, sinon Production.",
-  Course: "Action, sur le paramètre le moins avancé."
 };
