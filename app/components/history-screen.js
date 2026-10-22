@@ -3,6 +3,7 @@ import { LightElement } from "./light-element.js";
 import { gameRecord, pntOf } from "../engine.js";
 import { recordKey } from "../transfer.js";
 import { t } from "../i18n.js";
+import { actionIcon } from "./ui.js";
 import "./tr-curve.js";
 /** @typedef {import("../engine.js").Game} Game */
 /** @typedef {import("../engine.js").GameRecord} GameRecord */
@@ -52,10 +53,11 @@ export class HistoryScreen extends LightElement {
   /** @param {Which} which @param {string} date */
   actions(which, date) {
     const H = t.history;
-    /** @param {string} name @param {string} label */
+    /* icon buttons: the action is said by the tooltip and to screen readers */
+    /** @param {"export" | "copy" | "delete"} name @param {string} label */
     const button = (name, label) => html`
-      <button type="button" class="ghost" style="min-height:36px;padding:4px 10px;font-size:13px" aria-label=${H.actionAria(label, date)}
-        @click=${() => this.emit(name, which)}>${label}</button>`;
+      <button type="button" class="ghost icon-btn ${name === "delete" ? "danger" : ""}" title=${label} aria-label=${H.actionAria(label, date)}
+        @click=${() => this.emit(name, which)}>${actionIcon(name)}</button>`;
     return html`<div class="row" style="flex-wrap:nowrap;gap:4px">${button("export", H.export)}${button("copy", H.copy)}${button("delete", H.delete)}</div>`;
   }
 
@@ -104,11 +106,11 @@ export class HistoryScreen extends LightElement {
         <span class="lab">${T.title}</span>
         <p style="font-size:14px">${T.intro}</p>
         <div class="row">
-          <button type="button" class="ghost" ?disabled=${!any} @click=${() => this.emit("export", "all")}>${T.exportAll}</button>
-          <button type="button" class="ghost" ?disabled=${!any} @click=${() => this.emit("copy", "all")}>${T.copyAll}</button>
-          <button type="button" class="ghost" @click=${this.pickFile}>${T.import}</button>
+          <button type="button" class="ghost" ?disabled=${!any} @click=${() => this.emit("export", "all")}>${actionIcon("export")}${T.exportAll}</button>
+          <button type="button" class="ghost" ?disabled=${!any} @click=${() => this.emit("copy", "all")}>${actionIcon("copy")}${T.copyAll}</button>
+          <button type="button" class="ghost" @click=${this.pickFile}>${actionIcon("import")}${T.import}</button>
           <input type="file" id="import-file" accept=".json,application/json" hidden @change=${this.onFile}>
-          <button type="button" class="ghost" aria-expanded=${this.pasting} @click=${() => { this.pasting = !this.pasting; }}>${T.paste}</button>
+          <button type="button" class="ghost" aria-expanded=${this.pasting} @click=${() => { this.pasting = !this.pasting; }}>${actionIcon("paste")}${T.paste}</button>
         </div>
         ${this.pasting ? html`
           <div class="field"><label for="paste-text">${T.pasteLabel}</label>

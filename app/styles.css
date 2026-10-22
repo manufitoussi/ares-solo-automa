@@ -189,3 +189,7 @@ automa-app{display:flex;flex-direction:column;gap:14px}
   .splash .cubes svg:nth-child(3){animation-delay:.3s}
   @keyframes hop{0%,60%,100%{transform:none}30%{transform:translateY(-12px)}}
 }
+/* buttons with an action icon: icon and text side by side; icon only in the history rows */
+.ghost:has(svg){display:inline-flex;align-items:center;gap:6px}
+.icon-btn{min-height:40px;min-width:40px;padding:6px;justify-content:center}
+.icon-btn.danger{color:var(--danger)}

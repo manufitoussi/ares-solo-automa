@@ -54,3 +54,16 @@ export const phaseChip = (ph, cls = "") => {
   const C = PHASE_COLOR[ph];
   return html`<span class="chip ${cls}" style="background:${C.col};${C.dark ? "color:#1F1A24" : ""}"><i>${ph}</i>${t.phase[ph]}</span>`;
 };
+
+/* Action icons, drawn with lines in the colour of the text (our own drawings, nothing official). */
+const ACTIONS = {
+  export: svg`<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>`,
+  import: svg`<path d="M12 21V9M7 14l5-5 5 5M5 3h14"/>`,
+  copy: svg`<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/>`,
+  paste: svg`<rect x="5" y="4" width="14" height="18" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/>`,
+  delete: svg`<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>`
+};
+/** @typedef {keyof typeof ACTIONS} ActionIcon */
+/** @param {ActionIcon} name @param {number} [size] */
+export const actionIcon = (name, size = 18) =>
+  html`<svg width=${size} height=${size} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0">${ACTIONS[name]}</svg>`;
