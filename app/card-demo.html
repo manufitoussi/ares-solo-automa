@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carte automa · démo</title>
+<!-- The page only declares the fonts and loads the component: the card brings its own styles. -->
+<style>
+@font-face{font-family:'Barlow Condensed';font-weight:600;font-display:swap;src:url('fonts/BarlowCondensed-SemiBold.ttf')}
+@font-face{font-family:'Barlow Condensed';font-weight:700;font-display:swap;src:url('fonts/BarlowCondensed-Bold.ttf')}
+@font-face{font-family:'Barlow Condensed';font-weight:800;font-style:italic;font-display:swap;src:url('fonts/BarlowCondensed-ExtraBoldItalic.ttf')}
+@font-face{font-family:'Source Serif 4';font-weight:200 900;font-display:swap;src:url('fonts/SourceSerif4.ttf')}
+:root{--bg:#F3F8F8;--ink:#12202B;--muted:#4F5B62}
+@media (prefers-color-scheme: dark){:root{--bg:#0E1820;--ink:#E4EEF0;--muted:#9DB2BA}}
+body{margin:0;padding:16px;background:var(--bg);color:var(--ink);font-family:'Source Serif 4',Georgia,serif}
+h1,h2{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:800;text-transform:uppercase;margin:24px 0 8px}
+p{margin:0 0 12px;color:var(--muted);max-width:70ch}
+code{font-size:.9em}
+.row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+.fig{display:flex;flex-direction:column;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+label{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+
+/* customisation from outside the shadow root */
+.glow{--automa-card-shadow:0 0 0 3px #2FB6C0,0 8px 24px rgba(47,182,192,.45)}
+.flat{--automa-card-shadow:none}
+.flat::part(banner){clip-path:none}
+.flat::part(card){border-radius:0}
+.cream{--automa-card-background:#FFF8E8;--automa-card-font:Georgia,serif}
+.cream::part(target){border-style:dashed;border-width:2px}
+/* the landing page's hand-drawn mini card (site/assets/style.css), used as the no-JS fallback */
+.mcard { position: relative; width: 8.4rem; aspect-ratio: 63 / 88; flex-shrink: 0; background: #ffffff; color: #1f1a24; border: 1px solid #bdbdbd; border-radius: 0.4rem; padding: 0.3rem; display: flex; flex-direction: column; gap: 0.2rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18); font-family: 'Source Serif 4', Georgia, serif; font-size: 0.6rem; line-height: 1.25; overflow: hidden; }
+.mcard .kb { display: flex; flex-shrink: 0; height: 1.5rem; color: #ffffff; clip-path: polygon(0 0, calc(100% - 0.4rem) 0, 100% 0.4rem, 100% 100%, 0.25rem 100%, 0 calc(100% - 0.25rem)); }
+.mcard .kb i { width: 1.15rem; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.26); font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-style: italic; font-weight: 800; font-size: 0.9rem; }
+.mcard .kb span { display: flex; align-items: center; padding: 0 0.3rem; font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-style: italic; font-weight: 800; font-size: 0.72rem; text-transform: uppercase; white-space: nowrap; }
+.mcard .mt { display: flex; justify-content: space-between; font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-weight: 600; font-size: 0.45rem; letter-spacing: 0.14em; text-transform: uppercase; color: #1b5a7e; border-bottom: 1px solid #2fb6c0; }
+.mcard .au { border-radius: 0.2rem; padding: 0.3rem; font-size: 0.6rem; }
+.mcard .sp { flex: 1; }
+.mcard .cb { display: flex; align-items: center; gap: 0.15rem; border: 1px solid #2fb6c0; border-radius: 0.2rem; padding: 0.15rem 0.25rem; font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-style: italic; font-weight: 800; font-size: 0.6rem; min-width: 0; overflow: hidden; text-transform: uppercase; white-space: nowrap; }
+.mcard .cb b { margin-left: auto; display: flex; align-items: center; font-style: normal; }
+.mcard .jo { border-top: 1px dashed #b9a48c; padding-top: 0.15rem; font-size: 0.5rem; color: #33302e; }
+.mcard .jo b { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-style: italic; font-weight: 800; text-transform: uppercase; background: #e2be2c; padding: 0 0.2rem; }
+.mcard .pi { vertical-align: -1px; }
+.fig .mcard{margin:0}
+</style>
+<script type="importmap">{ "imports": { "lit": "./vendor/lit-all.min.js" } }</script>
+<script type="module" src="components/automa-card.js"></script>
+</head>
+<body>
+<h1>La carte automa</h1>
+<p>Un seul composant, <code>&lt;automa-card&gt;</code>, en Shadow DOM : il apporte ses propres styles, la page ne déclare que les polices.</p>
+
+<h2>Largeur en direct</h2>
+<label>Largeur <input type="range" id="w" min="140" max="420" value="260"> <output id="wv">260px</output></label>
+<div class="row" id="live">
+  <automa-card number="6" still></automa-card>
+  <automa-card number="15" phase="III" target="temp" why="Paramètre le moins avancé : température." still></automa-card>
+</div>
+
+<h2>Quatre tailles : <code>size</code></h2>
+<div class="row">
+  <div class="fig"><automa-card number="10" size="tiny" still></automa-card>size="tiny"</div>
+  <div class="fig"><automa-card number="10" size="small" still></automa-card>size="small"</div>
+  <div class="fig"><automa-card number="10" still></automa-card>(normal)</div>
+  <div class="fig"><automa-card number="10" size="large" still></automa-card>size="large"</div>
+</div>
+
+<h2>En illustration : <code>size="tiny"</code></h2>
+<p>Comme sur la page d'accueil : textes courts, cartes tournées par la page (<code>transform</code> sur la balise). Une carte réactive sans <code>phase</code> montre sa règle générale.</p>
+<div class="row" style="padding:12px 0 8px">
+  <span style="display:inline-flex"><automa-card number="1" size="tiny" still style="transform:rotate(-6deg) translateX(.6rem)"></automa-card><automa-card number="5" size="tiny" still style="transform:rotate(5deg) translateX(-.6rem);z-index:1"></automa-card></span>
+  <automa-card number="9" size="tiny" still style="transform:rotate(-4deg)"></automa-card>
+  <automa-card number="15" size="tiny" still style="transform:rotate(-3deg)"></automa-card>
+  <automa-card number="13" size="tiny" still style="transform:rotate(3deg)"></automa-card>
+  <automa-card number="14" size="tiny" still style="transform:rotate(-2deg)"></automa-card>
+</div>
+
+<h2>Sans JS : le repli</h2>
+<p>La mini-carte actuelle de la page d'accueil est écrite <em>dans</em> la balise <code>&lt;automa-card&gt;</code>. Sans JS, la balise est inconnue : le navigateur affiche ce qu'elle contient. Avec JS, le composant attache son Shadow DOM, qui n'a pas de <code>&lt;slot&gt;</code> : ce contenu n'est plus affiché, la carte dessinée par Lit prend sa place.</p>
+<div class="row" style="padding:8px 0">
+  <div class="fig"><automa-card-sans-js style="display:inline-block;transform:rotate(-4deg)">
+    <div class="mcard" aria-hidden="true">
+          <span class="kb" style="background:#3D7A47"><i>I</i><span>Développement</span></span>
+          <span class="mt"><span>Automa</span><span>09 / 15</span></span>
+          <span class="au" style="background:#DCEADB">+1 <svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg>, puis 1 <svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#AEB6BD"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#E4E9ED"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#4F5B62" stroke-width="1.1" stroke-linejoin="round"/></svg> : <b>moteur +1</b>.</span>
+          <span class="sp"></span><span class="cb"><svg class="pi" width="12" height="12" viewBox="0 0 20 20" aria-hidden="true"><polygon points="10,1 17.8,5.5 17.8,14.5 10,19 2.2,14.5 2.2,5.5" fill="#2E6FA8" stroke="#183F66" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.5 11c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0" stroke="#FFFFFF" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>Océan<b>1<svg class="pi" width="9" height="9" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#AEB6BD"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#E4E9ED"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#4F5B62" stroke-width="1.1" stroke-linejoin="round"/></svg></b></span>
+          <span class="jo"><b>Joueur</b> joue 1 carte verte.</span>
+        </div>
+  </automa-card-sans-js>sans JS (simulé : balise inconnue)</div>
+  <div class="fig"><automa-card number="9" size="tiny" still style="transform:rotate(-4deg)">
+    <div class="mcard" aria-hidden="true">
+          <span class="kb" style="background:#3D7A47"><i>I</i><span>Développement</span></span>
+          <span class="mt"><span>Automa</span><span>09 / 15</span></span>
+          <span class="au" style="background:#DCEADB">+1 <svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg>, puis 1 <svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#AEB6BD"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#E4E9ED"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#4F5B62" stroke-width="1.1" stroke-linejoin="round"/></svg> : <b>moteur +1</b>.</span>
+          <span class="sp"></span><span class="cb"><svg class="pi" width="12" height="12" viewBox="0 0 20 20" aria-hidden="true"><polygon points="10,1 17.8,5.5 17.8,14.5 10,19 2.2,14.5 2.2,5.5" fill="#2E6FA8" stroke="#183F66" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.5 11c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0" stroke="#FFFFFF" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>Océan<b>1<svg class="pi" width="9" height="9" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#AEB6BD"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#E4E9ED"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#4F5B62" stroke-width="1.1" stroke-linejoin="round"/></svg></b></span>
+          <span class="jo"><b>Joueur</b> joue 1 carte verte.</span>
+        </div>
+  </automa-card>avec JS : le même HTML</div>
+</div>
+
+<h2>Personnalisée de l'extérieur</h2>
+<p>Avec les variables <code>--automa-card-*</code> et <code>::part()</code>, sans toucher au composant. Les couleurs du texte et des phases restent celles de la carte imprimée : un fond sombre la rendrait illisible.</p>
+<div class="row">
+  <div class="fig"><automa-card class="flat" number="4" still></automa-card>::part(banner), ::part(card)</div>
+  <div class="fig"><automa-card class="cream" number="9" still></automa-card>fond, police, ::part(target)</div>
+  <div class="fig"><automa-card class="glow" number="2" still></automa-card>--automa-card-shadow</div>
+</div>
+
+<h2>Les 15 cartes</h2>
+<p>Les cartes réactives (13 à 15) dépendent de la partie : ici, une phase et une raison données en exemple.</p>
+<div class="row" id="all"></div>
+
+<script type="module">
+const all = document.getElementById("all");
+const reactive = {
+  13: { phase: "II", why: "Phase du joueur au tour précédent : Construction." },
+  14: { phase: "III", why: "Il a 2 argents : il dépense en Action." },
+  15: { phase: "III", target: "ocean", why: "Paramètre le moins avancé : océan." }
+};
+for (let n = 1; n <= 15; n++) {
+  const c = document.createElement("automa-card");
+  c.number = n; c.size = "small";
+  Object.assign(c, reactive[n] || {});
+  all.append(c);
+}
+const w = document.getElementById("w"), wv = document.getElementById("wv"), live = document.getElementById("live");
+w.addEventListener("input", () => { live.style.setProperty("--automa-card-width", w.value + "px"); wv.textContent = w.value + "px"; });
+</script>
+</body>
+</html>

@@ -8,7 +8,7 @@ Un automa solo **non officiel**, créé par des fans, pour le jeu de société *
 
 **La conception se fait dans le dépôt privé `ares-solo-automa-lab`**, cloné à côté (`../ares-solo-automa-lab`) : résumé des règles, décisions, comptes rendus de parties, backlog, charte visuelle, sources des cartes et du livret, PDF de travail. Son CLAUDE.md est la source de vérité. **Ce dépôt public ne reçoit que le résultat publié** :
 
-1. **L'appli** : le prototype `app/prototype/assistant-automa.html` (règles v0.6, brouillon), publié sous `site/app/index.html`, puis la future PWA dans `site/app/`. Elle joue un ou plusieurs automas contre un joueur solo (tirage des cartes automa, calcul de leurs gains et achats, suivi des scores) et, en option, tient le plateau de chaque automa.
+1. **L'appli** (règles v0.6, brouillon) : une PWA en Lit, sans build, dont les sources sont dans `app/` et qui est publiée sous `/ares-solo-automa/app/`. Elle joue un ou plusieurs automas contre un joueur solo (tirage des cartes automa, calcul de leurs gains et achats, suivi des scores) et, en option, tient le plateau de chaque automa.
 2. **Le livret de règles** publié, en PDF, dans `rules/<langue>/` : français d'abord, puis anglais.
 3. **Les cartes à imprimer** publiées (PDF A4), dans `cards/<langue>/`.
 
@@ -18,9 +18,9 @@ Le livret et les cartes sont générés dans le lab et copiés ici par son scrip
 
 ## Organisation
 
-- `site/` : ce que GitHub Pages publie, HTML et CSS statiques qui fonctionnent sans JS. `index.html` (redirige vers `fr/` ou `en/` selon le choix enregistré ou la langue du navigateur ; sans JS, deux liens), `fr/`, `en/`, `assets/`, `app/`, `manifest.webmanifest` (le `<link rel="manifest">` est en commentaire dans les pages, à activer avec la PWA).
-- `app/` : les sources de l'appli (pour l'instant, le prototype).
-- `scripts/build-site.mjs` : copie `site/` dans `_site/`, copie les PDF de `rules/<langue>/` et `cards/<langue>/` dans `_site/downloads/rules|cards/<langue>/`, et remplace dans les pages les blocs `<!-- downloads <dossier> -->` … `<!-- /downloads -->` par la liste des fichiers (sinon la mention « bientôt » reste).
+- `site/` : ce que GitHub Pages publie, HTML et CSS statiques qui fonctionnent sans JS. `index.html` (redirige vers `fr/` ou `en/` selon le choix enregistré ou la langue du navigateur ; sans JS, deux liens), `fr/`, `en/`, `assets/`, `manifest.webmanifest` (le `<link rel="manifest">` est en commentaire dans les pages, à activer avec la PWA).
+- `app/` : l'appli, servie telle quelle (voir [app/README.md](app/README.md)) : `engine.js` (les règles, pures et testées), `components/` (composants Lit), `vendor/` (Lit 3.3.1 en un fichier, et ses types), `sw.js`, `manifest.webmanifest`, `icons/`, `fonts/` (polices SIL OFL). `app/prototype/` : l'ancien prototype en un fichier, gardé comme référence, exclu du build.
+- `scripts/build-site.mjs` : copie `site/` dans `_site/`, copie `app/` dans `_site/app/` (sans le prototype, les tests, les types ni la démo) et remplit son service worker (liste des fichiers, version calculée sur leur contenu), copie les PDF de `rules/<langue>/` et `cards/<langue>/` dans `_site/downloads/rules|cards/<langue>/`, et remplace dans les pages les blocs `<!-- downloads <dossier> -->` … `<!-- /downloads -->` par la liste des fichiers (sinon la mention « bientôt » reste).
 - `.github/workflows/pages.yml` : build et déploiement sur GitHub Pages à chaque push sur `main`.
 
 ## Conventions
@@ -34,13 +34,15 @@ Le livret et les cartes sont générés dans le lab et copiés ici par son scrip
 
 Côté appli (les questions de règles sont suivies dans le lab) :
 
-- **Technologie de l'appli** : Svelte / SvelteKit en génération statique est une piste, à confirmer. L'appli sera servie sous `/ares-solo-automa/app/` sur GitHub Pages : prévoir ce chemin de base.
 - **Mode plusieurs automas** : comment les automas se partagent les phases, les cibles et le tirage des cartes.
 - **Plateau automa en option** : l'appli peut tenir le plateau de chaque automa, mais le jeu doit rester jouable avec un plateau physique.
 
 ## Pièges
 
-- Le prototype existe en deux copies identiques, `app/prototype/assistant-automa.html` et `site/app/index.html` : ne le modifier que pour corriger un défaut, dans les deux fichiers.
-- `site/app/` est une PWA minimale autour du prototype : `manifest.webmanifest`, `sw.js` (service worker, cache hors ligne), `icons/` et `fonts/` (polices SIL OFL servies avec l'appli). **Monter `VERSION` dans `sw.js` à chaque changement de l'appli**, sinon les appareils gardent l'ancienne version en cache pour les polices et icônes (la page elle-même est rechargée dès qu'il y a du réseau).
+- L'appli n'a **pas de build** : le navigateur charge les fichiers de `app/` tels quels, et une import map fait pointer `lit` vers `vendor/lit-all.min.js`. Ne pas y importer le paquet npm `lit` : il ne sert qu'aux types.
+- Le service worker (`app/sw.js`) ne fait rien tant qu'il n'est pas rempli par le build : la version et la liste des fichiers s'y mettent seules. Hors ligne, l'appli tourne sur le cache de la dernière visite.
+- `npm test` vérifie les types (TypeScript sur le JS et ses commentaires JSDoc, `jsconfig.json`), les templates (`lit-analyzer`) et lance les tests du moteur. Le moteur ne doit pas diverger des règles du lab : une règle change d'abord dans le lab.
+- **Aucun texte dans les composants ni dans le moteur** : tous les textes de l'appli sont dans `app/i18n/fr.js` (la référence) et `app/i18n/en.js`, que la vérification de types oblige à avoir les mêmes entrées. Le moteur produit des données (journal, raison d'une carte réactive), mises en mots par `t.log` et `t.why`. Les textes de la carte automa, qui sert aussi sur le site, sont dans `app/components/card-text.js`. La langue est celle choisie sur le site (clé `lang` de `localStorage`), sinon celle du navigateur.
+- L'appli garde la partie et l'historique dans `localStorage`, sous les clés du prototype (`automa-hybride-partie`, `automa-hybride-historique`) : ne pas les changer sans reprendre les données existantes.
 - Ne pas déposer de PDF dans `site/downloads/` (ignoré par git) : les PDF publiés vivent dans `rules/` et `cards/`.
 - Les liens des pages sont relatifs (le site est servi sous `/ares-solo-automa/`, pas à la racine du domaine).
