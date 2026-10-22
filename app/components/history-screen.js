@@ -1,4 +1,4 @@
-import { html } from "lit";
+import { html, nothing } from "lit";
 import { LightElement } from "./light-element.js";
 import { t } from "../i18n.js";
 import "./tr-curve.js";
@@ -14,13 +14,46 @@ const stepsPerAction = h => {
   return per?.length ? t.decimal(per.reduce((s, x) => s + x, 0) / per.length) : "—";
 };
 
-/* The saved games of this browser, most recent first. Reports `back` to return to the game. */
+/* The saved games of this browser, most recent first, and the backup of the data.
+   Reports `back` to return to the game, `export`, and `import` (detail: the chosen file);
+   `notice` is the result of the last import, set by the parent. */
 export class HistoryScreen extends LightElement {
-  static properties = { games: { attribute: false } };
+  static properties = {
+    games: { attribute: false },
+    canExport: { type: Boolean },
+    notice: { attribute: false }
+  };
 
   constructor() {
     super();
     this.games = /** @type {GameRecord[]} */ ([]);
+    this.canExport = false;
+    this.notice = /** @type {{ error: boolean, text: string } | null} */ (null);
+  }
+
+  /** the file input is hidden: the Import button opens it */
+  pickFile() { /** @type {HTMLInputElement | null} */ (this.querySelector("#import-file"))?.click(); }
+
+  /** @param {Event} e */
+  onFile(e) {
+    const input = /** @type {HTMLInputElement} */ (e.target), file = input.files?.[0];
+    if (file) this.emit("import", file);
+    input.value = "";
+  }
+
+  backup() {
+    const T = t.transfer, n = this.notice;
+    return html`
+      <div class="fcard">
+        <span class="lab">${T.title}</span>
+        <p style="font-size:14px">${T.intro}</p>
+        <div class="row">
+          <button type="button" class="ghost" ?disabled=${!this.canExport} @click=${() => this.emit("export")}>${T.export}</button>
+          <button type="button" class="ghost" @click=${this.pickFile}>${T.import}</button>
+          <input type="file" id="import-file" accept=".json,application/json" hidden @change=${this.onFile}>
+        </div>
+        ${n ? html`<p class="toast" role="status" style=${n.error ? "color:var(--danger)" : ""}>${n.text}</p>` : nothing}
+      </div>`;
   }
 
   /** @param {GameRecord} h */
@@ -58,6 +91,7 @@ export class HistoryScreen extends LightElement {
             <tbody>${games.map(h => this.row(h))}</tbody>
           </table></div>`
         : html`<p>${t.history.empty}</p>`}
+        ${this.backup()}
       </section>`;
   }
 }

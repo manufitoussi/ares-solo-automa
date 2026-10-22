@@ -161,6 +161,17 @@ const en = {
     winner: { player: "Player", automa: "Automa", tie: "Tie" }
   },
 
+  transfer: {
+    title: "Backup",
+    intro: "To go on with another device or keep a copy: export a file with the game in progress and the history, then import it on the other device. The imported history is added to this one.",
+    export: "Export", import: "Import",
+    fileName: date => `automa-backup-${date}.json`,
+    replace: "Replace the game in progress with the one in the file?",
+    done: (game, added) => `Imported: ${game ? "the game in progress, and " : ""}${pl(added, "game added", "games added")} to the history.`,
+    kept: "The game in progress on this device is kept.",
+    error: { json: "This file cannot be read.", format: "This file does not come from this app.", empty: "This file has no game and no history." }
+  },
+
   curve: {
     nt: "TR per round", crans: "Mars steps, so far", player: "Player", automa: "Automa",
     rounds: (a, b) => `rounds ${a} to ${b}`,

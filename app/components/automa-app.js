@@ -10,7 +10,8 @@ import "./phase-screen.js";
 import "./end-turn-screen.js";
 import "./end-screen.js";
 import "./history-screen.js";
-import { loadGame, saveGame, addToHistory, loadHistory } from "../storage.js";
+import { loadGame, saveGame, addToHistory, loadHistory, saveHistory } from "../storage.js";
+import { exportData, parseImport, mergeHistory, ImportError } from "../transfer.js";
 import { t, lang, setLang } from "../i18n.js";
 /** @typedef {import("../engine.js").Game} Game */
 /** @typedef {import("../engine.js").Setup} Setup */
@@ -30,7 +31,8 @@ export class AutomaApp extends LightElement {
     undo: { state: true },
     confirmNew: { state: true },
     view: { state: true },       /* "game" or "history" */
-    history: { state: true }
+    history: { state: true },
+    notice: { state: true }      /* the result of the last import, shown in the history */
   };
 
   constructor() {
@@ -43,6 +45,7 @@ export class AutomaApp extends LightElement {
     /** @type {"game" | "history"} */
     this.view = "game";
     this.history = /** @type {GameRecord[]} */ ([]);
+    this.notice = /** @type {{ error: boolean, text: string } | null} */ (null);
   }
 
   /* The tag holds the start screen of index.html: clear it before the first render,
@@ -97,7 +100,37 @@ export class AutomaApp extends LightElement {
 
   showHistory() {
     this.history = loadHistory();
+    this.notice = null;
     this.view = "history";
+  }
+
+  /* the game in progress and the history, as a file to save */
+  exportFile() {
+    const data = exportData({ game: this.game, history: loadHistory() });
+    const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+    const a = Object.assign(document.createElement("a"), { href: url, download: t.transfer.fileName(data.exportedAt.slice(0, 10)) });
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  /** the history of the file is added; its game replaces the one in progress, once confirmed
+      @param {CustomEvent<File>} e */
+  async importFile(e) {
+    const T = t.transfer;
+    try {
+      const data = parseImport(await e.detail.text());
+      const { history, added } = mergeHistory(loadHistory(), data.history);
+      saveHistory(history);
+      this.history = history;
+      const busy = this.game && this.game.status !== "ended" && this.game.createdAt !== data.game?.createdAt;
+      const replace = !!data.game && (!busy || window.confirm(T.replace));
+      if (replace && data.game) { this.game = data.game; this.undo = []; }
+      this.notice = { error: false, text: T.done(replace, added) + (data.game && !replace ? ` ${T.kept}` : "") };
+    } catch (err) {
+      this.notice = { error: true, text: err instanceof ImportError ? T.error[err.code] : T.error.json };
+    }
   }
 
   renderTop() {
@@ -177,7 +210,8 @@ export class AutomaApp extends LightElement {
     return html`
       ${this.renderTop()}
       ${this.view === "history" ? html`
-        <history-screen .games=${this.history} @back=${() => { this.view = "game"; }}></history-screen>`
+        <history-screen .games=${this.history} .notice=${this.notice} ?canExport=${!!this.game || this.history.length > 0}
+          @back=${() => { this.view = "game"; }} @export=${this.exportFile} @import=${this.importFile}></history-screen>`
       : this.game ? this.renderGame(this.game) : html`
         <div class="solo"><setup-screen @begin=${this.begin}></setup-screen></div>`}`;
   }

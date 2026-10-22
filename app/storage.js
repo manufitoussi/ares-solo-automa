@@ -22,5 +22,7 @@ export function saveGame(st) {
 
 /** @returns {GameRecord[]} */
 export const loadHistory = () => read(HISTORY, /** @type {GameRecord[]} */ ([]));
+/** @param {GameRecord[]} history */
+export function saveHistory(history) { write(HISTORY, history.slice(0, HISTORY_MAX)); }
 /** @param {GameRecord} record */
 export function addToHistory(record) { write(HISTORY, [record, ...loadHistory()].slice(0, HISTORY_MAX)); }

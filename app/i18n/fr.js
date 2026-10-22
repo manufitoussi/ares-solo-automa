@@ -202,6 +202,19 @@ const fr = {
     winner: { player: "Joueur", automa: "Automa", tie: "Égalité" }
   },
 
+  transfer: {
+    title: "Sauvegarde",
+    intro: "Pour continuer sur un autre appareil ou garder une copie : exporter un fichier avec la partie en cours et l'historique, puis l'importer sur l'autre appareil. L'historique importé s'ajoute à celui-ci.",
+    export: "Exporter", import: "Importer",
+    /** @param {string} date */
+    fileName: date => `automa-sauvegarde-${date}.json`,
+    replace: "Remplacer la partie en cours par celle du fichier ?",
+    /** @param {boolean} game @param {number} added */
+    done: (game, added) => `Importé : ${game ? "la partie en cours, et " : ""}${pl(added, "partie ajoutée", "parties ajoutées")} à l'historique.`,
+    kept: "La partie en cours de cet appareil est gardée.",
+    error: { json: "Ce fichier n'est pas lisible.", format: "Ce fichier ne vient pas de cette appli.", empty: "Ce fichier ne contient ni partie ni historique." }
+  },
+
   curve: {
     nt: "NT par tour", crans: "Crans de Mars, cumulés", player: "Joueur", automa: "Automa",
     /** @param {number} a @param {number} b */
