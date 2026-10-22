@@ -1,5 +1,6 @@
 import { html, nothing, classMap, styleMap } from "lit";
 import { LightElement } from "./light-element.js";
+import { t } from "../i18n.js";
 
 /* A value with − and + buttons, and a progress bar when `progress` (0 to 1) is set.
    It does not change the value itself: it reports `step` with -1 or +1. */
@@ -8,7 +9,7 @@ export class ParamStepper extends LightElement {
     label: { attribute: false },   /* text or a template, e.g. html`<span class="full">…</span>` */
     icon: { attribute: false },
     value: { attribute: false },
-    name: { type: String },        /* for the button labels read by screen readers: "Monter <name>" */
+    name: { type: String },        /* for the button labels read by screen readers: "Raise <name>" */
     progress: { type: Number },
     max: { type: Boolean },
     inline: { type: Boolean }
@@ -35,8 +36,8 @@ export class ParamStepper extends LightElement {
         ${this.progress == null ? nothing : html`
           <span class="bar"><i style=${styleMap({ width: `${Math.round(this.progress * 100)}%` })}></i></span>`}
         <div class="adj">
-          <button type="button" aria-label="Baisser ${this.name}" @click=${() => this.emit("step", -1)}>−</button>
-          <button type="button" aria-label="Monter ${this.name}" @click=${() => this.emit("step", 1)}>+</button>
+          <button type="button" aria-label=${t.mars.lower(this.name)} @click=${() => this.emit("step", -1)}>−</button>
+          <button type="button" aria-label=${t.mars.raise(this.name)} @click=${() => this.emit("step", 1)}>+</button>
         </div>
       </div>`;
   }

@@ -1,5 +1,6 @@
 import { html, svg } from "lit";
-import { MOTEUR0, PH } from "../engine.js";
+import { MOTEUR0 } from "../engine.js";
+import { t } from "../i18n.js";
 /** @typedef {import("lit").TemplateResult} TemplateResult */
 /** @typedef {import("../engine.js").Phase} Phase */
 /** @typedef {import("../engine.js").Target} Target */
@@ -14,7 +15,7 @@ export const PHASE_COLOR = {
 };
 export const REACT_COLOR = "#12202B";
 /** @param {Level} k */
-export const levelText = k => `Moteur de départ : ${MOTEUR0[k]}.`;
+export const levelText = k => t.levelText(MOTEUR0[k]);
 
 /* Icons, drawn as in the prototype. Elements inside an <svg> need the `svg` tag:
    with `html`, the browser would create them as HTML elements and draw nothing. */
@@ -51,5 +52,5 @@ export const PHASE_TINT = { I: "#DCEADB", II: "linear-gradient(100deg,#DAE3EF,#F
 /** a small phase label, as in the list of the phases of the round @param {Phase} ph @param {string} [cls] */
 export const phaseChip = (ph, cls = "") => {
   const C = PHASE_COLOR[ph];
-  return html`<span class="chip ${cls}" style="background:${C.col};${C.dark ? "color:#1F1A24" : ""}"><i>${ph}</i>${PH[ph].nom}</span>`;
+  return html`<span class="chip ${cls}" style="background:${C.col};${C.dark ? "color:#1F1A24" : ""}"><i>${ph}</i>${t.phase[ph]}</span>`;
 };

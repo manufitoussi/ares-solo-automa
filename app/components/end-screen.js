@@ -1,14 +1,15 @@
 import { html, nothing } from "lit";
 import { LightElement } from "./light-element.js";
-import { allMax, scoreAutoma, pntOf, plural, playerStepsPerAction, playerStepsOutsideAction } from "../engine.js";
+import { allMax, scoreAutoma, pntOf, playerStepsPerAction, playerStepsOutsideAction } from "../engine.js";
+import { t } from "../i18n.js";
 import { icon } from "./ui.js";
 import "./tr-curve.js";
 /** @typedef {import("../engine.js").Game} Game */
 /** @typedef {import("../engine.js").PlayerScore} PlayerScore */
 /** @typedef {keyof PlayerScore} ScoreKey */
 
-/** @type {[ScoreKey, string][]} */
-const FIELDS = [["nt", "NT"], ["forets", "Forêts"], ["cartes", "Cartes"], ["autres", "Autres PV"]];
+/** @type {ScoreKey[]} */
+const FIELDS = ["nt", "forets", "cartes", "autres"];
 const EMPTY = { nt: "", forets: "", cartes: "", autres: "" };
 /** @param {string} v */
 const toNumber = v => { const n = parseInt(v, 10); return isNaN(n) ? 0 : n; };
@@ -69,29 +70,27 @@ export class EndScreen extends LightElement {
     const st = this.game, per = playerStepsPerAction(st), outside = playerStepsOutsideAction(st);
     if (!per.length && !outside) return nothing;
     const total = per.reduce((s, x) => s + x, 0);
-    const mean = per.length ? (total / per.length).toFixed(1).replace(".", ",") : "";
-    return html`
-      <p class="note"><b>Crans du joueur</b>
-        ${plural(total, "cran")} en ${plural(per.length, "phase")} Action${per.length ? ` (${mean} par Action : ${per.join(", ")})` : ""}${outside ? `, et ${plural(outside, "cran")} hors Action` : ""}.</p>`;
+    const detail = per.length ? t.end.perAction(t.decimal(total / per.length), per.join(", ")) : "";
+    return html`<p class="note"><b>${t.end.stepsTitle}</b> ${t.end.steps(total, per.length, detail, outside)}</p>`;
   }
 
   render() {
-    const st = this.game, sc = scoreAutoma(st.a), p = this.player, f = this.fields ?? EMPTY;
+    const st = this.game, sc = scoreAutoma(st.a), p = this.player, f = this.fields ?? EMPTY, E = t.end;
     const total = p.nt + p.forets + p.cartes + p.autres;
     return html`
       <section class="panel">
-        <h2 style="font-size:32px;font-style:italic;text-transform:uppercase">Décompte final</h2>
-        <p>${allMax(st.p) ? "Tous les paramètres sont au maximum." : "Partie arrêtée avant la fin des paramètres."} Le joueur compte comme d'habitude : 1 PV par point de NT, plus ses PV de forêt et de cartes. L'automa n'a pas de forêt.</p>
-        <div class="scroll"><table><thead><tr><th>Automa</th><th class="n">PV</th></tr></thead><tbody>
-          <tr><td>${icon("nt")} NT</td><td class="n">${sc.nt}</td></tr>
-          <tr><td>${icon("argent", 14)} Argents restants au dernier tour</td><td class="n">${sc.fin}</td></tr>
-          <tr><td>${icon("pv")} Compteur de PV (1 PV par cube)</td><td class="n">${sc.pv}</td></tr>
-          <tr><td><b>Total</b></td><td class="n"><b>${sc.total}</b></td></tr>
+        <h2 style="font-size:32px;font-style:italic;text-transform:uppercase">${E.title}</h2>
+        <p>${allMax(st.p) ? E.maxed : E.stopped}${E.scoring}</p>
+        <div class="scroll"><table><thead><tr><th>${E.automa}</th><th class="n">${E.vp}</th></tr></thead><tbody>
+          <tr><td>${icon("nt")} ${E.tr}</td><td class="n">${sc.nt}</td></tr>
+          <tr><td>${icon("argent", 14)} ${E.silverLeft}</td><td class="n">${sc.fin}</td></tr>
+          <tr><td>${icon("pv")} ${E.counter}</td><td class="n">${sc.pv}</td></tr>
+          <tr><td><b>${E.total}</b></td><td class="n"><b>${sc.total}</b></td></tr>
         </tbody></table></div>
-        <div><span class="lab">Score du joueur · ${total} contre ${sc.total} pour l'automa</span>
+        <div><span class="lab">${E.playerScore(total, sc.total)}</span>
           <div class="fgrid" style="margin-top:6px">
-            ${FIELDS.map(([key, label]) => html`
-              <div class="field"><label for="e-${key}">${label}</label>
+            ${FIELDS.map(key => html`
+              <div class="field"><label for="e-${key}">${E.fields[key]}</label>
                 <input type="number" id="e-${key}" min="0" inputmode="numeric" .value=${f[key]} ?disabled=${st.saved}
                   @input=${(/** @type {InputEvent} */ e) => this.onField(key, e)}></div>`)}
           </div>
@@ -99,13 +98,13 @@ export class EndScreen extends LightElement {
         ${this.steps()}
         <tr-curve legend .track=${st.track ?? []}></tr-curve>
         <tr-curve legend kind="crans" .track=${st.track ?? []}></tr-curve>
-        <div class="field"><label for="e-rem">Remarques (équilibrage, ressenti)</label>
+        <div class="field"><label for="e-rem">${E.remark}</label>
           <input type="text" id="e-rem" maxlength="300" .value=${this.remark} ?disabled=${st.saved} @input=${this.onRemark}></div>
         <div class="row">
-          <button type="button" class="cta" ?disabled=${st.saved} @click=${this.save}>${st.saved ? "Partie enregistrée" : "Enregistrer la partie"}</button>
-          ${st.saved ? nothing : html`<button type="button" class="ghost" @click=${() => this.emit("resume")}>Reprendre la partie</button>`}
+          <button type="button" class="cta" ?disabled=${st.saved} @click=${this.save}>${st.saved ? E.saved : E.save}</button>
+          ${st.saved ? nothing : html`<button type="button" class="ghost" @click=${() => this.emit("resume")}>${E.resume}</button>`}
         </div>
-        ${st.saved ? html`<p class="toast">Partie enregistrée dans l'historique de ce navigateur.</p>` : nothing}
+        ${st.saved ? html`<p class="toast">${E.savedToast}</p>` : nothing}
       </section>`;
   }
 }

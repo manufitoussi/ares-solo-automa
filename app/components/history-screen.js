@@ -1,17 +1,17 @@
 import { html } from "lit";
 import { LightElement } from "./light-element.js";
-import { NIV } from "../engine.js";
+import { t } from "../i18n.js";
 import "./tr-curve.js";
 /** @typedef {import("../engine.js").GameRecord} GameRecord */
 
 /** @param {GameRecord} h */
 const winner = h => h.scoreJoueur == null ? "—"
-  : h.scoreJoueur > h.scoreAutoma ? "Joueur" : h.scoreJoueur < h.scoreAutoma ? "Automa" : "Égalité";
+  : h.scoreJoueur > h.scoreAutoma ? t.history.winner.player : h.scoreJoueur < h.scoreAutoma ? t.history.winner.automa : t.history.winner.tie;
 
 /** the player's mean steps per Action phase, for the games that recorded them @param {GameRecord} h */
 const stepsPerAction = h => {
   const per = h.joueur?.cransParAction;
-  return per?.length ? (per.reduce((s, x) => s + x, 0) / per.length).toFixed(1).replace(".", ",") : "—";
+  return per?.length ? t.decimal(per.reduce((s, x) => s + x, 0) / per.length) : "—";
 };
 
 /* The saved games of this browser, most recent first. Reports `back` to return to the game. */
@@ -27,8 +27,8 @@ export class HistoryScreen extends LightElement {
   row(h) {
     return html`
       <tr>
-        <td>${new Date(h.date).toLocaleDateString("fr-FR")}</td>
-        <td>${NIV[h.niveau] || h.niveau}</td>
+        <td>${new Date(h.date).toLocaleDateString(t.locale)}</td>
+        <td>${t.level[h.niveau] || h.niveau}</td>
         <td>${h.version || "—"}</td>
         <td class="n">${h.tours}</td>
         <td class="n">${h.scoreJoueur ?? "—"}</td>
@@ -48,16 +48,16 @@ export class HistoryScreen extends LightElement {
     return html`
       <section class="panel">
         <div class="row" style="justify-content:space-between">
-          <h2 style="font-size:28px;font-style:italic;text-transform:uppercase">Historique</h2>
-          <button type="button" class="ghost" @click=${() => this.emit("back")}>Retour à la partie</button>
+          <h2 style="font-size:28px;font-style:italic;text-transform:uppercase">${t.history.title}</h2>
+          <button type="button" class="ghost" @click=${() => this.emit("back")}>${t.history.back}</button>
         </div>
         ${n ? html`
-          <p>${n} partie${n > 1 ? "s" : ""} · ${won} victoire${won > 1 ? "s" : ""} du joueur contre l'automa.</p>
+          <p>${t.history.summary(n, won)}</p>
           <div class="scroll"><table>
-            <thead><tr><th>Date</th><th>Niveau</th><th>Règles</th><th class="n">Tours</th><th class="n">Joueur</th><th class="n">NT joueur</th><th class="n">Crans / Action</th><th class="n">Automa</th><th>Gagnant</th><th>NT par tour</th><th>Crans</th><th>Remarques</th></tr></thead>
+            <thead><tr>${t.history.cols.map((c, i) => html`<th class=${[3, 4, 5, 6, 7].includes(i) ? "n" : ""}>${c}</th>`)}</tr></thead>
             <tbody>${games.map(h => this.row(h))}</tbody>
           </table></div>`
-        : html`<p>Aucune partie enregistrée pour l'instant. À la fin d'une partie, l'enregistrer depuis l'écran de décompte : elle apparaîtra ici.</p>`}
+        : html`<p>${t.history.empty}</p>`}
       </section>`;
   }
 }

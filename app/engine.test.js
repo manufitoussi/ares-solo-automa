@@ -118,7 +118,7 @@ test("corrections clamp and merge in the log", () => {
   let st = E.adjustAutoma(game(), "moteur", 1);
   st = E.adjustAutoma(st, "moteur", 1);
   assert.equal(st.a.moteur, 5);
-  assert.equal(st.log[0], "T1 · Correction moteur : 3 → 5");
+  assert.deepEqual(st.log[0], { t: 1, k: "correct", key: "moteur", from: 3, to: 5 });
   assert.equal(E.adjustAutoma(game(), "cubes", -1).a.cubes, 0);
   assert.equal(E.adjustParam(game({ p: { oxy: 14, temp: 0, oce: 0 } }), "oxy", 1).p.oxy, 14);
   assert.equal(E.adjustPlayerTR(game(), 2).pnt, 7);

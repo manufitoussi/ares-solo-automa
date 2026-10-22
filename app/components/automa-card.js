@@ -1,5 +1,5 @@
 import { LitElement, html, css, nothing, styleMap } from "lit";
-import { PH, CIB, card } from "../engine.js";
+import { card, isPhase, isTarget } from "../engine.js";
 import { PHASE_COLOR, REACT_COLOR, PHASE_TINT, TARGET_COLOR, icon } from "./ui.js";
 import { cardTextFor } from "./card-text.js";
 /** @typedef {import("./card-text.js").CardText} CardText */
@@ -153,7 +153,7 @@ export class AutomaCard extends LitElement {
     const ph = this.phase || cd.ph || (cd.react === "Course" ? "III" : null);
     /** @type {Target | null} */
     const target = this.target || (cd.c === "low" ? null : cd.c);
-    if ((ph && !PH[ph]) || (target && !CIB[target])) return nothing;
+    if ((ph && !isPhase(ph)) || (target && !isTarget(target))) return nothing;
     const C = ph ? PHASE_COLOR[ph] : null;
     const banner = cd.react || !C
       ? { background: REACT_COLOR, color: null }

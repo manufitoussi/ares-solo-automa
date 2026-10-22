@@ -1,6 +1,7 @@
 import { html } from "lit";
 import { LightElement } from "./light-element.js";
 import { MAX, tempC, pntOf } from "../engine.js";
+import { t } from "../i18n.js";
 import { icon } from "./ui.js";
 import "./param-stepper.js";
 /** @typedef {import("../engine.js").Game} Game */
@@ -33,16 +34,16 @@ export class MarsPanel extends LightElement {
   }
 
   render() {
-    const p = this.game.p;
+    const p = this.game.p, M = t.mars;
     return html`
-      <section class="panel" aria-label="Paramètres de Mars">
-        <span class="lab">Mars · à mettre à jour quand le joueur monte un cran (+1 NT pour lui)</span>
+      <section class="panel" aria-label=${M.aria}>
+        <span class="lab">${M.title}</span>
         <div class="params">
-          ${this.param("oxy", "Oxygène", `${p.oxy} %`, "oxy", "l'oxygène")}
-          ${this.param("temp", html`<span class="full">Température</span><span class="short">Temp.</span>`, `${signed(tempC(p.temp))} °C`, "temp", "la température")}
-          ${this.param("oce", "Océans", `${p.oce} / 9`, "ocean", "les océans")}
+          ${this.param("oxy", M.oxy, `${p.oxy} %`, "oxy", M.oxyName)}
+          ${this.param("temp", html`<span class="full">${M.temp}</span><span class="short">${M.tempShort}</span>`, `${signed(tempC(p.temp))} °C`, "temp", M.tempName)}
+          ${this.param("oce", M.oce, `${p.oce} / 9`, "ocean", M.oceName)}
         </div>
-        <param-stepper inline .label=${"NT du joueur"} .icon=${icon("nt")} .value=${pntOf(this.game)} name="le NT du joueur"
+        <param-stepper inline .label=${M.tr} .icon=${icon("nt")} .value=${pntOf(this.game)} name=${M.trName}
           @step=${(/** @type {CustomEvent<number>} */ e) => this.emit("player-tr", e.detail)}></param-stepper>
       </section>`;
   }

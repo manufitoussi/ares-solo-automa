@@ -1,6 +1,7 @@
 import { html } from "lit";
 import { LightElement } from "./light-element.js";
-import { LEVELS, NIV, MOTEUR0 } from "../engine.js";
+import { LEVELS, MOTEUR0 } from "../engine.js";
+import { t } from "../i18n.js";
 import { levelText } from "./ui.js";
 import "./choice-group.js";
 /** @typedef {import("../engine.js").Setup} Setup */
@@ -9,11 +10,11 @@ import "./choice-group.js";
 /** @typedef {import("./choice-group.js").Choice} Choice */
 
 /** @type {Choice[]} */
-const LEVEL_OPTIONS = LEVELS.map(k => ({ value: k, title: NIV[k], text: levelText(k) }));
+const LEVEL_OPTIONS = LEVELS.map(k => ({ value: k, title: t.level[k], text: levelText(k) }));
 /** @type {Choice[]} */
 const DECK_OPTIONS = [
-  { value: "app", title: "L'appli tire", text: "L'assistant tire la carte automa au hasard." },
-  { value: "cartes", title: "Cartes imprimées", text: "Le joueur retourne la carte imprimée et indique son numéro." }
+  { value: "app", ...t.setup.deckApp },
+  { value: "cartes", ...t.setup.deckCards }
 ];
 
 /* The "new game" screen. The choices stay inside this component until the game starts,
@@ -43,12 +44,12 @@ export class SetupScreen extends LightElement {
     const s = this.setup;
     return html`
       <section class="panel">
-        <h2 style="font-size:30px;font-style:italic;text-transform:uppercase">Nouvelle partie</h2>
-        <p>L'assistant joue l'automa : il tire ses cartes, compte ses cuivres et ses argents et dit quoi faire sur son plateau. Le plateau et les cartes projet restent sur la table.</p>
-        <choice-group label="Niveau" .options=${LEVEL_OPTIONS} .value=${s.niveau} @choose=${this.onLevel}></choice-group>
-        <choice-group label="Pioche de l'automa" columns="2" .options=${DECK_OPTIONS} .value=${s.pioche} @choose=${this.onDeck}></choice-group>
-        <div class="note"><b>Mise en place</b> Un plateau joueur pour l'automa, un marqueur sur le 5 de la piste de NT, le marqueur de production des MC sur ${MOTEUR0[s.niveau]} (son moteur), des cubes cuivre et argent. Réserve et compteur de PV vides. Ni corporation, ni main.</div>
-        <div class="row"><button type="button" class="cta" @click=${() => this.emit("begin", this.setup)}>Commencer la partie</button></div>
+        <h2 style="font-size:30px;font-style:italic;text-transform:uppercase">${t.setup.title}</h2>
+        <p>${t.setup.intro}</p>
+        <choice-group label=${t.setup.level} .options=${LEVEL_OPTIONS} .value=${s.niveau} @choose=${this.onLevel}></choice-group>
+        <choice-group label=${t.setup.deck} columns="2" .options=${DECK_OPTIONS} .value=${s.pioche} @choose=${this.onDeck}></choice-group>
+        <div class="note"><b>${t.setup.setupTitle}</b> ${t.setup.setup(MOTEUR0[s.niveau])}</div>
+        <div class="row"><button type="button" class="cta" @click=${() => this.emit("begin", this.setup)}>${t.setup.begin}</button></div>
       </section>`;
   }
 }

@@ -5,6 +5,7 @@ L'appli, une PWA en [Lit](https://lit.dev), publiée sous `/ares-solo-automa/app
 - `index.html` : la page, son écran de démarrage, l'import map qui fait pointer `lit` vers `vendor/lit-all.min.js`, et l'enregistrement du service worker.
 - `engine.js` : les règles de l'automa (v0.6), pures, sans DOM. Chaque action rend un nouvel état. Testé par `engine.test.js`, et utilisé aussi par le simulateur d'équilibrage du dépôt de conception.
 - `storage.js` : la partie en cours et l'historique, dans `localStorage`.
+- `i18n.js` et `i18n/` : la langue (celle choisie sur le site, sinon celle du navigateur) et tous les textes, en français (`fr.js`, la référence) et en anglais (`en.js`). Les textes statiques de `index.html`, affichés avant le chargement, ont leur anglais dans un attribut `data-en`.
 - `components/` : les composants Lit. `automa-app` tient la partie ; les écrans et panneaux reçoivent la partie et renvoient des événements. Ils s'affichent dans le DOM de la page (sans Shadow DOM) avec `styles.css`, sauf `automa-card`, la carte automa, qui a ses propres styles et s'utilise aussi hors de l'appli (voir `card-demo.html`).
 - `vendor/` : Lit 3.3.1 en un fichier (licence BSD-3-Clause), et ses types pour la vérification.
 - `sw.js` : le service worker. Le build y met la version et la liste des fichiers ; non rempli, il ne fait rien.

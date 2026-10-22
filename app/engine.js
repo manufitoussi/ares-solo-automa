@@ -2,8 +2,8 @@
    Extracted from app/prototype/assistant-automa.html, same rules and same saved state (v:3).
    Every transition takes a state and returns a new one: the input is never mutated,
    so the UI can keep old states for undo and compare references to know what changed.
-   The log lines are still French text, as in the prototype: they will become structured
-   events when the app is translated.
+   No text: the log and the reason of a reactive card are data, put into words by the app in
+   the player's language (i18n/).
    Types are JSDoc comments, checked by TypeScript (npm run check); the file stays plain JS. */
 
 /* ---------- Types ---------- */
@@ -27,6 +27,19 @@
 /** Mars steps the player raised (d, negative for a correction), when: the round and the phase
     being resolved, or the step of the round outside the phases.
     @typedef {{ t: number, at: Phase | Step, k: Param, d: number }} PlayerStep */
+/** Why a reactive card chose its phase.
+    @typedef {{ k: "riposte", phase: Phase } | { k: "riposteFirst" } | { k: "oppSilver", silver: number } | { k: "oppNone" } | { k: "course", target: Target }} Why */
+/** What happened, for the game log.
+    @typedef {{ k: "new", level: Level, engine: number, rules: string }
+      | { k: "reshuffle" }
+      | { k: "draw", card: number, phase: Phase, target: Target, player: Phase | null }
+      | { k: "phase", phase: Phase, ch: Change, engine: number, counter: number, before: number, after: number }
+      | { k: "lastRound", silver: number }
+      | { k: "maxed" }
+      | { k: "stopped" }
+      | { k: "correct", key: AutomaKey, from: number, to: number }} LogEvent */
+/** A log entry: an event and its round. Games saved before the translation have text lines.
+    @typedef {(LogEvent & { t: number }) | string} LogEntry */
 /** The player's final score, typed at the end of the game.
     @typedef {{ nt: number, forets: number, cartes: number, autres: number }} PlayerScore */
 /** @typedef {{ niveau: Level, pioche?: DeckMode, oxy?: number, temp?: number, oce?: number }} Setup */
@@ -50,14 +63,14 @@
  * @property {Phase | null} playerPhase
  * @property {Phase | null} automaPhase
  * @property {Target | null} cible
- * @property {string} why               why a reactive card chose its phase
+ * @property {Why | string | null} why  why a reactive card chose its phase (text in older saves)
  * @property {Phase[]} queue            the phases of the round, in order
  * @property {number} qi                index of the current phase in the queue
  * @property {Phase | null} lastPlayerPhase
  * @property {string} rules
  * @property {Automa} a
  * @property {Mars} p
- * @property {string[]} log             most recent first
+ * @property {LogEntry[]} log          most recent first
  * @property {TrackPoint[]} [track]
  * @property {number} [pnt]             the player's TR, when set
  * @property {number | null} [playerScore]
@@ -88,18 +101,14 @@
  */
 
 /* ---------- Game data ---------- */
-/** @type {Record<Phase, { n: number, nom: string, court: string }>} */
-export const PH = {
-  I: { n: 1, nom: "Développement", court: "Dév." },
-  II: { n: 2, nom: "Construction", court: "Const." },
-  III: { n: 3, nom: "Action", court: "Action" },
-  IV: { n: 4, nom: "Production", court: "Prod." },
-  V: { n: 5, nom: "Recherche", court: "Rech." }
-};
 /** @type {Phase[]} */
 export const ORDER = ["I", "II", "III", "IV", "V"];
-/** @type {Record<Target, { nom: string }>} */
-export const CIB = { oxy: { nom: "Oxygène" }, temp: { nom: "Température" }, ocean: { nom: "Océan" } };
+/** @type {Target[]} */
+export const TARGETS = ["oxy", "temp", "ocean"];
+/** @param {unknown} x @returns {x is Phase} */
+export const isPhase = x => ORDER.includes(/** @type {Phase} */ (x));
+/** @param {unknown} x @returns {x is Target} */
+export const isTarget = x => TARGETS.includes(/** @type {Target} */ (x));
 /** @type {Card[]} */
 export const CARDS = [
   { n: 1, ph: "IV", c: "oxy" }, { n: 2, ph: "IV", c: "temp" }, { n: 3, ph: "IV", c: "ocean" },
@@ -112,8 +121,6 @@ export const CARDS = [
 export const COST = 5;
 /** @type {Level[]} */
 export const LEVELS = ["tresfacile", "facile", "normal", "difficile", "tresdifficile"];
-/** @type {Record<Level, string>} */
-export const NIV = { tresfacile: "Très facile", facile: "Facile", normal: "Normal", difficile: "Difficile", tresdifficile: "Très difficile" };
 /** @type {Record<Level, number>} */
 export const MOTEUR0 = { tresfacile: 1, facile: 2, normal: 3, difficile: 4, tresdifficile: 5 };
 /** @type {Record<Param, number>} */
@@ -128,10 +135,6 @@ export const clone = o => JSON.parse(JSON.stringify(o));
 export const ag = n => Math.floor(n / COST);
 /** copper left over @param {number} n */
 export const cu = n => n % COST;
-/** @param {number} n @param {string} w */
-export const plural = (n, w) => `${n} ${w}${n > 1 ? "s" : ""}`;
-/** @param {number} n */
-export const purse = n => `${plural(ag(n), "argent")} et ${plural(cu(n), "cuivre")}`;
 /** @template T @param {T[]} a @param {() => number} [rng] @returns {T[]} */
 export const shuffle = (a, rng = Math.random) => {
   a = a.slice();
@@ -170,15 +173,17 @@ export function effCible(c, p) {
   return "oxy";
 }
 /** the phase and target of the drawn card; a reactive card decides from the game
-    @param {Game} st @returns {{ phase: Phase, cible: Target, why: string }} */
+    @param {Game} st @returns {{ phase: Phase, cible: Target, why: Why | null }} */
 export function resolveCard(st) {
   const cd = drawnCard(st);
   /** @type {Phase} */
   let phase = cd.ph ?? "IV";
-  let why = "", cible = cd.c;
-  if (cd.react === "Riposte") { phase = st.lastPlayerPhase || "IV"; why = st.lastPlayerPhase ? `Phase du joueur au tour précédent : ${PH[phase].nom}.` : "Premier tour : Production."; }
-  if (cd.react === "Opportuniste") { phase = st.a.cubes >= COST ? "III" : "IV"; why = st.a.cubes >= COST ? `Il a ${plural(ag(st.a.cubes), "argent")} : il dépense en Action.` : `Il n'a aucun argent : il produit.`; }
-  if (cd.react === "Course") { phase = "III"; cible = leastAdvanced(st.p); why = `Paramètre le moins avancé : ${CIB[cible].nom.toLowerCase()}.`; }
+  /** @type {Why | null} */
+  let why = null;
+  let cible = cd.c;
+  if (cd.react === "Riposte") { phase = st.lastPlayerPhase || "IV"; why = st.lastPlayerPhase ? { k: "riposte", phase } : { k: "riposteFirst" }; }
+  if (cd.react === "Opportuniste") { phase = st.a.cubes >= COST ? "III" : "IV"; why = st.a.cubes >= COST ? { k: "oppSilver", silver: ag(st.a.cubes) } : { k: "oppNone" }; }
+  if (cd.react === "Course") { phase = "III"; cible = leastAdvanced(st.p); why = { k: "course", target: cible }; }
   /* only card 15 has "low", and Course has just replaced it */
   return { phase, cible: /** @type {Target} */ (cible), why };
 }
@@ -219,8 +224,8 @@ export function lastPNT(st) { const tr = (st.track || []).filter(x => x.p != nul
 export const pntOf = st => st.pnt ?? lastPNT(st);
 
 /* ---------- Transitions (each returns a new state) ---------- */
-/** @param {Game} st @param {string} msg */
-function log(st, msg) { st.log.unshift(`T${st.turn} · ${msg}`); if (st.log.length > 120) st.log.length = 120; }
+/** @param {Game} st @param {LogEvent} event */
+function log(st, event) { st.log.unshift({ t: st.turn, ...event }); if (st.log.length > 120) st.log.length = 120; }
 /** @param {Game} st */
 function recordTurn(st) {
   const p = pntOf(st);
@@ -237,13 +242,13 @@ export function newGame(setup, { rng = Math.random, now = Date.now() } = {}) {
   const st = {
     v: STATE_VERSION, status: "playing", niveau: s.niveau, pioche: s.pioche || "app", createdAt: now, savedAt: now, turn: 1,
     deck: shuffle(CARDS.map(c => c.n), rng), discard: [], card: null, step: "plan",
-    playerPhase: null, automaPhase: null, cible: null, why: "", queue: [], qi: 0, lastPlayerPhase: null,
+    playerPhase: null, automaPhase: null, cible: null, why: null, queue: [], qi: 0, lastPlayerPhase: null,
     rules: RULES,
     a: { cubes: 0, moteur: MOTEUR0[s.niveau] ?? 3, compteur: 0, nt: 5, pvFin: 0 },
     p: { oxy: Number(s.oxy) || 0, temp: Number(s.temp) || 0, oce: Number(s.oce) || 0 },
     log: []
   };
-  log(st, `Nouvelle partie (règles v${RULES}), niveau ${NIV[st.niveau]}, moteur de départ ${st.a.moteur}`);
+  log(st, { k: "new", level: st.niveau, engine: st.a.moteur, rules: RULES });
   return st;
 }
 /** a saved game is only resumed if it has the current format (a v0.5 or v0.4 save is ignored)
@@ -262,13 +267,12 @@ export function pickPhase(state, ph) {
     @param {Game} state @param {{ n?: number | null, rng?: () => number }} [options] @returns {Game} */
 export function draw(state, { n = null, rng = Math.random } = {}) {
   const st = clone(state);
-  if (!st.deck.length) { st.deck = shuffle(st.discard, rng); st.discard = []; log(st, "Pioche automa remélangée"); }
+  if (!st.deck.length) { st.deck = shuffle(st.discard, rng); st.discard = []; log(st, { k: "reshuffle" }); }
   if (n != null) { st.card = n; st.deck = st.deck.filter(x => x !== n); st.discard = st.discard.filter(x => x !== n); }
   else st.card = st.deck.pop() ?? null;
   const r = resolveCard(st); st.automaPhase = r.phase; st.cible = r.cible; st.why = r.why;
   st.queue = ORDER.filter(ph => ph === st.playerPhase || ph === st.automaPhase); st.qi = 0; st.step = "reveal";
-  const player = st.playerPhase ? PH[st.playerPhase].nom : "?";
-  log(st, `Carte ${st.card} : ${PH[r.phase].nom}, cible ${CIB[r.cible].nom.toLowerCase()} (joueur : ${player})`);
+  log(st, { k: "draw", card: /** @type {number} */ (st.card), phase: r.phase, target: r.cible, player: st.playerPhase });
   return st;
 }
 
@@ -284,20 +288,14 @@ export function applyPhase(state) {
   const raised = c.oxy + c.temp + c.oce;
   st.crans = { joueur: st.crans?.joueur ?? 0, automa: (st.crans?.automa ?? 0) + raised };
   if (ph === "III") st.actionTurns = [...(st.actionTurns ?? []), st.turn];
-  let what = "";
-  if (ph === "I") what = c.moteur ? `moteur ${st.a.moteur} (1 argent)` : "moteur inchangé, aucun argent";
-  else if (ph === "II") what = `compteur de PV ${st.a.compteur}`;
-  else if (ph === "III") what = `+${c.oxy} oxygène, +${c.temp} température, ${c.oce} océan(s), NT +${c.nt}, ${plural(c.spent / COST, "argent")} dépensé${c.spent > COST ? "s" : ""}${c.oce ? `, +${c.oce} cuivre(s) (bonus océans)` : ""}`;
-  else if (ph === "IV") what = `+${c.prod} (moteur)`;
-  else what = "rien de plus";
-  log(st, `${PH[ph].nom} : +1 cuivre, ${what} → ${purse(st.a.cubes)} (avant : ${purse(c0)})`);
+  log(st, { k: "phase", phase: ph, ch: c, engine: st.a.moteur, counter: st.a.compteur, before: c0, after: st.a.cubes });
   st.qi++;
   if (allMax(st.p)) {
     st.a.pvFin = ag(st.a.cubes);
-    if (st.a.pvFin) log(st, `Dernier tour : ${plural(st.a.pvFin, "argent")} restant = ${st.a.pvFin} PV`);
+    if (st.a.pvFin) log(st, { k: "lastRound", silver: st.a.pvFin });
     st.status = "ended";
     st.track = (st.track || []).filter(x => x.t !== st.turn); st.track.push({ t: st.turn, a: st.a.nt, p: null, ...cransOf(st) });
-    log(st, "Tous les paramètres sont au maximum : fin de partie.");
+    log(st, { k: "maxed" });
   }
   else if (st.qi >= st.queue.length) st.step = "endturn";
   return st;
@@ -311,21 +309,18 @@ export function nextTurn(state) {
   return st;
 }
 /** @param {Game} state @returns {Game} */
-export function endGame(state) { const st = clone(state); recordTurn(st); st.status = "ended"; log(st, "Partie terminée à la demande"); return st; }
+export function endGame(state) { const st = clone(state); recordTurn(st); st.status = "ended"; log(st, { k: "stopped" }); return st; }
 /** @param {Game} state @returns {Game} */
 export function resumeGame(state) { const st = clone(state); st.status = "playing"; return st; }
 
-/* manual corrections of the automa board; consecutive corrections of the same value are
-   merged into one log line */
-/** @type {Record<AutomaKey, string>} */
-const NOMS = { cubes: "réserve", moteur: "moteur", compteur: "compteur de PV", nt: "NT" };
-/** @param {Game} state @param {AutomaKey} k @param {number} d @returns {Game} */
+/** manual correction of the automa board; consecutive corrections of the same value are
+    merged into one log entry @param {Game} state @param {AutomaKey} k @param {number} d @returns {Game} */
 export function adjustAutoma(state, k, d) {
   const st = clone(state), old = st.a[k];
   st.a[k] = Math.max(0, st.a[k] + d);
-  const head = `T${st.turn} · Correction ${NOMS[k]} : `, prev = st.log[0] || "";
-  if (prev.startsWith(head)) { const from = prev.slice(head.length).split(" → ")[0]; st.log[0] = `${head}${from} → ${st.a[k]}`; }
-  else log(st, `Correction ${NOMS[k]} : ${old} → ${st.a[k]}`);
+  const prev = st.log[0];
+  if (typeof prev === "object" && prev.k === "correct" && prev.key === k && prev.t === st.turn) prev.to = st.a[k];
+  else log(st, { k: "correct", key: k, from: old, to: st.a[k] });
   return st;
 }
 /** The player raises (or corrects) a Mars parameter, kept between 0 and its maximum.

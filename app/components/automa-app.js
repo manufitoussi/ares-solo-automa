@@ -11,6 +11,7 @@ import "./end-turn-screen.js";
 import "./end-screen.js";
 import "./history-screen.js";
 import { loadGame, saveGame, addToHistory, loadHistory } from "../storage.js";
+import { t, lang, setLang } from "../i18n.js";
 /** @typedef {import("../engine.js").Game} Game */
 /** @typedef {import("../engine.js").Setup} Setup */
 /** @typedef {import("../engine.js").Phase} Phase */
@@ -100,19 +101,21 @@ export class AutomaApp extends LightElement {
   }
 
   renderTop() {
+    const T = t.top;
     return html`
       <header class="top">
-        <a class="brand" href="../" title="Retour au site"><b>Automa hybride</b><span>Assistant de partie · v${E.RULES} brouillon</span></a>
-        <button class="tb" aria-label="Annuler" ?disabled=${!this.undo.length || this.view !== "game"} @click=${this.undoLast}>
-          <span class="full">Annuler</span><span class="short" aria-hidden="true">↶</span></button>
-        <button class="tb" aria-label="Historique" @click=${this.showHistory}>
-          <span class="full">Historique</span><span class="short" aria-hidden="true">Parties</span></button>
+        <a class="brand" href="../" title=${T.back}><b>${T.brand}</b><span>${T.sub(E.RULES)}</span></a>
+        <button class="tb" aria-label=${T.undo} ?disabled=${!this.undo.length || this.view !== "game"} @click=${this.undoLast}>
+          <span class="full">${T.undo}</span><span class="short" aria-hidden="true">${T.undoShort}</span></button>
+        <button class="tb" aria-label=${T.history} @click=${this.showHistory}>
+          <span class="full">${T.history}</span><span class="short" aria-hidden="true">${T.historyShort}</span></button>
         <button class=${this.confirmNew ? "tb warn" : "tb"} @click=${this.askNew}
-          aria-label=${this.confirmNew ? "Confirmer la nouvelle partie" : "Nouvelle partie"}>
+          aria-label=${this.confirmNew ? T.confirmAria : T.newGame}>
           ${this.confirmNew
-            ? html`<span class="full">Confirmer ?</span><span class="short" aria-hidden="true">Sûr ?</span>`
-            : html`<span class="full">Nouvelle partie</span><span class="short" aria-hidden="true">Nouvelle</span>`}
+            ? html`<span class="full">${T.confirm}</span><span class="short" aria-hidden="true">${T.confirmShort}</span>`
+            : html`<span class="full">${T.newGame}</span><span class="short" aria-hidden="true">${T.newShort}</span>`}
         </button>
+        <button class="tb" lang=${lang === "fr" ? "en" : "fr"} aria-label=${T.otherAria} @click=${() => setLang(lang === "fr" ? "en" : "fr")}>${T.other}</button>
       </header>`;
   }
 
@@ -164,8 +167,8 @@ export class AutomaApp extends LightElement {
             @player-tr=${(/** @type {CustomEvent<number>} */ e) => this.play(E.adjustPlayerTR(st, e.detail))}></mars-panel>
         </aside>
         ${st.log.length ? html`
-          <div class="logz"><details class="panel"><summary>Journal (${st.log.length})</summary>
-            <ol class="log" reversed>${st.log.map(l => html`<li>${l}</li>`)}</ol></details></div>` : nothing}
+          <div class="logz"><details class="panel"><summary>${t.journal(st.log.length)}</summary>
+            <ol class="log" reversed>${st.log.map(l => html`<li>${t.log(l)}</li>`)}</ol></details></div>` : nothing}
       </div>`;
   }
 

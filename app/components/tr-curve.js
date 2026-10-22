@@ -1,12 +1,13 @@
 import { html, svg, nothing } from "lit";
 import { LightElement } from "./light-element.js";
+import { t } from "../i18n.js";
 /** @typedef {import("../engine.js").TrackPoint} TrackPoint */
 /** @typedef {"a" | "p" | "ca" | "cj"} Who  a series of a track point */
 
 /* each kind of curve: its title, then the automa's and the player's series */
 const KINDS = {
-  nt: { title: "NT par tour", automa: /** @type {Who} */ ("a"), player: /** @type {Who} */ ("p") },
-  crans: { title: "Crans de Mars, cumulés", automa: /** @type {Who} */ ("ca"), player: /** @type {Who} */ ("cj") }
+  nt: { title: () => t.curve.nt, automa: /** @type {Who} */ ("a"), player: /** @type {Who} */ ("p") },
+  crans: { title: () => t.curve.crans, automa: /** @type {Who} */ ("ca"), player: /** @type {Who} */ ("cj") }
 };
 
 /* The TR (kind="nt", the default) or the Mars steps raised so far (kind="crans") of the player
@@ -47,7 +48,7 @@ export class TrCurve extends LightElement {
         : nothing;
     };
     return html`<svg width=${w} height=${h} viewBox="0 0 ${w} ${h}" style="max-width:100%;height:auto" role="img"
-      aria-label="${S.title} : le joueur en orange, l'automa en pointillés">${line(S.automa, "var(--muted)", true)}${line(S.player, "var(--p4)")}</svg>`;
+      aria-label=${t.curve.aria(S.title())}>${line(S.automa, "var(--muted)", true)}${line(S.player, "var(--p4)")}</svg>`;
   }
 
   render() {
@@ -58,9 +59,9 @@ export class TrCurve extends LightElement {
     if (!this.legend) return this.chart();
     const last = pts[pts.length - 1];
     return html`
-      <div class="fcard"><span class="lab">${S.title}</span>${this.chart()}
-        <p style="font-size:13px;color:var(--muted)"><span style="color:var(--p4);font-weight:700">━ Joueur</span>${last[S.player] != null ? ` (${last[S.player]})` : ""}
-          · <span style="font-weight:700">┅ Automa</span> (${last[S.automa]}) · tours ${pts[0].t} à ${last.t}</p>
+      <div class="fcard"><span class="lab">${S.title()}</span>${this.chart()}
+        <p style="font-size:13px;color:var(--muted)"><span style="color:var(--p4);font-weight:700">━ ${t.curve.player}</span>${last[S.player] != null ? ` (${last[S.player]})` : ""}
+          · <span style="font-weight:700">┅ ${t.curve.automa}</span> (${last[S.automa]}) · ${t.curve.rounds(pts[0].t, last.t)}</p>
       </div>`;
   }
 }

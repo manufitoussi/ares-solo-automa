@@ -22,20 +22,32 @@
   <!-- Start screen: plain HTML, shown at once while the JS loads; <automa-app> removes it on its first render. -->
   <automa-app>
     <div class="splash" role="status">
-      <b>Automa hybride</b>
-      <span>Assistant de partie</span>
+      <b data-en="Hybrid automa">Automa hybride</b>
+      <span data-en="Game assistant">Assistant de partie</span>
       <div class="cubes" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 20 20"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg><svg width="40" height="40" viewBox="0 0 20 20"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg><svg width="40" height="40" viewBox="0 0 20 20"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg></div>
-      <p>Chargement…</p>
+      <p data-en="Loading…">Chargement…</p>
     </div>
   </automa-app>
-  <noscript><p class="note">Cette appli a besoin de JavaScript pour fonctionner.</p></noscript>
+  <noscript><p class="note">Cette appli a besoin de JavaScript pour fonctionner. · <span lang="en">This app needs JavaScript to work.</span></p></noscript>
   <footer style="border-top:1px solid var(--line);padding-top:12px;font-size:13px;color:var(--muted)">
-    <p>Projet de fans non officiel, non affilié à FryxGames ni à Stronghold Games. Terraforming Mars est une marque de FryxGames. Nécessite le jeu original.</p>
-    <p><a href="../" style="color:inherit">← Retour au site</a> : livret de règles et cartes à imprimer.</p>
-    <p>Règles et cartes sous licence CC BY-NC-SA 4.0 · <a href="https://github.com/manufitoussi/ares-solo-automa" style="color:inherit">GitHub</a></p>
+    <p data-en="Unofficial fan-made project, not affiliated with FryxGames or Stronghold Games. Terraforming Mars is a trademark of FryxGames. Requires the original game.">Projet de fans non officiel, non affilié à FryxGames ni à Stronghold Games. Terraforming Mars est une marque de FryxGames. Nécessite le jeu original.</p>
+    <p><a href="../" style="color:inherit" data-en="← Back to the website">← Retour au site</a><span data-en=": rulebook and print-and-play cards."> : livret de règles et cartes à imprimer.</span></p>
+    <p><span data-en="Rules and cards under the CC BY-NC-SA 4.0 licence">Règles et cartes sous licence CC BY-NC-SA 4.0</span> · <a href="https://github.com/manufitoussi/ares-solo-automa" style="color:inherit">GitHub</a></p>
   </footer>
 </div>
 <script>
+/* The texts above show before the app loads: in English, they come from their data-en
+   attribute (same choice of language as i18n.js: the website's, else the browser's). */
+(function () {
+  var l = null;
+  try { l = localStorage.getItem("lang"); } catch (e) {}
+  if (l !== "fr" && l !== "en") l = /^fr\b/i.test((navigator.languages && navigator.languages[0]) || navigator.language || "") ? "fr" : "en";
+  document.documentElement.lang = l;
+  if (l === "en") {
+    document.title = "Hybrid automa assistant";
+    document.querySelectorAll("[data-en]").forEach(function (el) { el.textContent = el.getAttribute("data-en"); });
+  }
+})();
 /* installable app and offline cache (sw.js only caches in the built site) */
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 </script>
