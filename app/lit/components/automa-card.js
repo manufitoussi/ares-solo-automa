@@ -1,18 +1,19 @@
 import { LitElement, html, css, nothing, styleMap } from "lit";
 import { PH, CIB, card } from "../engine.js";
-import { PHASE_COLOR, REACT_COLOR, PHASE_TINT, TARGET_COLOR, EFFECT, PLAYER, icon } from "./ui.js";
+import { PHASE_COLOR, REACT_COLOR, PHASE_TINT, TARGET_COLOR, EFFECT, PLAYER, EFFECT_SHORT, PLAYER_SHORT, TARGET_SHORT, REACT_RULE, icon } from "./ui.js";
 
 /* An automa card, drawn like the printed card. Unlike the other components, it renders in a
    shadow root with its own styles: it looks the same in the app and on any other page, and
    the page's CSS cannot break it. It only needs plain attributes:
      <automa-card number="5"></automa-card>
      <automa-card number="13" phase="II" why="Phase du joueur au tour précédent." size="small"></automa-card>
-   `phase` and `target` default to the ones printed on the card; a reactive card (13 to 15)
-   needs `phase`, since it depends on the game, and `target` for card 15.
+   `phase` and `target` default to the ones printed on the card. A reactive card (13 to 15)
+   depends on the game: without `phase`, it shows its general rule.
    `still` turns off the flip animation, for when the card stays on screen.
 
    What a page can still change from outside:
-   - `size`: small (200px), normal (260px) or large (320px);
+   - `size`: tiny (8.4rem, shorter texts, for an illustration), small (200px), normal (260px)
+     or large (320px);
    - CSS custom properties, which go through the shadow root:
        --automa-card-width       the width; every size inside follows (default 260px)
        --automa-card-font        the text font (default Source Serif 4)
@@ -47,6 +48,21 @@ export class AutomaCard extends LitElement {
     }
     :host([size="small"]) { --automa-card-width: 200px; }
     :host([size="large"]) { --automa-card-width: 320px; }
+    /* tiny: an illustration, as on the landing page. Shorter texts (see render), set larger
+       for the card width, and no "Cible" label. */
+    :host([size="tiny"]) { --automa-card-width: 8.4rem; }
+    :host([size="tiny"]) .card { padding: 3cqi; gap: 2cqi; }
+    :host([size="tiny"]) .kban .r { font-size: 10.7cqi; }
+    :host([size="tiny"]) .kban .nm { font-size: 8.6cqi; padding-inline: 3cqi; }
+    :host([size="tiny"]) .meta { font-size: 5.4cqi; }
+    :host([size="tiny"]) .au, :host([size="tiny"]) .why { font-size: 7.2cqi; line-height: 1.25; padding: 3cqi; }
+    :host([size="tiny"]) .cib { padding: 1.5cqi 2.5cqi; gap: 1.5cqi; }
+    :host([size="tiny"]) .cib .l { display: none; }
+    :host([size="tiny"]) .cn, :host([size="tiny"]) .cc { font-size: 7.2cqi; }
+    :host([size="tiny"]) .vous { font-size: 6cqi; line-height: 1.25; padding-top: 1.5cqi; }
+    :host([size="tiny"]) .vous .t { font-size: 6cqi; }
+    :host([size="tiny"]) .pi { width: 7.2cqi; height: 7.2cqi; vertical-align: -1.2cqi; }
+    :host([size="tiny"]) .ti .pi { width: 9cqi; height: 9cqi; }
     :host([hidden]) { display: none; }
     * { box-sizing: border-box; }
     p { margin: 0; }
@@ -82,12 +98,31 @@ export class AutomaCard extends LitElement {
     }
   `;
 
+  /* the target box; Course shown outside a game has no target yet: the least advanced one */
+  targetBox(target, tiny) {
+    if (!target) return html`
+      <div class="cib" part="target" style="border-color:#2FB6C0">
+        <span class="ti">${icon("oxy", 24)}${icon("temp", 24)}${icon("ocean", 24)}</span><span class="cn">Le moins avancé</span>
+      </div>`;
+    return html`
+      <div class="cib" part="target" style=${styleMap({ borderColor: TARGET_COLOR[target] })}>
+        <span class="l">Cible</span><span class="ti">${icon(target, 24)}</span>
+        <span class="cn">${tiny ? TARGET_SHORT[target] : CIB[target].nom}</span>
+        <span class="cc">1 ${icon("argent", 14)}</span>
+      </div>`;
+  }
+
   render() {
     const cd = card(this.number);
     if (!cd) return nothing;
-    const ph = this.phase || cd.ph, target = this.target || cd.c;
-    if (!PH[ph] || !CIB[target]) return nothing;
-    const P = PH[ph], C = PHASE_COLOR[ph];
+    const tiny = this.size === "tiny";
+    /* A reactive card without `phase` is shown with its general rule (outside a game).
+       Course always plays Action, so its phase is known even then. */
+    const general = cd.react && !this.phase;
+    const ph = this.phase || cd.ph || (cd.react === "Course" ? "III" : null);
+    const target = this.target || (cd.c === "low" ? null : cd.c);
+    if ((ph && !PH[ph]) || (target && !CIB[target])) return nothing;
+    const C = ph && PHASE_COLOR[ph];
     const banner = cd.react
       ? { background: REACT_COLOR, color: null }
       : { background: C.col, color: C.dark ? "#1F1A24" : null };
@@ -96,17 +131,17 @@ export class AutomaCard extends LitElement {
         <div class="kban" part="banner" style=${styleMap(banner)}>
           ${cd.react
             ? html`<span class="r" style="color:#8FE3E8">?</span><span class="nm">${cd.react}</span>`
-            : html`<span class="r">${ph}</span><span class="nm">${P.nom}</span>`}
+            : html`<span class="r">${ph}</span><span class="nm">${PH[ph].nom}</span>`}
         </div>
-        <div class="meta"><span>Automa${cd.react ? " · réactive" : ""}</span><span>${String(cd.n).padStart(2, "0")} / 15</span></div>
-        ${cd.react ? html`<div class="why">Il joue : <b>${P.nom}</b>. ${this.why}</div>` : nothing}
-        <div class="au" part="effect" style=${styleMap({ background: PHASE_TINT[ph] })}><p>${EFFECT[ph]}</p></div>
+        <div class="meta"><span>Automa${cd.react && !tiny ? " · réactive" : ""}</span><span>${String(cd.n).padStart(2, "0")} / 15</span></div>
+        ${general
+          ? html`<div class="au" part="effect" style="background:#E3F2F3"><p>${REACT_RULE[cd.react]}</p></div>`
+          : html`
+            ${cd.react ? html`<div class="why">Il joue : <b>${PH[ph].nom}</b>. ${this.why}</div>` : nothing}
+            <div class="au" part="effect" style=${styleMap({ background: PHASE_TINT[ph] })}><p>${(tiny ? EFFECT_SHORT : EFFECT)[ph]}</p></div>`}
         <div class="sp"></div>
-        <div class="cib" part="target" style=${styleMap({ borderColor: TARGET_COLOR[target] })}>
-          <span class="l">Cible</span><span class="ti">${icon(target, 24)}</span><span class="cn">${CIB[target].nom}</span>
-          <span class="cc">1 ${icon("argent", 14)}</span>
-        </div>
-        <div class="vous" part="player"><span class="t">Joueur</span><p>${PLAYER[ph]}</p></div>
+        ${this.targetBox(target, tiny)}
+        ${ph ? html`<div class="vous" part="player"><span class="t">Joueur</span><p>${(tiny ? PLAYER_SHORT : PLAYER)[ph]}</p></div>` : nothing}
       </div>`;
   }
 }

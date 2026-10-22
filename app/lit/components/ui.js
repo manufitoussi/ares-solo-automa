@@ -60,3 +60,23 @@ export const phaseChip = (ph, cls = "") => {
   const C = PHASE_COLOR[ph];
   return html`<span class="chip ${cls}" style="background:${C.col};${C.dark ? "color:#1F1A24" : ""}"><i>${ph}</i>${PH[ph].nom}</span>`;
 };
+
+/* Shorter texts for the tiny card, as on the landing page */
+export const EFFECT_SHORT = {
+  I: html`+1 ${CU}, puis 1 ${AG} : <b>moteur +1</b>.`,
+  II: html`+1 ${CU}, puis 1 ${CU} sur son <b>compteur de PV</b>.`,
+  III: html`+1 ${CU}, puis tous ses ${AG} sur sa cible.`,
+  IV: html`+1 ${CU}, puis autant de ${CU} que son moteur.`,
+  V: html`+1 ${CU}. Rien de plus.`
+};
+export const PLAYER_SHORT = {
+  I: "joue 1 carte verte.", II: "joue 1 carte bleue ou rouge.", III: "active ses actions.",
+  IV: "produit.", V: "pioche 2 cartes, en garde 1."
+};
+export const TARGET_SHORT = { oxy: "Oxygène", temp: "Temp.", ocean: "Océan" };
+/* what a reactive card does, when it is shown outside a game (no phase chosen yet) */
+export const REACT_RULE = {
+  Riposte: "Il joue la phase du joueur au tour précédent (Production au premier tour).",
+  Opportuniste: "Action s'il a un argent, sinon Production.",
+  Course: "Action, sur le paramètre le moins avancé."
+};
