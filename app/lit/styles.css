@@ -1,13 +1,13 @@
 /* Styles copied from app/prototype/assistant-automa.html, so both apps can be compared side by side.
    The components render in the light DOM (no Shadow DOM), so this global stylesheet applies to them. */
 /* fonts served with the app (SIL OFL, see fonts/), so it also works offline */
-@font-face{font-family:'Barlow Condensed';font-weight:500;font-style:normal;font-display:swap;src:url('../../site/app/fonts/BarlowCondensed-Medium.ttf')}
-@font-face{font-family:'Barlow Condensed';font-weight:600;font-style:normal;font-display:swap;src:url('../../site/app/fonts/BarlowCondensed-SemiBold.ttf')}
-@font-face{font-family:'Barlow Condensed';font-weight:700;font-style:normal;font-display:swap;src:url('../../site/app/fonts/BarlowCondensed-Bold.ttf')}
-@font-face{font-family:'Barlow Condensed';font-weight:700;font-style:italic;font-display:swap;src:url('../../site/app/fonts/BarlowCondensed-BoldItalic.ttf')}
-@font-face{font-family:'Barlow Condensed';font-weight:800;font-style:italic;font-display:swap;src:url('../../site/app/fonts/BarlowCondensed-ExtraBoldItalic.ttf')}
-@font-face{font-family:'Source Serif 4';font-weight:200 900;font-style:normal;font-display:swap;src:url('../../site/app/fonts/SourceSerif4.ttf')}
-@font-face{font-family:'Source Serif 4';font-weight:200 900;font-style:italic;font-display:swap;src:url('../../site/app/fonts/SourceSerif4-Italic.ttf')}
+@font-face{font-family:'Barlow Condensed';font-weight:500;font-style:normal;font-display:swap;src:url('fonts/BarlowCondensed-Medium.ttf')}
+@font-face{font-family:'Barlow Condensed';font-weight:600;font-style:normal;font-display:swap;src:url('fonts/BarlowCondensed-SemiBold.ttf')}
+@font-face{font-family:'Barlow Condensed';font-weight:700;font-style:normal;font-display:swap;src:url('fonts/BarlowCondensed-Bold.ttf')}
+@font-face{font-family:'Barlow Condensed';font-weight:700;font-style:italic;font-display:swap;src:url('fonts/BarlowCondensed-BoldItalic.ttf')}
+@font-face{font-family:'Barlow Condensed';font-weight:800;font-style:italic;font-display:swap;src:url('fonts/BarlowCondensed-ExtraBoldItalic.ttf')}
+@font-face{font-family:'Source Serif 4';font-weight:200 900;font-style:normal;font-display:swap;src:url('fonts/SourceSerif4.ttf')}
+@font-face{font-family:'Source Serif 4';font-weight:200 900;font-style:italic;font-display:swap;src:url('fonts/SourceSerif4-Italic.ttf')}
 /* Layout: mobile-first, one column; from 1024px the automa status and Mars sit in a sticky sidebar next to the current step. */
 :root{
   --bg:#FFFFFF; --panel:#F3F8F8; --panel2:#E3F2F3; --ink:#12202B; --muted:#4F5B62; --line:#CFE0E2;

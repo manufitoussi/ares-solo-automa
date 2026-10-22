@@ -2,10 +2,10 @@ import { isCurrent } from "./engine.js";
 /** @typedef {import("./engine.js").Game} Game */
 /** @typedef {import("./engine.js").GameRecord} GameRecord */
 
-/* Saving in the browser (localStorage). The keys differ from the prototype's, so both apps
-   can be open on the same site without overwriting each other's game.
+/* Saving in the browser (localStorage). The keys are the prototype's, which this app replaces:
+   on a device that played with it, the game in progress and the history are kept.
    Every access is wrapped: storage can be full, blocked or missing (private browsing). */
-const GAME = "automa-lit-partie", HISTORY = "automa-lit-historique", HISTORY_MAX = 100;
+const GAME = "automa-hybride-partie", HISTORY = "automa-hybride-historique", HISTORY_MAX = 100;
 
 /** @template T @param {string} key @param {T} fallback @returns {T} */
 const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) ?? "null") ?? fallback; } catch { return fallback; } };

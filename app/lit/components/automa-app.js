@@ -102,7 +102,7 @@ export class AutomaApp extends LightElement {
   renderTop() {
     return html`
       <header class="top">
-        <div class="brand"><b>Automa hybride</b><span>Expérience Lit · v${E.RULES} brouillon</span></div>
+        <a class="brand" href="../" title="Retour au site"><b>Automa hybride</b><span>Assistant de partie · v${E.RULES} brouillon</span></a>
         <button class="tb" aria-label="Annuler" ?disabled=${!this.undo.length || this.view !== "game"} @click=${this.undoLast}>
           <span class="full">Annuler</span><span class="short" aria-hidden="true">↶</span></button>
         <button class="tb" aria-label="Historique" @click=${this.showHistory}>

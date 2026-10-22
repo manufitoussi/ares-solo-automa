@@ -38,7 +38,13 @@ Le build copie les PDF de `rules/` et `cards/` dans `_site/downloads/` et rempli
 
 À chaque push sur `main`, le workflow `.github/workflows/pages.yml` construit et publie le site sur GitHub Pages.
 
-L'appli (PWA) sera dans `site/app/`. Sa technologie n'est pas encore choisie. En attendant, `site/app/index.html` publie le prototype de l'assistant, dont la source est `app/prototype/` (voir [app/README.md](app/README.md)).
+L'appli (PWA) est dans `app/lit/` : du JavaScript avec [Lit](https://lit.dev), sans build, que le build du site copie sous `_site/app/` (voir [app/README.md](app/README.md)).
+
+```bash
+npm install                        # outils de vérification (TypeScript, lit-analyzer)
+npm test                           # types, templates et tests du moteur
+python3 -m http.server             # puis http://localhost:8000/app/lit/ pour travailler sur l'appli
+```
 
 ## Branches et commits
 

@@ -1,5 +1,7 @@
-// Builds the website in _site/: copies site/, copies the PDF files of rules/<lang>/
-// and cards/<lang>/ to downloads/, and fills the download lists of the pages.
+// Builds the website in _site/: copies site/, copies the app from app/lit/ to app/ and fills
+// its service worker, copies the PDF files of rules/<lang>/ and cards/<lang>/ to downloads/,
+// and fills the download lists of the pages.
+import { createHash } from 'node:crypto';
 import { cp, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { basename, dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -43,6 +45,29 @@ await cp(join(root, 'site'), out, {
   recursive: true,
   filter: (src) => basename(src) !== 'README.md',
 });
+
+// the app: its sources are served as they are (no build step), without tests, types and demo
+const appSource = join(root, 'app', 'lit');
+const appOut = join(out, 'app');
+const notServed = (name) => name.endsWith('.test.js') || name.endsWith('.d.ts') || ['README.md', 'card-demo.html'].includes(name);
+await cp(appSource, appOut, { recursive: true, filter: (src) => !notServed(basename(src)) });
+
+// the service worker caches every file of the app, under a version that changes with them
+const appFiles = (await readdir(appOut, { recursive: true, withFileTypes: true }))
+  .filter((entry) => entry.isFile() && entry.name !== 'sw.js')
+  .map((entry) => relative(appOut, join(entry.parentPath, entry.name)).split(sep).join('/'))
+  .sort();
+const hash = createHash('sha256');
+for (const file of appFiles) hash.update(file).update(await readFile(join(appOut, file)));
+const version = hash.digest('hex').slice(0, 12);
+const worker = join(appOut, 'sw.js');
+const devWorker = await readFile(worker, 'utf8');
+const builtWorker = devWorker
+  .replace('const VERSION = "dev";', `const VERSION = "${version}";`)
+  .replace('const FILES = ["./"];', `const FILES = ${JSON.stringify(['./', ...appFiles.map((file) => `./${file}`)])};`);
+if (!builtWorker.includes(version) || builtWorker.includes('const FILES = ["./"];')) throw new Error('app/lit/sw.js: VERSION or FILES not found');
+await writeFile(worker, builtWorker);
+console.log(`app: ${appFiles.length} files, version ${version}`);
 
 // copies the PDF files and remembers them by source folder
 const downloads = new Map();
