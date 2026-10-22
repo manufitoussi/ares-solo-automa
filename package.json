@@ -8,6 +8,15 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "node scripts/build-site.mjs"
+    "build": "node scripts/build-site.mjs",
+    "check": "tsc -p jsconfig.json",
+    "lint:lit": "lit-analyzer \"app/components/*.js\"",
+    "test": "npm run check && npm run lint:lit && node --test \"app/**/*.test.js\""
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "lit": "3.3.1",
+    "lit-analyzer": "2.0.3",
+    "typescript": "5.9.3"
   }
 }
