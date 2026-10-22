@@ -3,8 +3,11 @@ import assert from "node:assert/strict";
 import * as E from "./engine.js";
 
 /* deterministic random numbers, so a shuffled deck is the same at every run */
+/** @param {number} [seed] */
 function seeded(seed = 1) { return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
+/** @type {E.Setup} */
 const setup = { niveau: "normal", pioche: "app", oxy: 0, temp: 0, oce: 0 };
+/** @param {Partial<E.Game>} [over] @returns {E.Game} */
 const game = (over = {}) => ({ ...E.newGame(setup, { rng: seeded(), now: 0 }), ...over });
 
 test("a new game starts with the engine of its level and a full deck", () => {
@@ -97,7 +100,7 @@ test("an empty deck is reshuffled from the discard", () => {
   const st = E.draw(game({ playerPhase: "I", deck: [], discard: [3, 7] }), { rng: seeded() });
   assert.equal(st.discard.length, 0);
   assert.equal(st.deck.length, 1);
-  assert.ok([3, 7].includes(st.card));
+  assert.ok(st.card != null && [3, 7].includes(st.card));
 });
 
 test("the game ends when every parameter is maxed, leftover silver scores", () => {

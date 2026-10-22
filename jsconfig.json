@@ -1,0 +1,18 @@
+{
+  // Type checking of the Lit app: plain JS with JSDoc types, checked by TypeScript, never compiled.
+  // `npm run check` runs it; the browser keeps loading the .js files as they are.
+  // "lit" resolves to the npm package (types only): the browser uses the vendored bundle.
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "es2022",
+    "moduleResolution": "bundler",
+    "lib": ["es2023", "dom", "dom.iterable"],
+    "checkJs": true,
+    "noEmit": true,
+    "strict": true,
+    "useDefineForClassFields": false,
+    "skipLibCheck": true
+  },
+  // the components come next; for now, the engine, the storage and their tests
+  "include": ["app/lit/engine.js", "app/lit/engine.test.js", "app/lit/storage.js"]
+}
