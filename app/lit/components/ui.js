@@ -1,5 +1,5 @@
 import { html, svg } from "lit";
-import { MOTEUR0 } from "../engine.js";
+import { MOTEUR0, PH } from "../engine.js";
 
 /* What only the interface needs: colours, icons and help texts. The rules stay in engine.js. */
 
@@ -53,4 +53,10 @@ export const PLAYER = {
   III: html`active ses « Action : » et les actions standard de son choix.`,
   IV: html`produit : ${icon("mc", 14)} production + NT, ${icon("chaleur", 14)} chaleur, ${icon("plantes", 14)} plantes, ${icon("cartes", 14)} cartes.`,
   V: html`pioche 2 ${icon("cartes", 14)} cartes et en garde&nbsp;1.`
+};
+
+/* a small phase label, as in the list of the phases of the round */
+export const phaseChip = (ph, cls = "") => {
+  const C = PHASE_COLOR[ph];
+  return html`<span class="chip ${cls}" style="background:${C.col};${C.dark ? "color:#1F1A24" : ""}"><i>${ph}</i>${PH[ph].nom}</span>`;
 };

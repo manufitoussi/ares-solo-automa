@@ -194,7 +194,7 @@ details summary{cursor:pointer;font-family:var(--display);font-weight:700;letter
 @media (prefers-reduced-motion:no-preference){.acard:not(.still){animation:flip .35s ease-out}@keyframes flip{from{transform:rotateY(70deg);opacity:.2}to{transform:none;opacity:1}}}
 
 /* custom elements are inline by default: make the components blocks */
-:is(automa-app, setup-screen, plan-screen, automa-card, automa-status, mars-panel, choice-group, param-stepper){display:block}
+:is(automa-app, setup-screen, plan-screen, reveal-screen, phase-screen, end-turn-screen, end-screen, tr-curve, automa-card, automa-status, mars-panel, choice-group, param-stepper){display:block}
 automa-app{display:flex;flex-direction:column;gap:14px}
 .param.inline{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
 /* until its JS has loaded, a custom element is not :defined */

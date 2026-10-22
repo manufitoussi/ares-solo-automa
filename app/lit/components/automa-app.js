@@ -5,7 +5,11 @@ import "./setup-screen.js";
 import "./plan-screen.js";
 import "./automa-status.js";
 import "./mars-panel.js";
-import "./automa-card.js";
+import "./reveal-screen.js";
+import "./phase-screen.js";
+import "./end-turn-screen.js";
+import "./end-screen.js";
+import { loadGame, saveGame, addToHistory } from "../storage.js";
 
 const UNDO_MAX = 30;
 
@@ -21,9 +25,15 @@ export class AutomaApp extends LightElement {
 
   constructor() {
     super();
-    this.game = null;
+    this.game = loadGame();
     this.undo = [];
     this.confirmNew = false;
+  }
+
+  /* updated runs after each render, with the properties that changed: saving here covers
+     every way the game can change (a move, undo, a new game) in one place. */
+  updated(changed) {
+    if (changed.has("game")) saveGame(this.game);
   }
 
   /* Every change of the game goes through here. The engine returns a new state and never
@@ -73,32 +83,41 @@ export class AutomaApp extends LightElement {
       </header>`;
   }
 
-  /* until step 3: the drawn card, with Annuler to go back to the planning */
-  renderDrawn() {
+  applyPhase() {
+    this.play(E.applyPhase(this.game));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  /* the record goes to the history; the game keeps the score and remark, marked as saved */
+  saveResult({ playerScore, remark }) {
+    addToHistory(E.gameRecord(this.game, { playerScore, remark }));
+    this.game = { ...this.game, playerScore, remark, saved: true };
+  }
+
+  /* the screen of the current step; each one only reports what the player did */
+  renderStep() {
     const st = this.game;
-    return html`
-      <section class="panel">
-        <h2 style="font-size:28px;font-style:italic;text-transform:uppercase">Carte de l'automa</h2>
-        <div class="reveal">
-          <automa-card number=${st.card} phase=${st.automaPhase} target=${st.cible} why=${st.why}></automa-card>
-          <div>
-            <p>Phases du tour : ${st.queue.map(ph => E.PH[ph].nom).join(", ")}.</p>
-            <p class="note"><b>Étape 3</b> La résolution des phases viendra ensuite. « Annuler » revient à la planification.</p>
-          </div>
-        </div>
-      </section>`;
+    if (st.status === "ended") return html`
+      <end-screen .game=${st} @save=${e => this.saveResult(e.detail)}
+        @resume=${() => this.play(E.resumeGame(st))}></end-screen>`;
+    switch (st.step) {
+      case "plan": return html`
+        <plan-screen .game=${st}
+          @pick=${e => this.play(E.pickPhase(st, e.detail), { undoable: false })}
+          @draw=${e => this.play(E.draw(st, { n: e.detail }))}></plan-screen>`;
+      case "reveal": return html`<reveal-screen .game=${st} @start=${() => this.play(E.startPhases(st))}></reveal-screen>`;
+      case "phase": return html`<phase-screen .game=${st} @apply=${this.applyPhase}></phase-screen>`;
+      default: return html`
+        <end-turn-screen .game=${st} @next=${() => this.play(E.nextTurn(st))}
+          @end=${() => this.play(E.endGame(st))}></end-turn-screen>`;
+    }
   }
 
   renderGame() {
     const st = this.game;
     return html`
       <div class="layout">
-        <div class="main">
-          ${st.step === "plan" ? html`
-            <plan-screen .game=${st}
-              @pick=${e => this.play(E.pickPhase(st, e.detail), { undoable: false })}
-              @draw=${e => this.play(E.draw(st, { n: e.detail }))}></plan-screen>` : this.renderDrawn()}
-        </div>
+        <div class="main">${this.renderStep()}</div>
         <aside class="side">
           <automa-status .game=${st} @correct=${e => this.play(E.adjustAutoma(st, e.detail.key, e.detail.delta))}></automa-status>
           <mars-panel .game=${st}
