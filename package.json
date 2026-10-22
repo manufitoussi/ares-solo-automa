@@ -10,7 +10,7 @@
   "scripts": {
     "build": "node scripts/build-site.mjs",
     "check": "tsc -p jsconfig.json",
-    "lint:lit": "lit-analyzer \"app/lit/components/*.js\"",
+    "lint:lit": "lit-analyzer \"app/components/*.js\"",
     "test": "npm run check && npm run lint:lit && node --test \"app/**/*.test.js\""
   },
   "devDependencies": {

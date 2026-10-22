@@ -13,9 +13,9 @@
     "strict": true,
     "useDefineForClassFields": false,
     "skipLibCheck": true,
-    "paths": { "lit": ["./app/lit/vendor/lit-all.min.d.ts"] }
+    "paths": { "lit": ["./app/vendor/lit-all.min.d.ts"] }
   },
-  "include": ["app/lit/**/*.js"],
+  "include": ["app/**/*.js"],
   // sw.js runs in a service worker, not in a page: the DOM types do not apply to it
-  "exclude": ["app/lit/vendor/*.js", "app/lit/sw.js"]
+  "exclude": ["app/vendor/*.js", "app/sw.js"]
 }

@@ -1,7 +1,7 @@
 /* Offline support for the app.
    scripts/build-site.mjs fills VERSION (a hash of the app files) and FILES (every file of the
    app) when it builds the site: nothing to bump by hand. Not filled (VERSION "dev", when the
-   app is served from app/lit/ while working on it), the worker does nothing. */
+   app is served from app/ while working on it), the worker does nothing. */
 const VERSION = "dev";
 const FILES = ["./"];
 const CACHE = `automa-${VERSION}`;

@@ -1,4 +1,4 @@
-// Builds the website in _site/: copies site/, copies the app from app/lit/ to app/ and fills
+// Builds the website in _site/: copies site/, copies the app from app/ (but its prototype) and fills
 // its service worker, copies the PDF files of rules/<lang>/ and cards/<lang>/ to downloads/,
 // and fills the download lists of the pages.
 import { createHash } from 'node:crypto';
@@ -46,10 +46,11 @@ await cp(join(root, 'site'), out, {
   filter: (src) => basename(src) !== 'README.md',
 });
 
-// the app: its sources are served as they are (no build step), without tests, types and demo
-const appSource = join(root, 'app', 'lit');
+// the app: its sources are served as they are (no build step), without the former prototype,
+// the tests, the types and the demo
+const appSource = join(root, 'app');
 const appOut = join(out, 'app');
-const notServed = (name) => name.endsWith('.test.js') || name.endsWith('.d.ts') || ['README.md', 'card-demo.html'].includes(name);
+const notServed = (name) => name.endsWith('.test.js') || name.endsWith('.d.ts') || ['README.md', 'card-demo.html', 'prototype'].includes(name);
 await cp(appSource, appOut, { recursive: true, filter: (src) => !notServed(basename(src)) });
 
 // the service worker caches every file of the app, under a version that changes with them
@@ -65,7 +66,7 @@ const devWorker = await readFile(worker, 'utf8');
 const builtWorker = devWorker
   .replace('const VERSION = "dev";', `const VERSION = "${version}";`)
   .replace('const FILES = ["./"];', `const FILES = ${JSON.stringify(['./', ...appFiles.map((file) => `./${file}`)])};`);
-if (!builtWorker.includes(version) || builtWorker.includes('const FILES = ["./"];')) throw new Error('app/lit/sw.js: VERSION or FILES not found');
+if (!builtWorker.includes(version) || builtWorker.includes('const FILES = ["./"];')) throw new Error('app/sw.js: VERSION or FILES not found');
 await writeFile(worker, builtWorker);
 console.log(`app: ${appFiles.length} files, version ${version}`);
 

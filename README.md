@@ -29,7 +29,7 @@ Les règles (v0.6) sont en cours de conception et de test. Le livret, les cartes
 | Dossier | Contenu |
 | --- | --- |
 | `site/` | le site publié sur GitHub Pages (accueil, pages par langue) ; l'appli y est ajoutée au build |
-| `app/` | l'appli (`app/lit/`) et l'ancien prototype, gardé comme référence (`app/prototype/`) |
+| `app/` | l'appli, et l'ancien prototype gardé comme référence (`app/prototype/`) |
 | `rules/<langue>/` | le livret de règles publié (PDF) |
 | `cards/<langue>/` | les cartes à imprimer publiées (PDF) |
 | `scripts/` | la construction du site |
@@ -68,7 +68,7 @@ The rules (v0.6) are being designed and playtested. The rulebook, the cards and 
 | Folder | Content |
 | --- | --- |
 | `site/` | the website published on GitHub Pages (home page, pages per language); the app is added at build time |
-| `app/` | the app (`app/lit/`) and the former prototype, kept as a reference (`app/prototype/`) |
+| `app/` | the app, and the former prototype kept as a reference (`app/prototype/`) |
 | `rules/<language>/` | the published rulebook (PDF) |
 | `cards/<language>/` | the published print & play cards (PDF) |
 | `scripts/` | the website build |
