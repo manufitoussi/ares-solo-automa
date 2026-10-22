@@ -106,11 +106,11 @@ export class HistoryScreen extends LightElement {
         <span class="lab">${T.title}</span>
         <p style="font-size:14px">${T.intro}</p>
         <div class="row">
-          <button type="button" class="ghost" ?disabled=${!any} @click=${() => this.emit("export", "all")}>${actionIcon("export")}${T.exportAll}</button>
-          <button type="button" class="ghost" ?disabled=${!any} @click=${() => this.emit("copy", "all")}>${actionIcon("copy")}${T.copyAll}</button>
-          <button type="button" class="ghost" @click=${this.pickFile}>${actionIcon("import")}${T.import}</button>
+          <button type="button" class="ghost with-icon" ?disabled=${!any} @click=${() => this.emit("export", "all")}>${actionIcon("export")}${T.exportAll}</button>
+          <button type="button" class="ghost with-icon" ?disabled=${!any} @click=${() => this.emit("copy", "all")}>${actionIcon("copy")}${T.copyAll}</button>
+          <button type="button" class="ghost with-icon" @click=${this.pickFile}>${actionIcon("import")}${T.import}</button>
           <input type="file" id="import-file" accept=".json,application/json" hidden @change=${this.onFile}>
-          <button type="button" class="ghost" aria-expanded=${this.pasting} @click=${() => { this.pasting = !this.pasting; }}>${actionIcon("paste")}${T.paste}</button>
+          <button type="button" class="ghost with-icon" aria-expanded=${this.pasting} @click=${() => { this.pasting = !this.pasting; }}>${actionIcon("paste")}${T.paste}</button>
         </div>
         ${this.pasting ? html`
           <div class="field"><label for="paste-text">${T.pasteLabel}</label>
