@@ -2,7 +2,9 @@ import { html } from "lit";
 import { LightElement } from "./light-element.js";
 import { NIV } from "../engine.js";
 import "./tr-curve.js";
+/** @typedef {import("../engine.js").GameRecord} GameRecord */
 
+/** @param {GameRecord} h */
 const winner = h => h.scoreJoueur == null ? "—"
   : h.scoreJoueur > h.scoreAutoma ? "Joueur" : h.scoreJoueur < h.scoreAutoma ? "Automa" : "Égalité";
 
@@ -12,9 +14,10 @@ export class HistoryScreen extends LightElement {
 
   constructor() {
     super();
-    this.games = [];
+    this.games = /** @type {GameRecord[]} */ ([]);
   }
 
+  /** @param {GameRecord} h */
   row(h) {
     return html`
       <tr>

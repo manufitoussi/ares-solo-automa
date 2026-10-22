@@ -1,7 +1,8 @@
 {
   // Type checking of the Lit app: plain JS with JSDoc types, checked by TypeScript, never compiled.
   // `npm run check` runs it; the browser keeps loading the .js files as they are.
-  // "lit" resolves to the npm package (types only): the browser uses the vendored bundle.
+  // "lit" is the vendored all-in-one bundle, typed by vendor/lit-all.min.d.ts from the npm
+  // package (a dev dependency, for its types only).
   "compilerOptions": {
     "target": "es2022",
     "module": "es2022",
@@ -11,8 +12,9 @@
     "noEmit": true,
     "strict": true,
     "useDefineForClassFields": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": { "lit": ["./app/lit/vendor/lit-all.min.d.ts"] }
   },
-  // the components come next; for now, the engine, the storage and their tests
-  "include": ["app/lit/engine.js", "app/lit/engine.test.js", "app/lit/storage.js"]
+  "include": ["app/lit/**/*.js"],
+  "exclude": ["app/lit/vendor/*.js"]
 }

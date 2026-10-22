@@ -1,10 +1,17 @@
 import { html } from "lit";
 import { LightElement } from "./light-element.js";
 import { pntOf } from "../engine.js";
+/** @typedef {import("../engine.js").Game} Game */
 
 /* End of the round. Reports `next` (next round) or `end` (stop the game here). */
 export class EndTurnScreen extends LightElement {
   static properties = { game: { attribute: false } };
+
+  constructor() {
+    super();
+    /** @type {Game} */
+    this.game;
+  }
 
   render() {
     const st = this.game;

@@ -1,5 +1,7 @@
 import { html, svg, nothing } from "lit";
 import { LightElement } from "./light-element.js";
+/** @typedef {import("../engine.js").TrackPoint} TrackPoint */
+/** @typedef {"a" | "p"} Who  the automa or the player */
 
 /* The TR of the player and of the automa, round by round.
    With `legend`, it is drawn in a frame with a caption; without, only the small chart. */
@@ -13,7 +15,7 @@ export class TrCurve extends LightElement {
 
   constructor() {
     super();
-    this.track = [];
+    this.track = /** @type {TrackPoint[]} */ ([]);
     this.width = 320;
     this.height = 110;
     this.legend = false;
@@ -21,14 +23,15 @@ export class TrCurve extends LightElement {
 
   chart() {
     const pts = (this.track || []).filter(x => x && x.t), w = this.width, h = this.height;
-    const vals = pts.flatMap(x => [x.a, x.p]).filter(v => v != null);
+    const vals = /** @type {number[]} */ (pts.flatMap(x => [x.a, x.p]).filter(v => v != null));
     const lo = Math.min(...vals), hi = Math.max(...vals, lo + 1), t0 = pts[0].t, t1 = pts[pts.length - 1].t;
-    const pad = 4, X = t => pad + (t - t0) / Math.max(1, t1 - t0) * (w - 2 * pad), Y = v => h - pad - (v - lo) / (hi - lo) * (h - 2 * pad);
+    const pad = 4, X = (/** @type {number} */ t) => pad + (t - t0) / Math.max(1, t1 - t0) * (w - 2 * pad), Y = (/** @type {number} */ v) => h - pad - (v - lo) / (hi - lo) * (h - 2 * pad);
+    /** @param {Who} k @param {string} col @param {boolean} [dash] */
     const line = (k, col, dash) => {
       const q = pts.filter(x => x[k] != null);
       return q.length > 1
         ? svg`<polyline fill="none" stroke=${col} stroke-width="2" stroke-dasharray=${dash ? "4 3" : "none"} stroke-linejoin="round"
-            points=${q.map(x => `${X(x.t).toFixed(1)},${Y(x[k]).toFixed(1)}`).join(" ")}/>`
+            points=${q.map(x => `${X(x.t).toFixed(1)},${Y(/** @type {number} */ (x[k])).toFixed(1)}`).join(" ")}/>`
         : nothing;
     };
     return html`<svg width=${w} height=${h} viewBox="0 0 ${w} ${h}" style="max-width:100%;height:auto" role="img"
@@ -36,6 +39,7 @@ export class TrCurve extends LightElement {
   }
 
   render() {
+    /** @type {TrackPoint[]} a saved record may have no curve */
     const track = this.track || [];
     if (track.length < 2) return this.legend ? nothing : html`—`;
     if (!this.legend) return this.chart();

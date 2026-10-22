@@ -3,6 +3,8 @@ import { LightElement } from "./light-element.js";
 import { NIV, ag, cu, vpOf } from "../engine.js";
 import { icon } from "./ui.js";
 import "./tr-curve.js";
+/** @typedef {import("../engine.js").Game} Game */
+/** @typedef {import("../engine.js").AutomaKey} AutomaKey */
 
 /* The automa board: reserve, engine, VP counter and TR.
    "Corriger" shows − / + buttons; that mode is local to the component (`edit`), the game
@@ -15,9 +17,12 @@ export class AutomaStatus extends LightElement {
 
   constructor() {
     super();
+    /** @type {Game} */
+    this.game;
     this.edit = false;
   }
 
+  /** @param {string} label @param {unknown} value @param {AutomaKey} key @param {string} [sub] */
   stat(label, value, key, sub) {
     return html`
       <div class="stat">
@@ -48,7 +53,7 @@ export class AutomaStatus extends LightElement {
           ${this.stat("NT", html`${icon("nt")}${a.nt}`, "nt")}
         </div>
         ${(st.track || []).length >= 2
-          ? html`<tr-curve legend .track=${st.track}></tr-curve>`
+          ? html`<tr-curve legend .track=${st.track ?? []}></tr-curve>`
           : html`<p style="font-size:13px;color:var(--muted)">La courbe de progression apparaîtra ici après 2 tours (le NT du joueur se règle dans le panneau Mars).</p>`}
       </section>`;
   }

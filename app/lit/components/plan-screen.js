@@ -2,8 +2,14 @@ import { html, styleMap } from "lit";
 import { LightElement } from "./light-element.js";
 import { PH, ORDER, CIB, CARDS, canPick } from "../engine.js";
 import { PHASE_COLOR, REACT_COLOR } from "./ui.js";
+/** @typedef {import("../engine.js").Game} Game */
 
-const cardLabel = cd => cd.react ? cd.react : `${PH[cd.ph].court} · ${CIB[cd.c].nom}`;
+/** @typedef {import("../engine.js").Phase} Phase */
+/** @typedef {import("../engine.js").Card} Card */
+
+/** @param {Card} cd */
+const cardLabel = cd => cd.react ?? `${PH[/** @type {Phase} */ (cd.ph)].court} · ${CIB[/** @type {import("../engine.js").Target} */ (cd.c)].nom}`;
+/** @param {number} n */
 const pad = n => String(n).padStart(2, "0");
 
 /* Planning: the player picks their phase, then the automa card is drawn.
@@ -12,6 +18,13 @@ const pad = n => String(n).padStart(2, "0");
 export class PlanScreen extends LightElement {
   static properties = { game: { attribute: false } };
 
+  constructor() {
+    super();
+    /** @type {Game} */
+    this.game;
+  }
+
+  /** @param {Phase} ph */
   phaseButton(ph) {
     const st = this.game, P = PH[ph], C = PHASE_COLOR[ph], last = st.lastPlayerPhase === ph;
     /* styleMap sets inline styles from an object; `?disabled` adds or removes a boolean attribute */
@@ -36,7 +49,7 @@ export class PlanScreen extends LightElement {
             return html`
               <button type="button" ?disabled=${!st.playerPhase || used} @click=${() => this.emit("draw", cd.n)}
                 aria-label="Carte ${cd.n}, ${cardLabel(cd)}${used ? ", déjà sortie" : ""}">
-                <i style=${styleMap({ background: cd.react ? REACT_COLOR : PHASE_COLOR[cd.ph].col })}></i><b>${pad(cd.n)}</b>${cardLabel(cd)}
+                <i style=${styleMap({ background: cd.react ? REACT_COLOR : PHASE_COLOR[/** @type {Phase} */ (cd.ph)].col })}></i><b>${pad(cd.n)}</b>${cardLabel(cd)}
               </button>`;
           })}
         </div>

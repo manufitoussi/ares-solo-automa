@@ -1,6 +1,9 @@
 import { LitElement, html, css, nothing, styleMap } from "lit";
 import { PH, CIB, card } from "../engine.js";
 import { PHASE_COLOR, REACT_COLOR, PHASE_TINT, TARGET_COLOR, EFFECT, PLAYER, EFFECT_SHORT, PLAYER_SHORT, TARGET_SHORT, REACT_RULE, icon } from "./ui.js";
+/** @typedef {import("../engine.js").Phase} Phase */
+/** @typedef {import("../engine.js").Target} Target */
+/** @typedef {import("../engine.js").Card} Card */
 
 /* An automa card, drawn like the printed card. Unlike the other components, it renders in a
    shadow root with its own styles: it looks the same in the app and on any other page, and
@@ -98,7 +101,22 @@ export class AutomaCard extends LitElement {
     }
   `;
 
-  /* the target box; Course shown outside a game has no target yet: the least advanced one */
+  constructor() {
+    super();
+    /** @type {number | undefined} */
+    this.number = undefined;
+    /** @type {Phase | undefined} the phase played; a reactive card needs it, see above */
+    this.phase = undefined;
+    /** @type {Target | undefined} */
+    this.target = undefined;
+    this.why = "";
+    this.still = false;
+    /** @type {"tiny" | "small" | "large" | undefined} */
+    this.size = undefined;
+  }
+
+  /** the target box; Course shown outside a game has no target yet: the least advanced one
+      @param {Target | null} target @param {boolean} tiny */
   targetBox(target, tiny) {
     if (!target) return html`
       <div class="cib" part="target" style="border-color:#2FB6C0">
@@ -112,33 +130,40 @@ export class AutomaCard extends LitElement {
       </div>`;
   }
 
+  /** what the card says the automa does: its effect, or the general rule of a reactive card
+      shown outside a game @param {Card} cd @param {Phase | null} ph @param {boolean} tiny */
+  effect(cd, ph, tiny) {
+    if (!ph || (cd.react && !this.phase)) return html`
+      <div class="au" part="effect" style="background:#E3F2F3"><p>${cd.react ? REACT_RULE[cd.react] : ""}</p></div>`;
+    return html`
+      ${cd.react ? html`<div class="why">Il joue : <b>${PH[ph].nom}</b>. ${this.why}</div>` : nothing}
+      <div class="au" part="effect" style=${styleMap({ background: PHASE_TINT[ph] })}><p>${(tiny ? EFFECT_SHORT : EFFECT)[ph]}</p></div>`;
+  }
+
   render() {
-    const cd = card(this.number);
+    const cd = this.number == null ? undefined : card(this.number);
     if (!cd) return nothing;
     const tiny = this.size === "tiny";
-    /* A reactive card without `phase` is shown with its general rule (outside a game).
-       Course always plays Action, so its phase is known even then. */
-    const general = cd.react && !this.phase;
+    /* The attributes come from any HTML page: an unknown phase or target draws nothing.
+       Course always plays Action, so its phase is known even outside a game. */
+    /** @type {Phase | null} */
     const ph = this.phase || cd.ph || (cd.react === "Course" ? "III" : null);
+    /** @type {Target | null} */
     const target = this.target || (cd.c === "low" ? null : cd.c);
     if ((ph && !PH[ph]) || (target && !CIB[target])) return nothing;
-    const C = ph && PHASE_COLOR[ph];
-    const banner = cd.react
+    const C = ph ? PHASE_COLOR[ph] : null;
+    const banner = cd.react || !C
       ? { background: REACT_COLOR, color: null }
       : { background: C.col, color: C.dark ? "#1F1A24" : null };
     return html`
       <div class="card" part="card" role="img" aria-label="Carte automa ${cd.n}">
         <div class="kban" part="banner" style=${styleMap(banner)}>
-          ${cd.react
+          ${cd.react || !ph
             ? html`<span class="r" style="color:#8FE3E8">?</span><span class="nm">${cd.react}</span>`
             : html`<span class="r">${ph}</span><span class="nm">${PH[ph].nom}</span>`}
         </div>
         <div class="meta"><span>Automa${cd.react && !tiny ? " · réactive" : ""}</span><span>${String(cd.n).padStart(2, "0")} / 15</span></div>
-        ${general
-          ? html`<div class="au" part="effect" style="background:#E3F2F3"><p>${REACT_RULE[cd.react]}</p></div>`
-          : html`
-            ${cd.react ? html`<div class="why">Il joue : <b>${PH[ph].nom}</b>. ${this.why}</div>` : nothing}
-            <div class="au" part="effect" style=${styleMap({ background: PHASE_TINT[ph] })}><p>${(tiny ? EFFECT_SHORT : EFFECT)[ph]}</p></div>`}
+        ${this.effect(cd, ph, tiny)}
         <div class="sp"></div>
         ${this.targetBox(target, tiny)}
         ${ph ? html`<div class="vous" part="player"><span class="t">Joueur</span><p>${(tiny ? PLAYER_SHORT : PLAYER)[ph]}</p></div>` : nothing}

@@ -8,8 +8,9 @@ import { LitElement } from "lit";
 export class LightElement extends LitElement {
   createRenderRoot() { return this; }
 
-  /* Tell the parent something happened. The event does not bubble: the parent listens on
-     this element in its own template (@name=${...}), so events go up one level at a time
-     and each component decides what to pass on. */
+  /** Tell the parent something happened. The event does not bubble: the parent listens on
+      this element in its own template (@name=${...}), so events go up one level at a time
+      and each component decides what to pass on.
+      @param {string} name @param {unknown} [detail] */
   emit(name, detail) { this.dispatchEvent(new CustomEvent(name, { detail })); }
 }

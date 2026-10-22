@@ -1,9 +1,11 @@
 import { html, classMap } from "lit";
 import { LightElement } from "./light-element.js";
 
+/** @typedef {{ value: string, title: string, text: string, disabled?: boolean }} Choice */
+
 /* A group of buttons where one option is chosen, as for the level or the automa deck.
    It is "controlled": it shows the value it receives and only reports a click with a
-   `choose` event; the parent decides and passes the new value back down. */
+   `choose` event (detail: the value); the parent decides and passes the new value back down. */
 export class ChoiceGroup extends LightElement {
   /* Reactive properties: assigning one of them re-renders the component.
      `attribute: false` means it is only set from JS (`.options=${...}` in a template),
@@ -18,7 +20,7 @@ export class ChoiceGroup extends LightElement {
   constructor() {
     super();
     this.label = "";
-    this.options = [];
+    this.options = /** @type {Choice[]} */ ([]);
     this.value = "";
     this.columns = 3;
   }

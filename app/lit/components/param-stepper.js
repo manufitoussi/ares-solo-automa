@@ -14,6 +14,19 @@ export class ParamStepper extends LightElement {
     inline: { type: Boolean }
   };
 
+  constructor() {
+    super();
+    /* text or templates: anything Lit can render */
+    this.label = /** @type {unknown} */ ("");
+    this.icon = /** @type {unknown} */ (undefined);
+    this.value = /** @type {unknown} */ ("");
+    this.name = "";
+    /** @type {number | undefined} */
+    this.progress = undefined;
+    this.max = false;
+    this.inline = false;
+  }
+
   render() {
     return html`
       <div class=${classMap({ param: true, max: this.max, inline: this.inline })}>

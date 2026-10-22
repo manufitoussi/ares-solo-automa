@@ -11,6 +11,12 @@ import "./end-turn-screen.js";
 import "./end-screen.js";
 import "./history-screen.js";
 import { loadGame, saveGame, addToHistory, loadHistory } from "../storage.js";
+/** @typedef {import("../engine.js").Game} Game */
+/** @typedef {import("../engine.js").Setup} Setup */
+/** @typedef {import("../engine.js").Phase} Phase */
+/** @typedef {import("../engine.js").Param} Param */
+/** @typedef {import("../engine.js").AutomaKey} AutomaKey */
+/** @typedef {import("../engine.js").GameRecord} GameRecord */
 
 const UNDO_MAX = 30;
 
@@ -28,11 +34,14 @@ export class AutomaApp extends LightElement {
 
   constructor() {
     super();
+    /** @type {Game | null} null until a game starts */
     this.game = loadGame();
-    this.undo = [];
+    /* the previous states, most recent last */
+    this.undo = /** @type {Game[]} */ ([]);
     this.confirmNew = false;
+    /** @type {"game" | "history"} */
     this.view = "game";
-    this.history = [];
+    this.history = /** @type {GameRecord[]} */ ([]);
   }
 
   /* The tag holds the start screen of index.html: clear it before the first render,
@@ -44,6 +53,7 @@ export class AutomaApp extends LightElement {
 
   /* updated runs after each render, with the properties that changed: saving here covers
      every way the game can change (a move, undo, a new game) in one place. */
+  /** @param {Map<PropertyKey, unknown>} changed */
   updated(changed) {
     if (changed.has("game")) saveGame(this.game);
   }
@@ -51,20 +61,23 @@ export class AutomaApp extends LightElement {
   /* Every change of the game goes through here. The engine returns a new state and never
      changes the old one, so undo only has to keep the previous states, and Lit sees the
      new object and re-renders. Some changes are not worth an undo step (picking a phase). */
+  /** @param {Game} next @param {{ undoable?: boolean }} [options] */
   play(next, { undoable = true } = {}) {
     if (next === this.game) return;
-    if (undoable) this.undo = [...this.undo, this.game].slice(-UNDO_MAX);
+    if (undoable && this.game) this.undo = [...this.undo, this.game].slice(-UNDO_MAX);
     this.game = next;
   }
 
-  begin(setup) {
+  /** @param {CustomEvent<Setup>} e */
+  begin(e) {
     this.undo = [];
-    this.game = E.newGame(setup);
+    this.game = E.newGame(e.detail);
   }
 
   undoLast() {
-    if (!this.undo.length) return;
-    this.game = this.undo.at(-1);
+    const last = this.undo.at(-1);
+    if (!last) return;
+    this.game = last;
     this.undo = this.undo.slice(0, -1);
   }
 
@@ -104,27 +117,31 @@ export class AutomaApp extends LightElement {
   }
 
   applyPhase() {
+    if (!this.game) return;
     this.play(E.applyPhase(this.game));
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   /* the record goes to the history; the game keeps the score and remark, marked as saved */
-  saveResult({ playerScore, remark }) {
+  /** @param {CustomEvent<{ playerScore: number | null, remark: string }>} e */
+  saveResult(e) {
+    if (!this.game) return;
+    const { playerScore, remark } = e.detail;
     addToHistory(E.gameRecord(this.game, { playerScore, remark }));
     this.game = { ...this.game, playerScore, remark, saved: true };
   }
 
   /* the screen of the current step; each one only reports what the player did */
-  renderStep() {
-    const st = this.game;
+  /** @param {Game} st */
+  renderStep(st) {
     if (st.status === "ended") return html`
-      <end-screen .game=${st} @save=${e => this.saveResult(e.detail)}
+      <end-screen .game=${st} @save=${this.saveResult}
         @resume=${() => this.play(E.resumeGame(st))}></end-screen>`;
     switch (st.step) {
       case "plan": return html`
         <plan-screen .game=${st}
-          @pick=${e => this.play(E.pickPhase(st, e.detail), { undoable: false })}
-          @draw=${e => this.play(E.draw(st, { n: e.detail }))}></plan-screen>`;
+          @pick=${(/** @type {CustomEvent<Phase>} */ e) => this.play(E.pickPhase(st, e.detail), { undoable: false })}
+          @draw=${(/** @type {CustomEvent<number | null>} */ e) => this.play(E.draw(st, { n: e.detail }))}></plan-screen>`;
       case "reveal": return html`<reveal-screen .game=${st} @start=${() => this.play(E.startPhases(st))}></reveal-screen>`;
       case "phase": return html`<phase-screen .game=${st} @apply=${this.applyPhase}></phase-screen>`;
       default: return html`
@@ -133,16 +150,16 @@ export class AutomaApp extends LightElement {
     }
   }
 
-  renderGame() {
-    const st = this.game;
+  /** @param {Game} st */
+  renderGame(st) {
     return html`
       <div class="layout">
-        <div class="main">${this.renderStep()}</div>
+        <div class="main">${this.renderStep(st)}</div>
         <aside class="side">
-          <automa-status .game=${st} @correct=${e => this.play(E.adjustAutoma(st, e.detail.key, e.detail.delta))}></automa-status>
+          <automa-status .game=${st} @correct=${(/** @type {CustomEvent<{ key: AutomaKey, delta: number }>} */ e) => this.play(E.adjustAutoma(st, e.detail.key, e.detail.delta))}></automa-status>
           <mars-panel .game=${st}
-            @param=${e => this.play(E.adjustParam(st, e.detail.key, e.detail.delta))}
-            @player-tr=${e => this.play(E.adjustPlayerTR(st, e.detail))}></mars-panel>
+            @param=${(/** @type {CustomEvent<{ key: Param, delta: number }>} */ e) => this.play(E.adjustParam(st, e.detail.key, e.detail.delta))}
+            @player-tr=${(/** @type {CustomEvent<number>} */ e) => this.play(E.adjustPlayerTR(st, e.detail))}></mars-panel>
         </aside>
         ${st.log.length ? html`
           <div class="logz"><details class="panel"><summary>Journal (${st.log.length})</summary>
@@ -156,8 +173,8 @@ export class AutomaApp extends LightElement {
       ${this.renderTop()}
       ${this.view === "history" ? html`
         <history-screen .games=${this.history} @back=${() => { this.view = "game"; }}></history-screen>`
-      : this.game ? this.renderGame() : html`
-        <div class="solo"><setup-screen @begin=${e => this.begin(e.detail)}></setup-screen></div>`}`;
+      : this.game ? this.renderGame(this.game) : html`
+        <div class="solo"><setup-screen @begin=${this.begin}></setup-screen></div>`}`;
   }
 }
 customElements.define("automa-app", AutomaApp);

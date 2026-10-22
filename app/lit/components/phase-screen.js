@@ -3,7 +3,13 @@ import { LightElement } from "./light-element.js";
 import { PH, CIB, COST, computePhase, effCible, allMax, cu, purse, plural, vpOf } from "../engine.js";
 import { PHASE_COLOR, phaseChip, icon } from "./ui.js";
 import "./automa-card.js";
+/** @typedef {import("../engine.js").Game} Game */
 
+/** @typedef {import("../engine.js").Phase} Phase */
+/** @typedef {import("../engine.js").Target} Target */
+/** @typedef {import("../engine.js").Automa} Automa */
+
+/** @type {Record<Phase, string>} */
 const TAGS = {
   I: "+1 cuivre, puis moteur +1 pour 1 argent.", II: "+1 cuivre, puis 1 cube sur son compteur de PV.",
   III: "+1 cuivre, puis tous ses argents sur sa cible.", IV: "+1 cuivre, puis autant de cuivres que son moteur.", V: "+1 cuivre. Rien de plus."
@@ -15,6 +21,13 @@ const TAGS = {
 export class PhaseScreen extends LightElement {
   static properties = { game: { attribute: false } };
 
+  constructor() {
+    super();
+    /** @type {Game} */
+    this.game;
+  }
+
+  /** @param {Phase} ph @param {ReturnType<typeof computePhase>} r @param {Automa} a0 */
   todo(ph, r, a0) {
     const st = this.game, ch = r.ch;
     const items = [html`${icon("cube")} <b>+1 cuivre</b> dans sa réserve${cu(a0.cubes) === COST - 1 ? " : avec 5 cuivres, l'échanger contre 1 argent" : ""}`];
@@ -37,12 +50,12 @@ export class PhaseScreen extends LightElement {
 
   render() {
     const st = this.game, ph = st.queue[st.qi], r = computePhase(st, ph), a0 = st.a, C = PHASE_COLOR[ph];
-    const eff = effCible(st.cible, st.p);
+    const cible = /** @type {Target} */ (st.cible), eff = effCible(cible, st.p);
     return html`
       <section class="panel">
         <div class="steps">${st.queue.map((x, i) => phaseChip(x, i < st.qi ? "done" : i === st.qi ? "cur" : ""))}</div>
         <div class="reveal">
-          <automa-card still number=${st.card} phase=${st.automaPhase} target=${st.cible} why=${st.why}></automa-card>
+          <automa-card still .number=${st.card ?? undefined} .phase=${st.automaPhase ?? undefined} .target=${cible} .why=${st.why}></automa-card>
           <div>
             <div class="ban ${C.dark ? "dark" : ""}" style=${styleMap({ background: C.col })}>
               <span class="r">${ph}</span><div><span class="nm">${PH[ph].nom}</span><span class="tg">${TAGS[ph]}</span></div>
@@ -50,7 +63,7 @@ export class PhaseScreen extends LightElement {
             <div class="todo"><span class="lab">À faire sur son plateau</span>
               <ul>${this.todo(ph, r, a0).map(t => html`<li>${t}</li>`)}</ul>
               <p style="font-size:14px;color:var(--muted)">Réserve : ${purse(a0.cubes)} → ${purse(r.a.cubes)} (5 cuivres = 1 argent).${ph === "III"
-                ? ` Cible : ${CIB[st.cible].nom}${eff !== st.cible ? ` au maximum, il passe à ${CIB[eff].nom.toLowerCase()}` : ""}.` : ""} Pas de bonus pour l'automa.</p>
+                ? ` Cible : ${CIB[cible].nom}${eff !== cible ? ` au maximum, il passe à ${CIB[eff].nom.toLowerCase()}` : ""}.` : ""} Pas de bonus pour l'automa.</p>
             </div>
             ${ph === "III" ? html`<p class="note"><b>Mars en direct</b> Ce plan suit les paramètres de Mars. Si le joueur vient d'en monter un, le mettre à jour dans le panneau Mars : le plan se recalcule.</p>` : nothing}
             ${ph === "III" && allMax(r.p) ? html`<p class="note"><b>Dernier tour</b> Tous les paramètres sont au maximum : chaque argent qu'il lui reste vaut 1 PV.</p>` : nothing}

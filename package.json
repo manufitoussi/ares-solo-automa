@@ -11,7 +11,7 @@
     "build": "node scripts/build-site.mjs",
     "check": "tsc -p jsconfig.json",
     "lint:lit": "lit-analyzer \"app/lit/components/*.js\"",
-    "test": "npm run check && node --test \"app/**/*.test.js\""
+    "test": "npm run check && npm run lint:lit && node --test \"app/**/*.test.js\""
   },
   "devDependencies": {
     "@types/node": "22.20.5",
