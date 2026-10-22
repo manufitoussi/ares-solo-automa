@@ -123,12 +123,12 @@ export class AutomaApp extends LightElement {
   }
 
   /* the record goes to the history; the game keeps the score and remark, marked as saved */
-  /** @param {CustomEvent<{ playerScore: number | null, remark: string }>} e */
+  /** @param {CustomEvent<{ playerScore: number, remark: string, player: import("../engine.js").PlayerScore }>} e */
   saveResult(e) {
     if (!this.game) return;
-    const { playerScore, remark } = e.detail;
-    addToHistory(E.gameRecord(this.game, { playerScore, remark }));
-    this.game = { ...this.game, playerScore, remark, saved: true };
+    const { playerScore, remark, player } = e.detail;
+    addToHistory(E.gameRecord(this.game, { playerScore, remark, player }));
+    this.game = { ...this.game, playerScore, remark, playerFinal: player, saved: true };
   }
 
   /* the screen of the current step; each one only reports what the player did */
@@ -143,7 +143,9 @@ export class AutomaApp extends LightElement {
           @pick=${(/** @type {CustomEvent<Phase>} */ e) => this.play(E.pickPhase(st, e.detail), { undoable: false })}
           @draw=${(/** @type {CustomEvent<number | null>} */ e) => this.play(E.draw(st, { n: e.detail }))}></plan-screen>`;
       case "reveal": return html`<reveal-screen .game=${st} @start=${() => this.play(E.startPhases(st))}></reveal-screen>`;
-      case "phase": return html`<phase-screen .game=${st} @apply=${this.applyPhase}></phase-screen>`;
+      case "phase": return html`
+        <phase-screen .game=${st} @apply=${this.applyPhase}
+          @param=${(/** @type {CustomEvent<{ key: Param, delta: number }>} */ e) => this.play(E.adjustParam(st, e.detail.key, e.detail.delta))}></phase-screen>`;
       default: return html`
         <end-turn-screen .game=${st} @next=${() => this.play(E.nextTurn(st))}
           @end=${() => this.play(E.endGame(st))}></end-turn-screen>`;

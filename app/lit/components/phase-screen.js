@@ -1,7 +1,8 @@
 import { html, nothing, styleMap } from "lit";
 import { LightElement } from "./light-element.js";
-import { PH, CIB, COST, computePhase, effCible, allMax, cu, purse, plural, vpOf } from "../engine.js";
+import { PH, CIB, COST, MAX, computePhase, effCible, allMax, cu, purse, plural, vpOf } from "../engine.js";
 import { PHASE_COLOR, phaseChip, icon } from "./ui.js";
+import "./param-stepper.js";
 import "./automa-card.js";
 /** @typedef {import("../engine.js").Game} Game */
 
@@ -48,6 +49,26 @@ export class PhaseScreen extends LightElement {
     return items;
   }
 
+  /* In the Action phase, the player raises their steps here, before the automa spends its
+     silver: each step goes up to <automa-app> as a `param` event, like in the Mars panel. */
+  playerSteps() {
+    const st = this.game;
+    const done = (st.playerSteps ?? []).filter(x => x.t === st.turn && x.at === "III").reduce((s, x) => s + x.d, 0);
+    /** @param {import("../engine.js").Param} key @param {string} label @param {import("./ui.js").IconName} ic @param {string} name */
+    const one = (key, label, ic, name) => html`
+      <param-stepper .label=${label} .icon=${icon(ic)} .value=${String(st.p[key])} name=${name}
+        .progress=${st.p[key] / MAX[key]} ?max=${st.p[key] >= MAX[key]}
+        @step=${(/** @type {CustomEvent<number>} */ e) => this.emit("param", { key, delta: e.detail })}></param-stepper>`;
+    return html`
+      <div class="fcard">
+        <span class="lab">Le joueur monte ses crans · ${plural(done, "cran")} dans cette Action</span>
+        <div class="params">
+          ${one("oxy", "Oxygène", "oxy", "l'oxygène")}${one("temp", "Temp.", "temp", "la température")}${one("oce", "Océans", "ocean", "les océans")}
+        </div>
+        <p style="font-size:13px;color:var(--muted)">Avant de résoudre l'automa. Chaque cran donne aussi 1 NT au joueur ; le plan de l'automa se recalcule.</p>
+      </div>`;
+  }
+
   render() {
     const st = this.game, ph = st.queue[st.qi], r = computePhase(st, ph), a0 = st.a, C = PHASE_COLOR[ph];
     const cible = /** @type {Target} */ (st.cible), eff = effCible(cible, st.p);
@@ -60,12 +81,12 @@ export class PhaseScreen extends LightElement {
             <div class="ban ${C.dark ? "dark" : ""}" style=${styleMap({ background: C.col })}>
               <span class="r">${ph}</span><div><span class="nm">${PH[ph].nom}</span><span class="tg">${TAGS[ph]}</span></div>
             </div>
+            ${ph === "III" ? this.playerSteps() : nothing}
             <div class="todo"><span class="lab">À faire sur son plateau</span>
               <ul>${this.todo(ph, r, a0).map(t => html`<li>${t}</li>`)}</ul>
               <p style="font-size:14px;color:var(--muted)">Réserve : ${purse(a0.cubes)} → ${purse(r.a.cubes)} (5 cuivres = 1 argent).${ph === "III"
                 ? ` Cible : ${CIB[cible].nom}${eff !== cible ? ` au maximum, il passe à ${CIB[eff].nom.toLowerCase()}` : ""}.` : ""} Pas de bonus pour l'automa.</p>
             </div>
-            ${ph === "III" ? html`<p class="note"><b>Mars en direct</b> Ce plan suit les paramètres de Mars. Si le joueur vient d'en monter un, le mettre à jour dans le panneau Mars : le plan se recalcule.</p>` : nothing}
             ${ph === "III" && allMax(r.p) ? html`<p class="note"><b>Dernier tour</b> Tous les paramètres sont au maximum : chaque argent qu'il lui reste vaut 1 PV.</p>` : nothing}
             <p style="font-size:14px;color:var(--muted)">${st.playerPhase === ph ? "Le joueur a choisi cette phase : il prend son bonus." : "Le joueur joue aussi cette phase, sans bonus."}</p>
             <div class="row"><button type="button" class="cta" @click=${() => this.emit("apply")}>C'est fait</button></div>

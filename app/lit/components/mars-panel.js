@@ -36,7 +36,7 @@ export class MarsPanel extends LightElement {
     const p = this.game.p;
     return html`
       <section class="panel" aria-label="Paramètres de Mars">
-        <span class="lab">Mars · à mettre à jour quand le joueur augmente un paramètre</span>
+        <span class="lab">Mars · à mettre à jour quand le joueur monte un cran (+1 NT pour lui)</span>
         <div class="params">
           ${this.param("oxy", "Oxygène", `${p.oxy} %`, "oxy", "l'oxygène")}
           ${this.param("temp", html`<span class="full">Température</span><span class="short">Temp.</span>`, `${signed(tempC(p.temp))} °C`, "temp", "la température")}

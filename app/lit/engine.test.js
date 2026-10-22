@@ -93,7 +93,7 @@ test("a full round: plan, draw, phases in order, next turn", () => {
   st = E.nextTurn(st);
   assert.deepEqual([st.turn, st.step, st.lastPlayerPhase, st.playerPhase], [2, "plan", "V", null]);
   assert.deepEqual(st.discard, [1]);
-  assert.deepEqual(st.track, [{ t: 1, a: 5, p: 5 }]);
+  assert.deepEqual(st.track, [{ t: 1, a: 5, p: 5, ca: 0, cj: 0 }]);
 });
 
 test("an empty deck is reshuffled from the discard", () => {
@@ -122,4 +122,31 @@ test("corrections clamp and merge in the log", () => {
   assert.equal(E.adjustAutoma(game(), "cubes", -1).a.cubes, 0);
   assert.equal(E.adjustParam(game({ p: { oxy: 14, temp: 0, oce: 0 } }), "oxy", 1).p.oxy, 14);
   assert.equal(E.adjustPlayerTR(game(), 2).pnt, 7);
+});
+
+test("the player's steps are recorded with their phase and give TR", () => {
+  let st = game({ step: "phase", queue: ["III", "IV"], qi: 0, cible: "temp", playerPhase: "III", automaPhase: "IV", card: 1 });
+  st = E.adjustParam(st, "oxy", 1);
+  st = E.adjustParam(st, "oxy", 1);
+  st = E.adjustParam(st, "temp", 1);
+  assert.equal(E.pntOf(st), 8);
+  assert.deepEqual(st.playerSteps, [{ t: 1, at: "III", k: "oxy", d: 2 }, { t: 1, at: "III", k: "temp", d: 1 }]);
+  st = E.applyPhase(st);                          /* Action: no silver, nothing for the automa */
+  st = E.adjustParam(st, "oce", 1);               /* during Production: outside an Action */
+  st = E.adjustParam(st, "oxy", -1);              /* a correction during Production */
+  assert.deepEqual(E.playerStepsPerAction(st), [3]);
+  assert.equal(E.playerStepsOutsideAction(st), 0);
+  assert.deepEqual(st.crans, { joueur: 3, automa: 0 });
+  assert.equal(E.adjustParam(game({ p: { oxy: 14, temp: 0, oce: 0 } }), "oxy", 1).playerSteps, undefined);
+});
+
+test("the curve records the steps of each side", () => {
+  let st = game({ step: "phase", queue: ["III"], qi: 0, cible: "oxy", playerPhase: "III", automaPhase: "III", card: 4,
+    a: { cubes: 10, moteur: 3, compteur: 0, nt: 5, pvFin: 0 } });
+  st = E.adjustParam(st, "temp", 1);
+  st = E.applyPhase(st);                          /* 11 cubes: 2 oxygen steps */
+  st = E.nextTurn(st);
+  assert.deepEqual(st.track, [{ t: 1, a: 7, p: 6, ca: 2, cj: 1 }]);
+  const rec = E.gameRecord(st, { player: { nt: 6, forets: 1, cartes: 2, autres: 0 } });
+  assert.deepEqual(rec.joueur, { nt: 6, forets: 1, cartes: 2, autres: 0, cransParAction: [1], cransHorsAction: 0 });
 });

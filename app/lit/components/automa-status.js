@@ -53,7 +53,7 @@ export class AutomaStatus extends LightElement {
           ${this.stat("NT", html`${icon("nt")}${a.nt}`, "nt")}
         </div>
         ${(st.track || []).length >= 2
-          ? html`<tr-curve legend .track=${st.track ?? []}></tr-curve>`
+          ? html`<tr-curve legend .track=${st.track ?? []}></tr-curve><tr-curve legend kind="crans" .track=${st.track ?? []}></tr-curve>`
           : html`<p style="font-size:13px;color:var(--muted)">La courbe de progression apparaîtra ici après 2 tours (le NT du joueur se règle dans le panneau Mars).</p>`}
       </section>`;
   }

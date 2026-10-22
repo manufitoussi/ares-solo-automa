@@ -8,6 +8,12 @@ import "./tr-curve.js";
 const winner = h => h.scoreJoueur == null ? "—"
   : h.scoreJoueur > h.scoreAutoma ? "Joueur" : h.scoreJoueur < h.scoreAutoma ? "Automa" : "Égalité";
 
+/** the player's mean steps per Action phase, for the games that recorded them @param {GameRecord} h */
+const stepsPerAction = h => {
+  const per = h.joueur?.cransParAction;
+  return per?.length ? (per.reduce((s, x) => s + x, 0) / per.length).toFixed(1).replace(".", ",") : "—";
+};
+
 /* The saved games of this browser, most recent first. Reports `back` to return to the game. */
 export class HistoryScreen extends LightElement {
   static properties = { games: { attribute: false } };
@@ -26,9 +32,12 @@ export class HistoryScreen extends LightElement {
         <td>${h.version || "—"}</td>
         <td class="n">${h.tours}</td>
         <td class="n">${h.scoreJoueur ?? "—"}</td>
+        <td class="n">${h.joueur ? h.joueur.nt : "—"}</td>
+        <td class="n">${stepsPerAction(h)}</td>
         <td class="n">${h.scoreAutoma}</td>
         <td>${winner(h)}</td>
         <td><tr-curve .track=${h.courbe} width="120" height="40"></tr-curve></td>
+        <td><tr-curve kind="crans" .track=${h.courbe} width="120" height="40"></tr-curve></td>
         <td style="min-width:160px">${h.remarque || ""}</td>
       </tr>`;
   }
@@ -45,7 +54,7 @@ export class HistoryScreen extends LightElement {
         ${n ? html`
           <p>${n} partie${n > 1 ? "s" : ""} · ${won} victoire${won > 1 ? "s" : ""} du joueur contre l'automa.</p>
           <div class="scroll"><table>
-            <thead><tr><th>Date</th><th>Niveau</th><th>Règles</th><th class="n">Tours</th><th class="n">Joueur</th><th class="n">Automa</th><th>Gagnant</th><th>NT par tour</th><th>Remarques</th></tr></thead>
+            <thead><tr><th>Date</th><th>Niveau</th><th>Règles</th><th class="n">Tours</th><th class="n">Joueur</th><th class="n">NT joueur</th><th class="n">Crans / Action</th><th class="n">Automa</th><th>Gagnant</th><th>NT par tour</th><th>Crans</th><th>Remarques</th></tr></thead>
             <tbody>${games.map(h => this.row(h))}</tbody>
           </table></div>`
         : html`<p>Aucune partie enregistrée pour l'instant. À la fin d'une partie, l'enregistrer depuis l'écran de décompte : elle apparaîtra ici.</p>`}

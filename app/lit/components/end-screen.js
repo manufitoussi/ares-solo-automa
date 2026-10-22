@@ -1,17 +1,25 @@
 import { html, nothing } from "lit";
 import { LightElement } from "./light-element.js";
-import { allMax, scoreAutoma } from "../engine.js";
+import { allMax, scoreAutoma, pntOf, plural, playerStepsPerAction, playerStepsOutsideAction } from "../engine.js";
 import { icon } from "./ui.js";
 import "./tr-curve.js";
 /** @typedef {import("../engine.js").Game} Game */
+/** @typedef {import("../engine.js").PlayerScore} PlayerScore */
+/** @typedef {keyof PlayerScore} ScoreKey */
 
-/* Final scoring. The player's score and remarks are typed here, kept in the component
-   until "Enregistrer", then sent up with `save` ({playerScore, remark}).
-   `resume` goes back to the game if it was stopped by mistake. */
+/** @type {[ScoreKey, string][]} */
+const FIELDS = [["nt", "NT"], ["forets", "Forêts"], ["cartes", "Cartes"], ["autres", "Autres PV"]];
+const EMPTY = { nt: "", forets: "", cartes: "", autres: "" };
+/** @param {string} v */
+const toNumber = v => { const n = parseInt(v, 10); return isNaN(n) ? 0 : n; };
+
+/* Final scoring. The player's score is typed in parts (TR, prefilled, then forests, cards and
+   other VP), kept in the component until "Enregistrer", then sent up with `save`
+   ({playerScore, remark, player}). `resume` goes back to the game if it was stopped by mistake. */
 export class EndScreen extends LightElement {
   static properties = {
     game: { attribute: false },
-    score: { state: true },
+    fields: { state: true },
     remark: { state: true }
   };
 
@@ -19,8 +27,8 @@ export class EndScreen extends LightElement {
     super();
     /** @type {Game} */
     this.game;
-    /** @type {string | undefined} what is typed in the score field */
-    this.score = undefined;
+    /** @type {Record<ScoreKey, string> | undefined} what is typed, field by field */
+    this.fields = undefined;
     this.remark = "";
   }
 
@@ -28,24 +36,48 @@ export class EndScreen extends LightElement {
      Here, the fields start from what the game already holds. */
   /** @param {Map<PropertyKey, unknown>} changed */
   willUpdate(changed) {
-    if (changed.has("game") && this.score === undefined) {
-      this.score = String(this.game.playerScore ?? "");
+    if (changed.has("game") && this.fields === undefined) {
+      const f = this.game.playerFinal;
+      this.fields = {
+        nt: String(f?.nt ?? pntOf(this.game)), forets: String(f?.forets ?? ""),
+        cartes: String(f?.cartes ?? ""), autres: String(f?.autres ?? "")
+      };
       this.remark = this.game.remark ?? "";
     }
   }
 
-  /** @param {InputEvent} e */
-  onScore(e) { this.score = /** @type {HTMLInputElement} */ (e.target).value; }
+  /** @returns {PlayerScore} */
+  get player() {
+    const f = this.fields ?? EMPTY;
+    return { nt: toNumber(f.nt), forets: toNumber(f.forets), cartes: toNumber(f.cartes), autres: toNumber(f.autres) };
+  }
+
+  /** @param {ScoreKey} key @param {InputEvent} e */
+  onField(key, e) {
+    this.fields = { ...(this.fields ?? EMPTY), [key]: /** @type {HTMLInputElement} */ (e.target).value };
+  }
   /** @param {InputEvent} e */
   onRemark(e) { this.remark = /** @type {HTMLInputElement} */ (e.target).value; }
 
   save() {
-    const n = parseInt(this.score ?? "", 10);
-    this.emit("save", { playerScore: isNaN(n) ? null : n, remark: this.remark.trim() });
+    const player = this.player;
+    this.emit("save", { playerScore: player.nt + player.forets + player.cartes + player.autres, remark: this.remark.trim(), player });
+  }
+
+  /* the player's steps, for the balancing: per Action phase and outside them */
+  steps() {
+    const st = this.game, per = playerStepsPerAction(st), outside = playerStepsOutsideAction(st);
+    if (!per.length && !outside) return nothing;
+    const total = per.reduce((s, x) => s + x, 0);
+    const mean = per.length ? (total / per.length).toFixed(1).replace(".", ",") : "";
+    return html`
+      <p class="note"><b>Crans du joueur</b>
+        ${plural(total, "cran")} en ${plural(per.length, "phase")} Action${per.length ? ` (${mean} par Action : ${per.join(", ")})` : ""}${outside ? `, et ${plural(outside, "cran")} hors Action` : ""}.</p>`;
   }
 
   render() {
-    const st = this.game, sc = scoreAutoma(st.a);
+    const st = this.game, sc = scoreAutoma(st.a), p = this.player, f = this.fields ?? EMPTY;
+    const total = p.nt + p.forets + p.cartes + p.autres;
     return html`
       <section class="panel">
         <h2 style="font-size:32px;font-style:italic;text-transform:uppercase">Décompte final</h2>
@@ -56,15 +88,19 @@ export class EndScreen extends LightElement {
           <tr><td>${icon("pv")} Compteur de PV (1 PV par cube)</td><td class="n">${sc.pv}</td></tr>
           <tr><td><b>Total</b></td><td class="n"><b>${sc.total}</b></td></tr>
         </tbody></table></div>
-        <tr-curve legend .track=${st.track ?? []}></tr-curve>
-        <div class="fgrid">
-          <div class="field"><label for="e-score">Score du joueur</label>
-            <input type="number" id="e-score" min="0" inputmode="numeric" .value=${this.score ?? ""} ?disabled=${st.saved}
-              @input=${this.onScore}></div>
-          <div class="field" style="grid-column:span 2"><label for="e-rem">Remarques (équilibrage, ressenti)</label>
-            <input type="text" id="e-rem" maxlength="300" .value=${this.remark} ?disabled=${st.saved}
-              @input=${this.onRemark}></div>
+        <div><span class="lab">Score du joueur · ${total} contre ${sc.total} pour l'automa</span>
+          <div class="fgrid" style="margin-top:6px">
+            ${FIELDS.map(([key, label]) => html`
+              <div class="field"><label for="e-${key}">${label}</label>
+                <input type="number" id="e-${key}" min="0" inputmode="numeric" .value=${f[key]} ?disabled=${st.saved}
+                  @input=${(/** @type {InputEvent} */ e) => this.onField(key, e)}></div>`)}
+          </div>
         </div>
+        ${this.steps()}
+        <tr-curve legend .track=${st.track ?? []}></tr-curve>
+        <tr-curve legend kind="crans" .track=${st.track ?? []}></tr-curve>
+        <div class="field"><label for="e-rem">Remarques (équilibrage, ressenti)</label>
+          <input type="text" id="e-rem" maxlength="300" .value=${this.remark} ?disabled=${st.saved} @input=${this.onRemark}></div>
         <div class="row">
           <button type="button" class="cta" ?disabled=${st.saved} @click=${this.save}>${st.saved ? "Partie enregistrée" : "Enregistrer la partie"}</button>
           ${st.saved ? nothing : html`<button type="button" class="ghost" @click=${() => this.emit("resume")}>Reprendre la partie</button>`}
