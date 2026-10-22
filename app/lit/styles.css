@@ -111,25 +111,6 @@ button{cursor:pointer}
 .chip.cur{outline:2px solid var(--ink);outline-offset:2px}
 
 /* automa card */
-.acard{width:260px;aspect-ratio:63/88;max-width:100%;background:#fff;color:#1F1A24;border:1px solid #BDBDBD;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px;box-shadow:0 6px 18px rgba(0,0,0,.18);flex-shrink:0}
-.acard .kban{display:grid;grid-template-columns:42px minmax(0,1fr);height:45px;color:#fff;clip-path:polygon(0 0,calc(100% - 15px) 0,100% 15px,100% 100%,8px 100%,0 calc(100% - 8px));box-shadow:inset 0 -4px 0 rgba(0,0,0,.22)}
-.acard .kban .r{display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.26);font-family:var(--display);font-style:italic;font-weight:800;font-size:24px;padding-bottom:4px}
-.acard .kban .nm{display:flex;align-items:center;padding:0 10px 4px;font-family:var(--display);font-style:italic;font-weight:800;font-size:18px;text-transform:uppercase;white-space:nowrap}
-.acard .meta{display:flex;justify-content:space-between;font-family:var(--display);font-weight:600;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#1B5A7E;border-bottom:1.3px solid #2FB6C0;padding-bottom:3px}
-.acard .au{display:flex;gap:8px;align-items:center;border-radius:6px;padding:9px 8px;font-size:14px;line-height:1.4}
-.acard .au svg.ph{flex-shrink:0}
-.acard .au b{font-weight:600}
-.acard .bon{display:flex;align-items:center;gap:6px;background:#12202B;color:#fff;border-radius:5px;padding:5px 8px;font-size:12px;line-height:1.3}
-.acard .bon .bl{flex-shrink:0;font-family:var(--display);font-style:italic;font-weight:800;font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:#E2BE2C}
-.acard .cib{display:flex;align-items:center;gap:6px;border:1.5px solid;border-radius:5px;padding:6px 8px}
-.acard .cib .l{font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#6E625A}
-.acard .cn{font-family:var(--display);font-style:italic;font-weight:800;font-size:18px;text-transform:uppercase;line-height:1}
-.acard .cc{margin-left:auto;font-family:var(--display);font-weight:700;font-size:15px;display:flex;align-items:center;gap:3px;white-space:nowrap}
-.acard .vous{display:flex;gap:6px;align-items:flex-start;font-size:11.5px;line-height:1.3;color:#33302E;border-top:1.2px dashed #B9A48C;padding-top:5px}
-.acard .vous .t{flex-shrink:0;font-family:var(--display);font-style:italic;font-weight:800;font-size:11px;text-transform:uppercase;background:#E2BE2C;color:#1F1A24;padding:1px 7px 2px}
-.acard .pi{vertical-align:-2px}
-.acard .sp{flex:1}
-.acard .why{font-size:12.5px;line-height:1.35;background:#E3F2F3;border-radius:6px;padding:6px 8px}
 .reveal{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
 .reveal > div:last-child{flex:1;min-width:220px;display:flex;flex-direction:column;gap:10px}
 
@@ -191,10 +172,9 @@ details summary{cursor:pointer;font-family:var(--display);font-weight:700;letter
 @media (pointer:coarse){
   .adj button{width:44px;height:40px}
 }
-@media (prefers-reduced-motion:no-preference){.acard:not(.still){animation:flip .35s ease-out}@keyframes flip{from{transform:rotateY(70deg);opacity:.2}to{transform:none;opacity:1}}}
 
 /* custom elements are inline by default: make the components blocks */
-:is(automa-app, setup-screen, plan-screen, reveal-screen, phase-screen, end-turn-screen, end-screen, tr-curve, automa-card, automa-status, mars-panel, choice-group, param-stepper){display:block}
+:is(automa-app, setup-screen, plan-screen, reveal-screen, phase-screen, end-turn-screen, end-screen, tr-curve, automa-status, mars-panel, choice-group, param-stepper){display:block}
 automa-app{display:flex;flex-direction:column;gap:14px}
 .param.inline{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
 /* until its JS has loaded, a custom element is not :defined */
