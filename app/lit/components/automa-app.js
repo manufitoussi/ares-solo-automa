@@ -9,7 +9,8 @@ import "./reveal-screen.js";
 import "./phase-screen.js";
 import "./end-turn-screen.js";
 import "./end-screen.js";
-import { loadGame, saveGame, addToHistory } from "../storage.js";
+import "./history-screen.js";
+import { loadGame, saveGame, addToHistory, loadHistory } from "../storage.js";
 
 const UNDO_MAX = 30;
 
@@ -20,7 +21,9 @@ export class AutomaApp extends LightElement {
   static properties = {
     game: { state: true },
     undo: { state: true },
-    confirmNew: { state: true }
+    confirmNew: { state: true },
+    view: { state: true },       /* "game" or "history" */
+    history: { state: true }
   };
 
   constructor() {
@@ -28,6 +31,8 @@ export class AutomaApp extends LightElement {
     this.game = loadGame();
     this.undo = [];
     this.confirmNew = false;
+    this.view = "game";
+    this.history = [];
   }
 
   /* updated runs after each render, with the properties that changed: saving here covers
@@ -66,14 +71,22 @@ export class AutomaApp extends LightElement {
     this.confirmNew = false;
     this.game = null;
     this.undo = [];
+    this.view = "game";
+  }
+
+  showHistory() {
+    this.history = loadHistory();
+    this.view = "history";
   }
 
   renderTop() {
     return html`
       <header class="top">
         <div class="brand"><b>Automa hybride</b><span>Expérience Lit · v${E.RULES} brouillon</span></div>
-        <button class="tb" aria-label="Annuler" ?disabled=${!this.undo.length} @click=${this.undoLast}>
+        <button class="tb" aria-label="Annuler" ?disabled=${!this.undo.length || this.view !== "game"} @click=${this.undoLast}>
           <span class="full">Annuler</span><span class="short" aria-hidden="true">↶</span></button>
+        <button class="tb" aria-label="Historique" @click=${this.showHistory}>
+          <span class="full">Historique</span><span class="short" aria-hidden="true">Parties</span></button>
         <button class=${this.confirmNew ? "tb warn" : "tb"} @click=${this.askNew}
           aria-label=${this.confirmNew ? "Confirmer la nouvelle partie" : "Nouvelle partie"}>
           ${this.confirmNew
@@ -134,7 +147,9 @@ export class AutomaApp extends LightElement {
   render() {
     return html`
       ${this.renderTop()}
-      ${this.game ? this.renderGame() : html`
+      ${this.view === "history" ? html`
+        <history-screen .games=${this.history} @back=${() => { this.view = "game"; }}></history-screen>`
+      : this.game ? this.renderGame() : html`
         <div class="solo"><setup-screen @begin=${e => this.begin(e.detail)}></setup-screen></div>`}`;
   }
 }
