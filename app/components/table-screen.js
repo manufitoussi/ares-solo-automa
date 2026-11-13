@@ -85,7 +85,7 @@ export class TableScreen extends LightElement {
             return html`
               <button type="button" ?disabled=${!st.playerPhase || used} @click=${() => this.emit("draw", cd.n)}
                 aria-label=${t.plan.cardAria(cd.n, cardLabel(cd), used)}>
-                <i style=${styleMap({ background: cd.react ? REACT_COLOR : PHASE_COLOR[/** @type {Phase} */ (cd.ph)].col })}></i><b>${pad(cd.n)}</b>${cardLabel(cd)}
+                <i class=${cd.react ? "react" : ""} style=${styleMap({ background: cd.react ? REACT_COLOR : PHASE_COLOR[/** @type {Phase} */ (cd.ph)].col })}></i><b>${pad(cd.n)}</b>${cardLabel(cd)}
               </button>`;
           })}
         </div>
