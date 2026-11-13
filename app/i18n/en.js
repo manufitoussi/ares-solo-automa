@@ -157,6 +157,9 @@ const en = {
 
   confirmTerraformed: "Is Mars terraformed? The game stops here: each silver the automa has left is worth 1 VP, then comes the scoring.",
   phaseScreen: {
+    title: "Resolution",
+    /** @param {number} i @param {number} n */
+    stepOf: (i, n) => `Phase ${i} of ${n}`,
     /** @param {boolean} player @param {boolean} automa @returns {string} */
     chosenBy: (player, automa) => player && automa ? "Chosen by the player and drawn by the automa" : player ? "Chosen by the player" : "Drawn by the automa",
     tag: {

@@ -184,6 +184,9 @@ const fr = {
 
   confirmTerraformed: "Mars est terraformé ? La partie s'arrête ici : chaque argent restant de l'automa vaut 1 PV, puis on passe au décompte.",
   phaseScreen: {
+    title: "Résolution",
+    /** @param {number} i @param {number} n */
+    stepOf: (i, n) => `Phase ${i} sur ${n}`,
     /** @param {boolean} player @param {boolean} automa @returns {string} */
     chosenBy: (player, automa) => player && automa ? "Choisie par le joueur et tirée par l'automa" : player ? "Choisie par le joueur" : "Tirée par l'automa",
     tag: {

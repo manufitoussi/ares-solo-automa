@@ -5,7 +5,7 @@ import { t } from "../i18n.js";
 import { PHASE_COLOR, phaseChip, icon, undoButton } from "./ui.js";
 import "./param-stepper.js";
 import "./automa-card.js";
-import { playerBlock } from "./phase-info.js";
+import { playerBlock, playerCard } from "./phase-info.js";
 /** @typedef {import("../engine.js").Game} Game */
 
 /** @typedef {import("../engine.js").Phase} Phase */
@@ -18,14 +18,21 @@ import { playerBlock } from "./phase-info.js";
    follows. Reports `apply` once the player has done it on the table, and, in mode "jeu",
    `terraformed` when the player says Mars is terraformed. */
 export class PhaseScreen extends LightElement {
-  static properties = { game: { attribute: false }, canUndo: { type: Boolean } };
+  static properties = { game: { attribute: false }, canUndo: { type: Boolean }, narrow: { state: true } };
 
   constructor() {
     super();
     /** @type {Game} */
     this.game;
     this.canUndo = false;
+    /* on a phone, the automa card uses its short texts, as on the table screen */
+    this.media = window.matchMedia("(max-width: 520px)");
+    this.narrow = this.media.matches;
+    this.onMedia = () => { this.narrow = this.media.matches; };
   }
+
+  connectedCallback() { super.connectedCallback(); this.media.addEventListener("change", this.onMedia); }
+  disconnectedCallback() { super.disconnectedCallback(); this.media.removeEventListener("change", this.onMedia); }
 
   /** @param {Phase} ph @param {ReturnType<typeof computePhase>} r @param {Automa} a0 */
   todo(ph, r, a0) {
@@ -95,9 +102,19 @@ export class PhaseScreen extends LightElement {
     const cible = /** @type {Target} */ (st.cible);
     return html`
       <section class="panel">
-        <div class="steps">${st.queue.map((x, i) => phaseChip(x, i < st.qi ? "done" : i === st.qi ? "cur" : ""))}</div>
-        <div class="reveal">
-          <automa-card still .size=${track ? undefined : "small"} .number=${st.card ?? undefined} .phase=${st.automaPhase ?? undefined} .target=${cible} .why=${t.why(st.why)}></automa-card>
+        <div class="row" style="justify-content:space-between">
+          <h2 style="font-size:28px;font-style:italic;text-transform:uppercase">${P.title}</h2>
+          <span class="lab">${t.plan.turn(st.turn)}</span>
+        </div>
+        <div class="row"><span class="lab">${P.stepOf(st.qi + 1, st.queue.length)}</span>
+          <div class="steps">${st.queue.map((x, i) => phaseChip(x, i < st.qi ? "done" : i === st.qi ? "cur" : ""))}</div></div>
+        <!-- both cards stay on the table; the one(s) behind the current phase stand out -->
+        <div class="table2">
+          <div class="tslot ${st.playerPhase === ph ? "on" : "off"}"><span class="lab">${t.table.player}</span>${playerCard(st.playerPhase)}</div>
+          <div class="tslot ${st.automaPhase === ph ? "on" : "off"}"><span class="lab">${t.table.automa}</span>
+            <div class="cw"><automa-card still size=${this.narrow ? "tiny" : nothing} .number=${st.card ?? undefined} .phase=${st.automaPhase ?? undefined} .target=${cible} .why=${t.why(st.why)}></automa-card></div></div>
+        </div>
+        <div class="fcol">
           <div>
             <div class="ban ${C.dark ? "dark" : ""}" style=${styleMap({ background: C.col })}>
               <span class="r">${ph}</span><div><span class="by">${P.chosenBy(st.playerPhase === ph, st.automaPhase === ph)}</span><span class="nm">${t.phase[ph]}</span><span class="tg">${P.tag[ph]}</span></div>

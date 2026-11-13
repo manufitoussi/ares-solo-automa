@@ -3,7 +3,7 @@ import { LightElement } from "./light-element.js";
 import { ORDER, CARDS, TARGETS, COST, canPick, computePhase, effCible, hasBoard, tracksMars, question } from "../engine.js";
 import { t } from "../i18n.js";
 import { PHASE_COLOR, PHASE_TINT, REACT_COLOR, phaseChip, icon, undoButton } from "./ui.js";
-import { playerBlock, automaBlock } from "./phase-info.js";
+import { playerBlock, automaBlock, playerCard } from "./phase-info.js";
 import "./automa-card.js";
 /** @typedef {import("../engine.js").Game} Game */
 /** @typedef {import("../engine.js").Phase} Phase */
@@ -54,22 +54,6 @@ export class TableScreen extends LightElement {
         @click=${() => this.emit("pick", ph)}>
         <span class="r">${ph}</span><span class="n">${t.phase[ph]}</span><span class="short">${t.phaseShort[ph]}</span>
       </button>`;
-  }
-
-  /* the player's phase card, drawn like the printed one (short texts) */
-  playerCard() {
-    const ph = this.game.playerPhase, T = t.table;
-    if (!ph) return html`<div class="cw"><div class="cempty">${T.empty}</div></div>`;
-    const C = PHASE_COLOR[ph];
-    return html`
-      <div class="cw"><div class="pcard" role="img" aria-label="${T.player} : ${t.phase[ph]}">
-        <div class="pc-ban" style=${styleMap({ background: C.col, color: C.dark ? "#1F1A24" : "#fff" })}>
-          <span class="r">${ph}</span><span class="nm">${t.phase[ph]}</span></div>
-        <div class="pc-meta"><span>${T.meta}</span><span>${T.metaPhase}</span></div>
-        <div class="pc-you"><span class="pc-lab">${T.skill}</span><p>${T.skillShort[ph]}</p></div>
-        <p class="pc-bon"><b>${t.info.bonus}</b> ${T.bonusShort[ph]}</p>
-        <div class="pc-au" style=${styleMap({ background: PHASE_TINT[ph] })}><span class="pc-tag">${T.automa}</span><p>${t.phaseScreen.tag[ph]}</p></div>
-      </div></div>`;
   }
 
   /* the automa card: its back until it is drawn; touching the back flips it */
@@ -186,7 +170,7 @@ export class TableScreen extends LightElement {
           <p>${t.plan.intro(st.lastPlayerPhase ? t.phase[st.lastPlayerPhase] : null)}</p>
           <div class="phases">${ORDER.map(ph => this.phaseButton(ph))}</div>` : nothing}
         <div class="table2">
-          <div class="tslot"><span class="lab">${T.player}</span>${this.playerCard()}</div>
+          <div class="tslot"><span class="lab">${T.player}</span>${playerCard(st.playerPhase)}</div>
           <div class="tslot"><span class="lab">${T.automa}</span>${this.automaCard()}</div>
         </div>
         ${st.step === "plan" && !st.playerPhase ? html`<p class="muted small">${t.plan.hint}</p>` : nothing}
