@@ -1,4 +1,4 @@
-/* Automa engine, rules v0.6: pure game logic, no DOM, no HTML.
+/* Automa engine, rules v0.6 (published as v0.7 of the project): pure game logic, no DOM, no HTML.
    Extracted from app/prototype/assistant-automa.html, same rules and same saved state (v:3).
    Every transition takes a state and returns a new one: the input is never mutated,
    so the UI can keep old states for undo and compare references to know what changed.
@@ -13,7 +13,10 @@
 /** @typedef {"tresfacile" | "facile" | "normal" | "difficile" | "tresdifficile"} Level */
 /** @typedef {"Riposte" | "Opportuniste" | "Course"} Reaction */
 /** @typedef {"app" | "cartes"} DeckMode  the app draws, or the player flips the printed cards */
-/** @typedef {"plan" | "reveal" | "phase" | "endturn"} Step */
+/** @typedef {"plan" | "ask" | "reveal" | "phase" | "endturn"} Step  "ask": a reactive card waits for an answer of the player */
+/** "jeu": the app replaces the printed cards and does not follow Mars; "suivi": detailed tracking
+    of Mars and of the player's steps (the only mode of older saves)
+    @typedef {"jeu" | "suivi"} GameMode */
 /** @typedef {"cubes" | "moteur" | "compteur" | "nt"} AutomaKey  what "Corriger" can change */
 
 /** An automa card: a phase, or a reaction (13 to 15). Card 15 targets the least advanced parameter.
@@ -28,7 +31,7 @@
     being resolved, or the step of the round outside the phases.
     @typedef {{ t: number, at: Phase | Step, k: Param, d: number }} PlayerStep */
 /** Why a reactive card chose its phase.
-    @typedef {{ k: "riposte", phase: Phase } | { k: "riposteFirst" } | { k: "oppSilver", silver: number } | { k: "oppNone" } | { k: "course", target: Target }} Why */
+    @typedef {{ k: "riposte", phase: Phase } | { k: "riposteFirst" } | { k: "oppSilver", silver: number } | { k: "oppNone" } | { k: "oppYes" } | { k: "course", target: Target }} Why */
 /** What happened, for the game log.
     @typedef {{ k: "new", level: Level, engine: number, rules: string }
       | { k: "reshuffle" }
@@ -37,12 +40,13 @@
       | { k: "lastRound", silver: number }
       | { k: "maxed" }
       | { k: "stopped" }
+      | { k: "terraformed" }
       | { k: "correct", key: AutomaKey, from: number, to: number }} LogEvent */
 /** A log entry: an event and its round. Games saved before the translation have text lines.
     @typedef {(LogEvent & { t: number }) | string} LogEntry */
 /** The player's final score, typed at the end of the game.
     @typedef {{ nt: number, forets: number, cartes: number, autres: number }} PlayerScore */
-/** @typedef {{ niveau: Level, pioche?: DeckMode, oxy?: number, temp?: number, oce?: number }} Setup */
+/** @typedef {{ niveau: Level, pioche?: DeckMode, oxy?: number, temp?: number, oce?: number, mode?: GameMode, plateau?: boolean }} Setup */
 /** What one phase changes for the automa.
     @typedef {{ gain: number, moteur: number, compteur: number, prod: number, temp: number, oce: number, oxy: number, nt: number, spent: number }} Change */
 
@@ -80,6 +84,9 @@
  * @property {number[]} [actionTurns]   the rounds with an Action phase
  * @property {{ joueur: number, automa: number }} [crans]  Mars steps raised by each so far
  * @property {PlayerScore} [playerFinal]  the player's final score, once saved
+ * @property {GameMode} [mode]          absent in older saves: "suivi"
+ * @property {boolean} [plateau]        the app keeps the automa board; absent in older saves: true
+ * @property {boolean} [terraformed]    the player said Mars is terraformed (mode "jeu")
  */
 
 /**
@@ -98,6 +105,8 @@
  * @property {DeckMode} pioche
  * @property {string} version
  * @property {PlayerScore & { cransParAction: number[], cransHorsAction: number }} [joueur]
+ * @property {GameMode} [mode]          absent in older records: "suivi"
+ * @property {boolean} [plateau]
  */
 
 /* ---------- Game data ---------- */
@@ -126,7 +135,8 @@ export const MOTEUR0 = { tresfacile: 1, facile: 2, normal: 3, difficile: 4, tres
 /** @type {Record<Param, number>} */
 export const MAX = { oxy: 14, temp: 19, oce: 9 };
 export const STATE_VERSION = 3;
-export const RULES = "0.6";
+/* the published version of the project; the rules of the engine are those of v0.6 */
+export const RULES = "0.7";
 
 /* ---------- Helpers ---------- */
 /** @template T @param {T} o @returns {T} */
@@ -149,6 +159,12 @@ export const tempC = step => -30 + 2 * step;
 export const paramOf = c => c === "oxy" ? "oxy" : c === "temp" ? "temp" : "oce";
 /** @param {number} n */
 export const card = n => CARDS.find(c => c.n === n);
+/** the mode of a game; a game saved before the modes is a detailed tracking game @param {Game} st @returns {GameMode} */
+export const modeOf = st => st.mode ?? "suivi";
+/** the app follows Mars (detailed tracking) @param {Game} st */
+export const tracksMars = st => modeOf(st) === "suivi";
+/** the app keeps the automa board (always in detailed tracking) @param {Game} st */
+export const hasBoard = st => tracksMars(st) || st.plateau !== false;
 
 /** the card of the round; a phase screen without a drawn card is a bug @param {Game} st @returns {Card} */
 function drawnCard(st) {
@@ -183,7 +199,7 @@ export function resolveCard(st) {
   let cible = cd.c;
   if (cd.react === "Riposte") { phase = st.lastPlayerPhase || "IV"; why = st.lastPlayerPhase ? { k: "riposte", phase } : { k: "riposteFirst" }; }
   if (cd.react === "Opportuniste") { phase = st.a.cubes >= COST ? "III" : "IV"; why = st.a.cubes >= COST ? { k: "oppSilver", silver: ag(st.a.cubes) } : { k: "oppNone" }; }
-  if (cd.react === "Course") { phase = "III"; cible = leastAdvanced(st.p); why = { k: "course", target: cible }; }
+  if (cd.react === "Course") { phase = "III"; cible = tracksMars(st) || !isTarget(st.cible) ? leastAdvanced(st.p) : st.cible; why = { k: "course", target: cible }; }
   /* only card 15 has "low", and Course has just replaced it */
   return { phase, cible: /** @type {Target} */ (cible), why };
 }
@@ -198,6 +214,15 @@ export function computePhase(st, ph) {
   if (ph === "I") { if (a.cubes >= COST) { a.cubes -= COST; a.moteur++; ch.moteur = 1; ch.spent = COST; } }
   else if (ph === "II") { a.compteur++; ch.compteur = 1; }
   else if (ph === "IV") { a.cubes += a.moteur; ch.prod = a.moteur; }
+  else if (ph === "III" && !tracksMars(st)) {
+    /* the app does not know Mars: every silver is 1 step on the target of the card and 1 TR
+       (on the table, a maxed target moves to the next one; the player fixes the board if needed) */
+    const target = /** @type {Target} */ (st.cible);
+    for (let g = 0; g < 200 && a.cubes >= COST; g++) {
+      a.cubes -= COST; ch.spent += COST; a.nt++; ch.nt++;
+      if (target === "ocean") { ch.oce++; a.cubes += 1; } else if (target === "temp") ch.temp++; else ch.oxy++;
+    }
+  }
   else if (ph === "III") {
     const target = /** @type {Target} */ (st.cible); /* set by the draw */
     /* no forests, the oxygen target raises oxygen directly */
@@ -237,15 +262,17 @@ const cransOf = st => ({ ca: st.crans?.automa ?? 0, cj: st.crans?.joueur ?? 0 })
 
 /** @param {Setup} setup @param {{ rng?: () => number, now?: number }} [options] @returns {Game} */
 export function newGame(setup, { rng = Math.random, now = Date.now() } = {}) {
-  const s = setup;
+  const s = setup, mode = s.mode ?? "suivi";
   /** @type {Game} */
   const st = {
-    v: STATE_VERSION, status: "playing", niveau: s.niveau, pioche: s.pioche || "app", createdAt: now, savedAt: now, turn: 1,
+    v: STATE_VERSION, status: "playing", niveau: s.niveau, mode, plateau: mode === "suivi" || s.plateau !== false,
+    /* the printed automa cards are only an option of detailed tracking */
+    pioche: mode === "suivi" ? s.pioche || "app" : "app", createdAt: now, savedAt: now, turn: 1,
     deck: shuffle(CARDS.map(c => c.n), rng), discard: [], card: null, step: "plan",
     playerPhase: null, automaPhase: null, cible: null, why: null, queue: [], qi: 0, lastPlayerPhase: null,
     rules: RULES,
     a: { cubes: 0, moteur: MOTEUR0[s.niveau] ?? 3, compteur: 0, nt: 5, pvFin: 0 },
-    p: { oxy: Number(s.oxy) || 0, temp: Number(s.temp) || 0, oce: Number(s.oce) || 0 },
+    p: mode === "suivi" ? { oxy: Number(s.oxy) || 0, temp: Number(s.temp) || 0, oce: Number(s.oce) || 0 } : { oxy: 0, temp: 0, oce: 0 },
     log: []
   };
   log(st, { k: "new", level: st.niveau, engine: st.a.moteur, rules: RULES });
@@ -270,10 +297,45 @@ export function draw(state, { n = null, rng = Math.random } = {}) {
   if (!st.deck.length) { st.deck = shuffle(st.discard, rng); st.discard = []; log(st, { k: "reshuffle" }); }
   if (n != null) { st.card = n; st.deck = st.deck.filter(x => x !== n); st.discard = st.discard.filter(x => x !== n); }
   else st.card = st.deck.pop() ?? null;
-  const r = resolveCard(st); st.automaPhase = r.phase; st.cible = r.cible; st.why = r.why;
+  if (question(st)) {
+    st.automaPhase = null; st.cible = null; st.why = null; st.queue = []; st.qi = 0; st.step = "ask";
+    return st;
+  }
+  return reveal(st, resolveCard(st));
+}
+
+/** The question a reactive card asks before it is revealed, when the app lacks what it needs:
+    Opportuniste without the board (has it at least 1 silver?), Course without Mars (which
+    parameter is the least advanced?). @param {Game} st @returns {"opportuniste" | "course" | null} */
+export function question(st) {
+  const cd = st.card == null ? undefined : card(st.card);
+  if (cd?.react === "Opportuniste" && !hasBoard(st)) return "opportuniste";
+  if (cd?.react === "Course" && !tracksMars(st)) return "course";
+  return null;
+}
+
+/** the card is revealed with its phase and target (changes st, a copy)
+    @param {Game} st @param {{ phase: Phase, cible: Target, why: Why | null }} r @returns {Game} */
+function reveal(st, r) {
+  st.automaPhase = r.phase; st.cible = r.cible; st.why = r.why;
   st.queue = ORDER.filter(ph => ph === st.playerPhase || ph === st.automaPhase); st.qi = 0; st.step = "reveal";
   log(st, { k: "draw", card: /** @type {number} */ (st.card), phase: r.phase, target: r.cible, player: st.playerPhase });
   return st;
+}
+
+/** Opportuniste, the board on the table: the player says whether the automa has at least 1 silver
+    @param {Game} state @param {boolean} hasSilver @returns {Game} */
+export function answerOpportunist(state, hasSilver) {
+  if (state.step !== "ask" || question(state) !== "opportuniste") return state;
+  const st = clone(state), cd = drawnCard(st);
+  return reveal(st, { phase: hasSilver ? "III" : "IV", cible: /** @type {Target} */ (cd.c), why: hasSilver ? { k: "oppYes" } : { k: "oppNone" } });
+}
+
+/** Course, Mars not followed: the player says which parameter is the least advanced
+    @param {Game} state @param {Target} target @returns {Game} */
+export function answerCourse(state, target) {
+  if (state.step !== "ask" || question(state) !== "course" || !isTarget(target)) return state;
+  return reveal(clone(state), { phase: "III", cible: target, why: { k: "course", target } });
 }
 
 /** @param {Game} state @returns {Game} */
@@ -283,14 +345,16 @@ export function startPhases(state) { const st = clone(state); st.step = "phase";
     @param {Game} state @returns {Game} */
 export function applyPhase(state) {
   const st = clone(state), ph = st.queue[st.qi];
-  const c0 = st.a.cubes, r = computePhase(st, ph), c = r.ch;
+  /* the board on the table: the app only follows the phases */
+  const c0 = st.a.cubes, r = hasBoard(st) ? computePhase(st, ph) : { a: st.a, p: st.p, ch: { gain: 0, moteur: 0, compteur: 0, prod: 0, temp: 0, oce: 0, oxy: 0, nt: 0, spent: 0 } };
+  const c = r.ch;
   st.a = r.a; st.p = r.p;
   const raised = c.oxy + c.temp + c.oce;
   st.crans = { joueur: st.crans?.joueur ?? 0, automa: (st.crans?.automa ?? 0) + raised };
   if (ph === "III") st.actionTurns = [...(st.actionTurns ?? []), st.turn];
   log(st, { k: "phase", phase: ph, ch: c, engine: st.a.moteur, counter: st.a.compteur, before: c0, after: st.a.cubes });
   st.qi++;
-  if (allMax(st.p)) {
+  if (tracksMars(st) && allMax(st.p)) {
     st.a.pvFin = ag(st.a.cubes);
     if (st.a.pvFin) log(st, { k: "lastRound", silver: st.a.pvFin });
     st.status = "ended";
@@ -311,7 +375,34 @@ export function nextTurn(state) {
 /** @param {Game} state @returns {Game} */
 export function endGame(state) { const st = clone(state); recordTurn(st); st.status = "ended"; log(st, { k: "stopped" }); return st; }
 /** @param {Game} state @returns {Game} */
-export function resumeGame(state) { const st = clone(state); st.status = "playing"; return st; }
+export function resumeGame(state) {
+  const st = clone(state); st.status = "playing";
+  if (st.terraformed) { st.terraformed = false; st.a.pvFin = 0; }
+  return st;
+}
+
+/** Mode "jeu": the player says Mars is terraformed, at any time of the round. The game ends
+    with the rule of the last round: with the board in the app, each silver left is 1 VP.
+    @param {Game} state @returns {Game} */
+export function terraformed(state) {
+  if (state.status === "ended") return state;
+  const st = clone(state);
+  st.terraformed = true;
+  st.a.pvFin = hasBoard(st) ? ag(st.a.cubes) : 0;
+  if (st.a.pvFin) log(st, { k: "lastRound", silver: st.a.pvFin });
+  recordTurn(st);
+  st.status = "ended";
+  log(st, { k: "terraformed" });
+  return st;
+}
+
+/** the automa's final board, typed by the player when it is on the table
+    @param {Game} state @param {{ nt: number, compteur: number, silver: number }} board @returns {Game} */
+export function setAutomaFinal(state, { nt, compteur, silver }) {
+  const st = clone(state);
+  st.a.nt = Math.max(0, nt); st.a.compteur = Math.max(0, compteur); st.a.pvFin = Math.max(0, silver);
+  return st;
+}
 
 /** manual correction of the automa board; consecutive corrections of the same value are
     merged into one log entry @param {Game} state @param {AutomaKey} k @param {number} d @returns {Game} */
@@ -363,6 +454,7 @@ export function gameRecord(st, { playerScore = null, remark = "", date = new Dat
     ...(player ? { joueur: { ...player, cransParAction: playerStepsPerAction(st), cransHorsAction: playerStepsOutsideAction(st) } } : {}),
     date, createdAt: st.createdAt, niveau: st.niveau, tours: st.turn, scoreJoueur: playerScore, scoreAutoma: sc.total,
     detail: { nt: sc.nt, pvFin: sc.fin, pvCompteur: sc.pv, compteur: st.a.compteur, moteur: st.a.moteur, cubesFin: st.a.cubes },
-    params: st.p, remarque: remark, courbe: st.track || [], pioche: st.pioche || "app", version: RULES
+    params: st.p, remarque: remark, courbe: tracksMars(st) ? st.track || [] : [], pioche: st.pioche || "app", version: RULES,
+    mode: modeOf(st), plateau: hasBoard(st)
   };
 }
