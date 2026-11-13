@@ -8,6 +8,13 @@ import { t } from "../i18n.js";
 
 /* What only the interface needs: colours, icons and help texts. The rules stay in engine.js. */
 
+/** The undo button, next to the action buttons of each game screen: it sends `undo` from the
+    screen to <automa-app>, which keeps the previous states.
+    @param {import("./light-element.js").LightElement} host @param {boolean} enabled */
+export const undoButton = (host, enabled) => html`
+  <button type="button" class="ghost undo" ?disabled=${!enabled} aria-label=${t.top.undo}
+    @click=${() => host.emit("undo")}>↶ ${t.top.undo}</button>`;
+
 /** @type {Record<Phase, { col: string, dark?: boolean }>} */
 export const PHASE_COLOR = {
   I: { col: "var(--p1)" }, II: { col: "var(--p2g)" }, III: { col: "var(--p3)" },

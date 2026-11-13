@@ -2,7 +2,7 @@ import { html } from "lit";
 import { LightElement } from "./light-element.js";
 import { TARGETS, question } from "../engine.js";
 import { t } from "../i18n.js";
-import { icon } from "./ui.js";
+import { icon, undoButton } from "./ui.js";
 import "./automa-card.js";
 /** @typedef {import("../engine.js").Game} Game */
 
@@ -10,12 +10,13 @@ import "./automa-card.js";
    the table: Opportuniste without the board in the app (`opportunist`, detail: has it at
    least 1 silver), Course without Mars (`course`, detail: the least advanced target). */
 export class AskScreen extends LightElement {
-  static properties = { game: { attribute: false } };
+  static properties = { game: { attribute: false }, canUndo: { type: Boolean } };
 
   constructor() {
     super();
     /** @type {Game} */
     this.game;
+    this.canUndo = false;
   }
 
   opportunist() {
@@ -47,7 +48,8 @@ export class AskScreen extends LightElement {
         <h2 style="font-size:28px;font-style:italic;text-transform:uppercase">${t.ask.title}</h2>
         <div class="reveal">
           <automa-card size="small" .number=${st.card ?? undefined}></automa-card>
-          <div>${q === "course" ? this.course() : this.opportunist()}</div>
+          <div>${q === "course" ? this.course() : this.opportunist()}
+            <div class="row">${undoButton(this, this.canUndo)}</div></div>
         </div>
       </section>`;
   }

@@ -205,8 +205,6 @@ export class AutomaApp extends LightElement {
     return html`
       <header class="top">
         <a class="brand" href="../" title=${T.back}><b>${T.brand}</b><span>${T.sub(E.RULES)}</span></a>
-        <button class="tb" aria-label=${T.undo} ?disabled=${!this.undo.length || this.view !== "game"} @click=${this.undoLast}>
-          <span class="full">${T.undo}</span><span class="short" aria-hidden="true">${T.undoShort}</span></button>
         <button class="tb" aria-label=${T.history} @click=${this.showHistory}>
           <span class="full">${T.history}</span><span class="short" aria-hidden="true">${T.historyShort}</span></button>
         <button class=${this.confirmNew ? "tb warn" : "tb"} @click=${this.askNew}
@@ -247,23 +245,23 @@ export class AutomaApp extends LightElement {
   /** @param {Game} st */
   renderStep(st) {
     if (st.status === "ended") return html`
-      <end-screen .game=${st} @save=${this.saveResult}
+      <end-screen .game=${st} .canUndo=${this.undo.length > 0} @undo=${this.undoLast} @save=${this.saveResult}
         @resume=${() => this.play(E.resumeGame(st))}></end-screen>`;
     switch (st.step) {
       case "plan": return html`
-        <plan-screen .game=${st}
+        <plan-screen .game=${st} .canUndo=${this.undo.length > 0} @undo=${this.undoLast}
           @pick=${(/** @type {CustomEvent<Phase>} */ e) => this.play(E.pickPhase(st, e.detail), { undoable: false })}
           @draw=${(/** @type {CustomEvent<number | null>} */ e) => this.play(E.draw(st, { n: e.detail }))}></plan-screen>`;
       case "ask": return html`
-        <ask-screen .game=${st}
+        <ask-screen .game=${st} .canUndo=${this.undo.length > 0} @undo=${this.undoLast}
           @opportunist=${(/** @type {CustomEvent<boolean>} */ e) => this.play(E.answerOpportunist(st, e.detail))}
           @course=${(/** @type {CustomEvent<Target>} */ e) => this.play(E.answerCourse(st, e.detail))}></ask-screen>`;
-      case "reveal": return html`<reveal-screen .game=${st} @start=${() => this.play(E.startPhases(st))}></reveal-screen>`;
+      case "reveal": return html`<reveal-screen .game=${st} .canUndo=${this.undo.length > 0} @undo=${this.undoLast} @start=${() => this.play(E.startPhases(st))}></reveal-screen>`;
       case "phase": return html`
-        <phase-screen .game=${st} @apply=${this.applyPhase} @terraformed=${this.terraformed}
+        <phase-screen .game=${st} .canUndo=${this.undo.length > 0} @undo=${this.undoLast} @apply=${this.applyPhase} @terraformed=${this.terraformed}
           @param=${(/** @type {CustomEvent<{ key: Param, delta: number }>} */ e) => this.play(E.adjustParam(st, e.detail.key, e.detail.delta))}></phase-screen>`;
       default: return html`
-        <end-turn-screen .game=${st} @next=${() => this.play(E.nextTurn(st))} @terraformed=${this.terraformed}
+        <end-turn-screen .game=${st} .canUndo=${this.undo.length > 0} @undo=${this.undoLast} @next=${() => this.play(E.nextTurn(st))} @terraformed=${this.terraformed}
           @end=${() => this.play(E.endGame(st))}></end-turn-screen>`;
     }
   }

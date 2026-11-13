@@ -2,7 +2,7 @@ import { html, nothing } from "lit";
 import { LightElement } from "./light-element.js";
 import { allMax, scoreAutoma, pntOf, playerStepsPerAction, playerStepsOutsideAction, tracksMars, hasBoard } from "../engine.js";
 import { t } from "../i18n.js";
-import { icon } from "./ui.js";
+import { icon, undoButton } from "./ui.js";
 import "./tr-curve.js";
 /** @typedef {import("../engine.js").Game} Game */
 /** @typedef {import("../engine.js").PlayerScore} PlayerScore */
@@ -26,6 +26,7 @@ const toNumber = v => { const n = parseInt(v, 10); return isNaN(n) ? 0 : n; };
 export class EndScreen extends LightElement {
   static properties = {
     game: { attribute: false },
+    canUndo: { type: Boolean },
     fields: { state: true },
     automa: { state: true },
     remark: { state: true }
@@ -35,6 +36,7 @@ export class EndScreen extends LightElement {
     super();
     /** @type {Game} */
     this.game;
+    this.canUndo = false;
     /** @type {Record<ScoreKey, string> | undefined} what is typed, field by field */
     this.fields = undefined;
     /** @type {Record<AutomaField, string>} the automa board on the table, field by field */
@@ -151,6 +153,7 @@ export class EndScreen extends LightElement {
         <div class="field"><label for="e-rem">${E.remark}</label>
           <input type="text" id="e-rem" maxlength="300" .value=${this.remark} ?disabled=${st.saved} @input=${this.onRemark}></div>
         <div class="row">
+          ${st.saved ? nothing : undoButton(this, this.canUndo)}
           <button type="button" class="cta" ?disabled=${st.saved} @click=${this.save}>${st.saved ? E.saved : E.save}</button>
           ${st.saved ? nothing : html`<button type="button" class="ghost" @click=${() => this.emit("resume")}>${E.resume}</button>`}
         </div>

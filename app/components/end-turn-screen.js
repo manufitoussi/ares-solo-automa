@@ -2,17 +2,19 @@ import { html } from "lit";
 import { LightElement } from "./light-element.js";
 import { pntOf, tracksMars } from "../engine.js";
 import { t } from "../i18n.js";
+import { undoButton } from "./ui.js";
 /** @typedef {import("../engine.js").Game} Game */
 
 /* End of the round. Reports `next` (next round), `end` (stop the game here) or, in mode "jeu",
    `terraformed` (Mars is terraformed: the last round rule, then the scoring). */
 export class EndTurnScreen extends LightElement {
-  static properties = { game: { attribute: false } };
+  static properties = { game: { attribute: false }, canUndo: { type: Boolean } };
 
   constructor() {
     super();
     /** @type {Game} */
     this.game;
+    this.canUndo = false;
   }
 
   render() {
@@ -27,6 +29,7 @@ export class EndTurnScreen extends LightElement {
         </ul></div>
         ${tracksMars(st) ? html`<p class="note"><b>${E.trTitle}</b> ${E.tr(pntOf(st), st.a.nt)}</p>` : ""}
         <div class="row">
+          ${undoButton(this, this.canUndo)}
           <button type="button" class="cta" @click=${() => this.emit("next")}>${E.next}</button>
           ${tracksMars(st)
             ? html`<button type="button" class="ghost" @click=${() => this.emit("end")}>${E.end}</button>`

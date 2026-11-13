@@ -2,7 +2,7 @@ import { html, nothing, styleMap } from "lit";
 import { LightElement } from "./light-element.js";
 import { COST, MAX, computePhase, effCible, allMax, cu, vpOf, hasBoard, tracksMars } from "../engine.js";
 import { t } from "../i18n.js";
-import { PHASE_COLOR, phaseChip, icon } from "./ui.js";
+import { PHASE_COLOR, phaseChip, icon, undoButton } from "./ui.js";
 import "./param-stepper.js";
 import "./automa-card.js";
 import { playerBlock } from "./phase-info.js";
@@ -18,12 +18,13 @@ import { playerBlock } from "./phase-info.js";
    follows. Reports `apply` once the player has done it on the table, and, in mode "jeu",
    `terraformed` when the player says Mars is terraformed. */
 export class PhaseScreen extends LightElement {
-  static properties = { game: { attribute: false } };
+  static properties = { game: { attribute: false }, canUndo: { type: Boolean } };
 
   constructor() {
     super();
     /** @type {Game} */
     this.game;
+    this.canUndo = false;
   }
 
   /** @param {Phase} ph @param {ReturnType<typeof computePhase>} r @param {Automa} a0 */
@@ -105,6 +106,7 @@ export class PhaseScreen extends LightElement {
             ${track && ph === "III" ? this.playerSteps() : nothing}
             ${hasBoard(st) ? this.automaTodo(ph) : this.automaRule(ph)}
             <div class="row">
+              ${undoButton(this, this.canUndo)}
               <button type="button" class="cta" @click=${() => this.emit("apply")}>${P.done}</button>
               ${track ? nothing : html`<button type="button" class="ghost" @click=${() => this.emit("terraformed")}>${t.endTurn.terraformed}</button>`}
             </div>

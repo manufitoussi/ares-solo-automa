@@ -2,19 +2,20 @@ import { html } from "lit";
 import { LightElement } from "./light-element.js";
 import { COST, computePhase, effCible, hasBoard, tracksMars } from "../engine.js";
 import { t } from "../i18n.js";
-import { phaseChip } from "./ui.js";
+import { phaseChip, undoButton } from "./ui.js";
 import "./automa-card.js";
 /** @typedef {import("../engine.js").Game} Game */
 
 /* The card is revealed: what the automa will do this round, phase by phase.
    Reports `start` when the player is ready to resolve the phases. */
 export class RevealScreen extends LightElement {
-  static properties = { game: { attribute: false } };
+  static properties = { game: { attribute: false }, canUndo: { type: Boolean } };
 
   constructor() {
     super();
     /** @type {Game} */
     this.game;
+    this.canUndo = false;
   }
 
   /** @param {import("../engine.js").Phase} ph */
@@ -46,7 +47,7 @@ export class RevealScreen extends LightElement {
               : t.reveal.targetNoAction}</p>
             ${st.queue.includes("III") && !tracksMars(st) ? html`<p style="font-size:14px;color:var(--muted)">${t.info.targetRule}</p>` : ""}
             <p style="font-size:14px;color:var(--muted)">${t.reveal.wait}</p>
-            <div class="row"><button type="button" class="cta" @click=${() => this.emit("start")}>${t.reveal.start}</button></div>
+            <div class="row">${undoButton(this, this.canUndo)}<button type="button" class="cta" @click=${() => this.emit("start")}>${t.reveal.start}</button></div>
           </div>
         </div>
       </section>`;

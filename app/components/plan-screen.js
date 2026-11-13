@@ -2,7 +2,7 @@ import { html, styleMap } from "lit";
 import { LightElement } from "./light-element.js";
 import { ORDER, CARDS, canPick } from "../engine.js";
 import { t } from "../i18n.js";
-import { PHASE_COLOR, REACT_COLOR } from "./ui.js";
+import { PHASE_COLOR, REACT_COLOR, undoButton } from "./ui.js";
 import { playerBlock, automaBlock } from "./phase-info.js";
 /** @typedef {import("../engine.js").Game} Game */
 
@@ -19,12 +19,13 @@ const pad = n => String(n).padStart(2, "0");
    It only displays the game it receives and reports `pick` (a phase) and `draw`
    (a card number with the printed cards, null when the app draws). */
 export class PlanScreen extends LightElement {
-  static properties = { game: { attribute: false } };
+  static properties = { game: { attribute: false }, canUndo: { type: Boolean } };
 
   constructor() {
     super();
     /** @type {Game} */
     this.game;
+    this.canUndo = false;
   }
 
   /** @param {Phase} ph */
@@ -74,9 +75,9 @@ export class PlanScreen extends LightElement {
           <div class="side-blocks">${playerBlock(st.playerPhase, true)}${automaBlock(st, st.playerPhase)}</div>
           <p class="muted small">${t.plan.revealed}</p>`
         : html`<p class="muted small">${t.plan.hint}</p>`}
-        ${st.turn === 1 ? html`<p class="note"><b>${t.plan.lockTitle}</b> ${t.plan.lock}</p>` : ""}
         ${st.pioche === "cartes" ? this.printedCards() : html`
           <div class="row">
+            ${undoButton(this, this.canUndo)}
             <button type="button" class="cta" ?disabled=${!st.playerPhase} @click=${() => this.emit("draw", null)}>${t.plan.draw}</button>
             <span class="lab">${t.plan.inDeck(n)}</span>
           </div>`}
