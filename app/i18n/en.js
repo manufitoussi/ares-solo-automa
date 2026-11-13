@@ -64,6 +64,8 @@ const en = {
     intro: last => `The player's phase${last ? ` (not ${last}, played last round)` : ""}, then the automa card.`,
     lastPlayed: ", played last round",
     draw: "Flip the automa card",
+    lockTitle: "Note:",
+    lock: "once the card is flipped, the player keeps their phase, just like when the cards are revealed in the game. The ↶ button is only for fixing a wrong tap.",
     inDeck: n => `${pl(n, "card", "cards")} in the deck`,
     pickCard: "Flip its card, then tap its number", pickPhaseFirst: "First the player's phase",
     emptyTitle: "Empty deck", empty: "Shuffle its 15 cards before drawing.",

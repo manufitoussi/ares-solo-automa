@@ -75,6 +75,8 @@ const fr = {
     intro: last => `Phase choisie par le joueur${last ? ` (pas ${last}, jouée au tour précédent)` : ""}, puis la carte de l'automa.`,
     lastPlayed: ", déjà jouée au tour précédent",
     draw: "Retourner la carte automa",
+    lockTitle: "Attention :",
+    lock: "une fois la carte retournée, le joueur ne change plus sa phase, comme quand on révèle les cartes dans le jeu. Le bouton ↶ sert seulement à corriger une erreur de saisie.",
     /** @param {number} n */
     inDeck: n => `${pl(n, "carte", "cartes")} dans la pioche`,
     pickCard: "Retourner sa carte, puis toucher son numéro", pickPhaseFirst: "D'abord la phase du joueur",

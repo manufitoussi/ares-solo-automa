@@ -74,6 +74,7 @@ export class PlanScreen extends LightElement {
           <div class="side-blocks">${playerBlock(st.playerPhase, true)}${automaBlock(st, st.playerPhase)}</div>
           <p class="muted small">${t.plan.revealed}</p>`
         : html`<p class="muted small">${t.plan.hint}</p>`}
+        ${st.turn === 1 ? html`<p class="note"><b>${t.plan.lockTitle}</b> ${t.plan.lock}</p>` : ""}
         ${st.pioche === "cartes" ? this.printedCards() : html`
           <div class="row">
             <button type="button" class="cta" ?disabled=${!st.playerPhase} @click=${() => this.emit("draw", null)}>${t.plan.draw}</button>
