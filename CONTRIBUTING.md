@@ -55,7 +55,7 @@ python3 -m http.server             # puis http://localhost:8000/app/ pour travai
 
 ## Outils d'IA
 
-Les contributions assistées par une IA sont bienvenues. Vous êtes responsable de ce que vous soumettez : relisez, comprenez et testez chaque ligne. Les instructions pour les agents de code sont dans [CLAUDE.md](CLAUDE.md).
+Les contributions assistées par une IA sont bienvenues. Vous êtes responsable de ce que vous soumettez : relisez, comprenez et testez chaque ligne. Commencez par lire ce guide et [app/README.md](app/README.md).
 
 ## Licence
 

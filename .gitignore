@@ -11,3 +11,6 @@ site/downloads/**
 /cards/src/
 /rules/src/
 /drafts/
+
+# agent instructions live in the private lab repository
+CLAUDE.md
