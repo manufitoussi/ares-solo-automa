@@ -47,7 +47,7 @@ const en = {
     level: "Level", deck: "Automa deck",
     board: "Automa board",
     boardApp: { title: "In the app", text: "The app keeps its reserve, its engine, its VP counter and its TR." },
-    boardTable: { title: "On the table", text: "A player board for the automa; the app gives the rules to apply." },
+    boardTable: { title: "On the table", text: "A player board for the automa, and the app gives the rules to apply." },
     boardForced: "Detailed tracking keeps the automa board in the app.",
     tracking: "Detailed tracking",
     trackingText: "To analyse your games: the app also follows Mars, the player's steps and TR, and draws the curves.",
@@ -151,7 +151,7 @@ const en = {
     targetTitle: "Its target",
     targetAction: other => ` It is used in the Action phase: the parameter it raises${other ? ` (maxed: it goes for ${other} instead)` : ""}.`,
     targetNoAction: " It is only used in the Action phase. No Action phase this round: ignore it.",
-    wait: "Nothing to do yet. The phases are resolved in order; the card stays on screen.",
+    wait: "Nothing to do yet. The phases are resolved in order, and the card stays on screen.",
     start: "Resolve the phases"
   },
 
@@ -184,7 +184,7 @@ const en = {
     lastRoundTitle: "Last round", lastRound: "Every parameter is maxed: each silver it has left is worth 1 VP.",
     done: "Done",
     stepsTitle: n => `The player raises their steps · ${steps(n)} in this Action`,
-    stepsNote: "Before resolving the automa. Each step also gives the player 1 TR; the automa's plan is computed again."
+    stepsNote: "Before resolving the automa. Each step also gives the player 1 TR, and the automa's plan is computed again."
   },
 
   mars: {
@@ -257,7 +257,7 @@ const en = {
 
   transfer: {
     title: "Backup",
-    intro: "To go on with another device or keep a copy: each game is exported as a file or copied from its row; “Export all” and “Copy all” take the game in progress and the whole history. On the other device, import the file or paste the text: the games are added to the history, and a game in progress replaces the device's one.",
+    intro: "To go on with another device or keep a copy: each game is exported as a file or copied from its row. “Export all” and “Copy all” take the game in progress and the whole history. On the other device, import the file or paste the text: the games are added to the history, and a game in progress replaces the device's one.",
     exportAll: "Export all", import: "Import", copyAll: "Copy all", paste: "Paste",
     pasteLabel: "Paste the text of a backup here", importText: "Import the text",
     copied: "Copied: paste it in the app of the other device (History, Paste).",

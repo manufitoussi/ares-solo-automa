@@ -24,13 +24,13 @@ Le projet a trois volets :
 
 ### État
 
-Version 0.7. Les règles sont en cours de test ; elles n'ont pas changé depuis la v0.6, dont le livret et les cartes restent valables. L'appli, le livret et les cartes sont sur le [site](https://manufitoussi.github.io/ares-solo-automa/).
+Version 0.7. Les règles sont en cours de test. Elles n'ont pas changé depuis la v0.6, dont le livret et les cartes restent valables. L'appli, le livret et les cartes sont sur le [site](https://manufitoussi.github.io/ares-solo-automa/).
 
 ### Organisation du dépôt
 
 | Dossier | Contenu |
 | --- | --- |
-| `site/` | le site publié sur GitHub Pages (accueil, pages par langue) ; l'appli y est ajoutée au build |
+| `site/` | le site publié sur GitHub Pages (accueil, pages par langue), auquel le build ajoute l'appli |
 | `app/` | l'appli, et l'ancien prototype gardé comme référence (`app/prototype/`) |
 | `rules/<langue>/` | le livret de règles publié (PDF) |
 | `cards/<langue>/` | les cartes à imprimer publiées (PDF) |
@@ -63,13 +63,13 @@ The project has three parts:
 
 ### Status
 
-Version 0.7. The rules are being playtested; they have not changed since v0.6, whose rulebook and cards remain valid. The app, the rulebook and the cards are on the [website](https://manufitoussi.github.io/ares-solo-automa/).
+Version 0.7. The rules are being playtested. They have not changed since v0.6, whose rulebook and cards remain valid. The app, the rulebook and the cards are on the [website](https://manufitoussi.github.io/ares-solo-automa/).
 
 ### Repository layout
 
 | Folder | Content |
 | --- | --- |
-| `site/` | the website published on GitHub Pages (home page, pages per language); the app is added at build time |
+| `site/` | the website published on GitHub Pages (home page, pages per language), to which the build adds the app |
 | `app/` | the app, and the former prototype kept as a reference (`app/prototype/`) |
 | `rules/<language>/` | the published rulebook (PDF) |
 | `cards/<language>/` | the published print & play cards (PDF) |

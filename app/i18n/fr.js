@@ -55,7 +55,7 @@ const fr = {
     level: "Niveau", deck: "Pioche de l'automa",
     board: "Plateau de l'automa",
     boardApp: { title: "Dans l'appli", text: "L'appli tient sa réserve, son moteur, son compteur de PV et son NT." },
-    boardTable: { title: "Sur la table", text: "Un plateau joueur pour l'automa ; l'appli donne les règles à appliquer." },
+    boardTable: { title: "Sur la table", text: "Un plateau joueur pour l'automa, et l'appli donne les règles à appliquer." },
     boardForced: "Le suivi détaillé tient le plateau de l'automa dans l'appli.",
     tracking: "Suivi détaillé",
     trackingText: "Pour analyser vos parties : l'appli suit aussi Mars, les crans et le NT du joueur, et trace les courbes.",
@@ -178,7 +178,7 @@ const fr = {
     /** @param {string | null} other */
     targetAction: other => ` Elle sert en phase Action : c'est le paramètre qu'il monte${other ? ` (au maximum : il vise ${other} à la place)` : ""}.`,
     targetNoAction: " Elle ne sert qu'en phase Action. Pas de phase Action ce tour : on l'ignore.",
-    wait: "Rien à faire pour l'instant. Les phases se résolvent dans l'ordre ; la carte reste affichée.",
+    wait: "Rien à faire pour l'instant. Les phases se résolvent dans l'ordre, et la carte reste affichée.",
     start: "Résoudre les phases"
   },
 
@@ -223,7 +223,7 @@ const fr = {
     done: "C'est fait",
     /** @param {number} n */
     stepsTitle: n => `Le joueur monte ses crans · ${steps(n)} dans cette Action`,
-    stepsNote: "Avant de résoudre l'automa. Chaque cran donne aussi 1 NT au joueur ; le plan de l'automa se recalcule."
+    stepsNote: "Avant de résoudre l'automa. Chaque cran donne aussi 1 NT au joueur, et le plan de l'automa se recalcule."
   },
 
   mars: {
@@ -311,7 +311,7 @@ const fr = {
 
   transfer: {
     title: "Sauvegarde",
-    intro: "Pour continuer sur un autre appareil ou garder une copie : chaque partie s'exporte en fichier ou se copie depuis sa ligne ; « Tout exporter » et « Tout copier » prennent la partie en cours et tout l'historique. Sur l'autre appareil, importer le fichier ou coller le texte : les parties s'ajoutent à l'historique, et une partie en cours remplace celle de l'appareil.",
+    intro: "Pour continuer sur un autre appareil ou garder une copie : chaque partie s'exporte en fichier ou se copie depuis sa ligne. « Tout exporter » et « Tout copier » prennent la partie en cours et tout l'historique. Sur l'autre appareil, importer le fichier ou coller le texte : les parties s'ajoutent à l'historique, et une partie en cours remplace celle de l'appareil.",
     exportAll: "Tout exporter", import: "Importer", copyAll: "Tout copier", paste: "Coller",
     pasteLabel: "Coller ici le texte d'une sauvegarde", importText: "Importer le texte",
     copied: "Copié : le coller dans l'appli de l'autre appareil (Historique, Coller).",
