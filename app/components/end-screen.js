@@ -152,7 +152,7 @@ export class EndScreen extends LightElement {
           <tr-curve legend kind="crans" .track=${st.track ?? []}></tr-curve>` : nothing}
         <div class="field"><label for="e-rem">${E.remark}</label>
           <input type="text" id="e-rem" maxlength="300" .value=${this.remark} ?disabled=${st.saved} @input=${this.onRemark}></div>
-        <div class="row">
+        <div class="row actions">
           ${st.saved ? nothing : undoButton(this, this.canUndo)}
           <button type="button" class="cta" ?disabled=${st.saved} @click=${this.save}>${st.saved ? E.saved : E.save}</button>
           ${st.saved ? nothing : html`<button type="button" class="ghost" @click=${() => this.emit("resume")}>${E.resume}</button>`}

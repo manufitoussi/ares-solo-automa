@@ -90,7 +90,7 @@ export class TableScreen extends LightElement {
           })}
         </div>
         <p style="font-size:13px;color:var(--muted);margin-top:6px">${t.plan.usedNote}</p>
-        <div class="row">${undoButton(this, this.canUndo)}</div>
+        <div class="row actions">${undoButton(this, this.canUndo)}</div>
       </div>`;
   }
 
@@ -101,7 +101,7 @@ export class TableScreen extends LightElement {
         <div class="side-blocks">${playerBlock(st.playerPhase, true)}${automaBlock(st, st.playerPhase)}</div>
         <p class="muted small">${t.plan.revealed}</p>` : nothing}
       ${st.pioche === "cartes" ? this.printedCards() : html`
-        <div class="row">
+        <div class="row actions">
           ${undoButton(this, this.canUndo)}
           <button type="button" class="cta" ?disabled=${!st.playerPhase} @click=${() => this.emit("draw", null)}>${t.plan.draw}</button>
         </div>`}`;
@@ -122,7 +122,7 @@ export class TableScreen extends LightElement {
         <button type="button" class="answer" @click=${() => this.emit("opportunist", true)}><b>${A.oppYes}</b><span>${A.oppYesText}</span></button>
         <button type="button" class="answer" @click=${() => this.emit("opportunist", false)}><b>${A.oppNo}</b><span>${A.oppNoText}</span></button>
       </div>`;
-    return html`${answers}<div class="row">${undoButton(this, this.canUndo)}</div>`;
+    return html`${answers}<div class="row actions">${undoButton(this, this.canUndo)}</div>`;
   }
 
   /** @param {Phase} ph */
@@ -153,7 +153,7 @@ export class TableScreen extends LightElement {
         : t.reveal.targetNoAction}</p>
       ${st.queue.includes("III") && !tracksMars(st) ? html`<p class="muted small">${t.info.targetRule}</p>` : nothing}
       <p class="muted small">${t.reveal.wait}</p>
-      <div class="row">
+      <div class="row actions">
         ${undoButton(this, this.canUndo)}
         <button type="button" class="cta" @click=${() => this.emit("start")}>${t.reveal.start}</button>
       </div>`;

@@ -122,7 +122,7 @@ export class PhaseScreen extends LightElement {
             ${playerBlock(ph, st.playerPhase === ph)}
             ${track && ph === "III" ? this.playerSteps() : nothing}
             ${hasBoard(st) ? this.automaTodo(ph) : this.automaRule(ph)}
-            <div class="row">
+            <div class="row actions">
               ${undoButton(this, this.canUndo)}
               <button type="button" class="cta" @click=${() => this.emit("apply")}>${P.done}</button>
               ${track ? nothing : html`<button type="button" class="ghost" @click=${() => this.emit("terraformed")}>${t.endTurn.terraformed}</button>`}

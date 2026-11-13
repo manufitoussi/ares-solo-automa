@@ -28,7 +28,7 @@ export class EndTurnScreen extends LightElement {
           <li>${E.card(st.pioche === "cartes", st.deck.length)}</li>
         </ul></div>
         ${tracksMars(st) ? html`<p class="note"><b>${E.trTitle}</b> ${E.tr(pntOf(st), st.a.nt)}</p>` : ""}
-        <div class="row">
+        <div class="row actions">
           ${undoButton(this, this.canUndo)}
           <button type="button" class="cta" @click=${() => this.emit("next")}>${E.next}</button>
           ${tracksMars(st)
