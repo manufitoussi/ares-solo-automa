@@ -34,7 +34,7 @@ const en = {
 
   top: {
     back: "Back to the website", brand: "Hybrid automa",
-    sub: v => `Game assistant · v${v} draft`,
+    sub: v => `Game assistant · v${v}`,
     undo: "Undo", undoShort: "↶", history: "History", historyShort: "Games",
     newGame: "New game", newShort: "New", confirm: "Confirm?", confirmShort: "Sure?", confirmAria: "Confirm the new game",
     other: "FR", otherAria: "Version française"

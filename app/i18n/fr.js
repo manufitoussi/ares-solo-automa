@@ -41,7 +41,7 @@ const fr = {
   top: {
     back: "Retour au site", brand: "Automa hybride",
     /** @param {string} v */
-    sub: v => `Assistant de partie · v${v} brouillon`,
+    sub: v => `Assistant de partie · v${v}`,
     undo: "Annuler", undoShort: "↶", history: "Historique", historyShort: "Parties",
     newGame: "Nouvelle partie", newShort: "Nouvelle", confirm: "Confirmer ?", confirmShort: "Sûr ?", confirmAria: "Confirmer la nouvelle partie",
     other: "EN", otherAria: "English version"
