@@ -138,7 +138,10 @@ const en = {
     start: "Resolve the phases"
   },
 
+  confirmTerraformed: "Is Mars terraformed? The game stops here: each silver the automa has left is worth 1 VP, then comes the scoring.",
   phaseScreen: {
+    /** @param {boolean} player @param {boolean} automa @returns {string} */
+    chosenBy: (player, automa) => player && automa ? "Chosen by the player and drawn by the automa" : player ? "Chosen by the player" : "Drawn by the automa",
     tag: {
       I: "+1 copper, then engine +1 for 1 silver.", II: "+1 copper, then 1 cube on its VP counter.",
       III: "+1 copper, then all its silver on its target.", IV: "+1 copper, then as many copper as its engine.", V: "+1 copper. Nothing more."

@@ -99,7 +99,7 @@ export class PhaseScreen extends LightElement {
           <automa-card still .size=${track ? undefined : "small"} .number=${st.card ?? undefined} .phase=${st.automaPhase ?? undefined} .target=${cible} .why=${t.why(st.why)}></automa-card>
           <div>
             <div class="ban ${C.dark ? "dark" : ""}" style=${styleMap({ background: C.col })}>
-              <span class="r">${ph}</span><div><span class="nm">${t.phase[ph]}</span><span class="tg">${P.tag[ph]}</span></div>
+              <span class="r">${ph}</span><div><span class="by">${P.chosenBy(st.playerPhase === ph, st.automaPhase === ph)}</span><span class="nm">${t.phase[ph]}</span><span class="tg">${P.tag[ph]}</span></div>
             </div>
             ${playerBlock(ph, st.playerPhase === ph)}
             ${track && ph === "III" ? this.playerSteps() : nothing}

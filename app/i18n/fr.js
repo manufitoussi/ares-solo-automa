@@ -164,7 +164,10 @@ const fr = {
     start: "Résoudre les phases"
   },
 
+  confirmTerraformed: "Mars est terraformé ? La partie s'arrête ici : chaque argent restant de l'automa vaut 1 PV, puis on passe au décompte.",
   phaseScreen: {
+    /** @param {boolean} player @param {boolean} automa @returns {string} */
+    chosenBy: (player, automa) => player && automa ? "Choisie par le joueur et tirée par l'automa" : player ? "Choisie par le joueur" : "Tirée par l'automa",
     tag: {
       I: "+1 cuivre, puis moteur +1 pour 1 argent.", II: "+1 cuivre, puis 1 cube sur son compteur de PV.",
       III: "+1 cuivre, puis tous ses argents sur sa cible.", IV: "+1 cuivre, puis autant de cuivres que son moteur.", V: "+1 cuivre. Rien de plus."

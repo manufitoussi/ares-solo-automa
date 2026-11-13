@@ -227,7 +227,7 @@ export class AutomaApp extends LightElement {
 
   /* Mars is terraformed (mode "jeu"): the last round rule, then the scoring */
   terraformed() {
-    if (!this.game) return;
+    if (!this.game || !window.confirm(t.confirmTerraformed)) return;
     this.play(E.terraformed(this.game));
     window.scrollTo({ top: 0, behavior: "smooth" });
   }

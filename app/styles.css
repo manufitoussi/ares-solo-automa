@@ -84,6 +84,7 @@ button{cursor:pointer}
 .ban > div{padding:8px 16px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
 .ban .nm{font-family:var(--display);font-style:italic;font-weight:800;font-size:26px;text-transform:uppercase;line-height:1}
 .ban .tg{font-size:14px}
+.ban .by{font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
 .ban.dark{color:#1F1A24}
 .phases{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
 .phb{border:none;color:#fff;padding:10px 6px 12px;display:flex;flex-direction:column;align-items:flex-start;gap:0;min-height:64px;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);box-shadow:inset 0 -4px 0 rgba(0,0,0,.22);opacity:.8;text-align:left}
