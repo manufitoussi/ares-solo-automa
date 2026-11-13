@@ -176,7 +176,7 @@ details summary{cursor:pointer;font-family:var(--display);font-weight:700;letter
 }
 
 /* custom elements are inline by default: make the components blocks */
-:is(automa-app, setup-screen, plan-screen, ask-screen, reveal-screen, phase-screen, end-turn-screen, end-screen, history-screen, tr-curve, automa-status, mars-panel, choice-group, param-stepper){display:block}
+:is(automa-app, setup-screen, table-screen, phase-screen, end-turn-screen, end-screen, history-screen, tr-curve, automa-status, mars-panel, choice-group, param-stepper){display:block}
 automa-app{display:flex;flex-direction:column;gap:14px}
 .param.inline{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
 /* start screen, in index.html, until <automa-app> renders */
@@ -218,3 +218,29 @@ automa-app{display:flex;flex-direction:column;gap:14px}
 .big-check{align-items:flex-start;gap:12px;padding:8px 0;cursor:pointer}
 .big-check input{width:28px;height:28px;margin-top:2px;flex-shrink:0}
 .big-check b{font-family:var(--display);font-style:italic;font-weight:800;font-size:20px;text-transform:uppercase}
+
+/* the table: the player's phase card and the automa card side by side, even on a phone.
+   The cards stay light, like printed cards, in both themes. Lengths in cqi: 1% of the card width. */
+.table2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%;max-width:560px;margin-inline:auto}
+.tslot{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.cw{width:100%;max-width:260px;container-type:inline-size}
+.cw automa-card{--automa-card-width:100%;width:100%;display:block}
+.cempty,.cback,.pcard{width:100%;aspect-ratio:63/88;border-radius:3.85cqi}
+.cempty{display:flex;align-items:center;justify-content:center;text-align:center;padding:8cqi;border:2px dashed var(--line);color:var(--muted);font-family:var(--display);font-weight:700;font-size:max(14px,8cqi);letter-spacing:.06em;text-transform:uppercase}
+.cback{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3cqi;border:4cqi solid #fff;outline:1px solid #BDBDBD;background:repeating-linear-gradient(135deg,#12202B 0 6cqi,#1A2E3B 6cqi 12cqi);color:#fff;box-shadow:0 2.31cqi 6.92cqi rgba(0,0,0,.18);padding:0}
+.cback .q{font-family:var(--display);font-style:italic;font-weight:800;font-size:34cqi;line-height:1;color:#8FE3E8}
+.cback .b{font-family:var(--display);font-style:italic;font-weight:800;font-size:max(15px,10cqi);text-transform:uppercase;letter-spacing:.04em}
+.cback .n{font-family:var(--display);font-weight:600;font-size:max(12px,6cqi);letter-spacing:.12em;text-transform:uppercase;color:#C9D6DC;text-align:center;padding-inline:4cqi}
+.cback:disabled{cursor:default;opacity:.75}
+.cback:not(:disabled):hover{outline:3px solid var(--cyan)}
+.pcard{display:flex;flex-direction:column;gap:2.3cqi;padding:3.85cqi;border:1px solid #BDBDBD;background:#fff;color:#1F1A24;box-shadow:0 2.31cqi 6.92cqi rgba(0,0,0,.18);overflow:hidden;line-height:1.28;font-size:max(12px,6.2cqi)}
+.pc-ban{display:grid;grid-template-columns:16cqi minmax(0,1fr);height:17.3cqi;flex-shrink:0;clip-path:polygon(0 0,calc(100% - 5.77cqi) 0,100% 5.77cqi,100% 100%,3.08cqi 100%,0 calc(100% - 3.08cqi));box-shadow:inset 0 -1.54cqi 0 rgba(0,0,0,.22)}
+.pc-ban .r{display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.26);font-family:var(--display);font-style:italic;font-weight:800;font-size:9.2cqi;padding-bottom:1.5cqi}
+.pc-ban .nm{display:flex;align-items:center;padding:0 3.85cqi 1.54cqi;font-family:var(--display);font-style:italic;font-weight:800;font-size:8cqi;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.pc-meta{display:flex;justify-content:space-between;font-family:var(--display);font-weight:600;font-size:max(9px,3.85cqi);letter-spacing:.14em;text-transform:uppercase;color:#1B5A7E;border-bottom:1.3px solid #2FB6C0;padding-bottom:1.15cqi}
+.pc-you{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1.5cqi;min-height:0}
+.pc-lab{font-family:var(--display);font-weight:700;font-size:max(9px,3.85cqi);letter-spacing:.16em;text-transform:uppercase;color:#6E625A}
+.pc-bon{background:#EDE0CD;border-radius:2.3cqi;padding:2cqi 3cqi;font-size:max(11.5px,5.6cqi)}
+.pc-bon b{font-family:var(--display);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8F3A10;margin-right:1cqi}
+.pc-au{border-radius:2.3cqi;padding:2cqi 3cqi;display:flex;flex-direction:column;gap:1cqi;font-size:max(11.5px,5.6cqi)}
+.pc-tag{align-self:flex-start;font-family:var(--display);font-style:italic;font-weight:800;font-size:max(10px,4.6cqi);text-transform:uppercase;letter-spacing:.04em;background:#12202B;color:#8FE3E8;padding:0 2.3cqi .3cqi}

@@ -112,6 +112,25 @@ const en = {
     fix: "If the automa board does not match, fix it with “Fix”."
   },
 
+  table: {
+    player: "Player", automa: "Automa", empty: "Pick a phase",
+    meta: "Player + automa", metaPhase: "Phase", skill: "Skill",
+    skillShort: {
+      I: "Play 1 green card.",
+      II: "Play 1 blue or red card.",
+      III: "“Action:” effects and standard actions.",
+      IV: "Produce: heat, plants, cards, MC + TR.",
+      V: "Draw 2 cards, keep 1."
+    },
+    bonusShort: {
+      I: "−3 MC on that card.",
+      II: "Draw 1 card, or play 1 more blue or red card.",
+      III: "One “Action:” once more.",
+      IV: "+4 MC.",
+      V: "Draw 3 more cards, keep 1 more."
+    }
+  },
+
   ask: {
     title: "Reactive card",
     oppQuestion: "Does it have at least 1 silver in its reserve?",
