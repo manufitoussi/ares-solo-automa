@@ -2,11 +2,9 @@ import { html, nothing } from "lit";
 import { LightElement } from "./light-element.js";
 import * as E from "../engine.js";
 import "./setup-screen.js";
-import "./plan-screen.js";
+import "./table-screen.js";
 import "./automa-status.js";
 import "./mars-panel.js";
-import "./reveal-screen.js";
-import "./ask-screen.js";
 import "./phase-screen.js";
 import "./end-turn-screen.js";
 import "./end-screen.js";
@@ -248,15 +246,14 @@ export class AutomaApp extends LightElement {
       <end-screen .game=${st} .canUndo=${this.undo.length > 0} @undo=${this.undoLast} @save=${this.saveResult}
         @resume=${() => this.play(E.resumeGame(st))}></end-screen>`;
     switch (st.step) {
-      case "plan": return html`
-        <plan-screen .game=${st} .canUndo=${this.undo.length > 0} @undo=${this.undoLast}
+      /* one element for the three steps: the automa card is flipped in place and stays */
+      case "plan": case "ask": case "reveal": return html`
+        <table-screen .game=${st} .canUndo=${this.undo.length > 0} @undo=${this.undoLast}
           @pick=${(/** @type {CustomEvent<Phase>} */ e) => this.play(E.pickPhase(st, e.detail), { undoable: false })}
-          @draw=${(/** @type {CustomEvent<number | null>} */ e) => this.play(E.draw(st, { n: e.detail }))}></plan-screen>`;
-      case "ask": return html`
-        <ask-screen .game=${st} .canUndo=${this.undo.length > 0} @undo=${this.undoLast}
+          @draw=${(/** @type {CustomEvent<number | null>} */ e) => this.play(E.draw(st, { n: e.detail }))}
           @opportunist=${(/** @type {CustomEvent<boolean>} */ e) => this.play(E.answerOpportunist(st, e.detail))}
-          @course=${(/** @type {CustomEvent<Target>} */ e) => this.play(E.answerCourse(st, e.detail))}></ask-screen>`;
-      case "reveal": return html`<reveal-screen .game=${st} .canUndo=${this.undo.length > 0} @undo=${this.undoLast} @start=${() => this.play(E.startPhases(st))}></reveal-screen>`;
+          @course=${(/** @type {CustomEvent<Target>} */ e) => this.play(E.answerCourse(st, e.detail))}
+          @start=${() => this.play(E.startPhases(st))}></table-screen>`;
       case "phase": return html`
         <phase-screen .game=${st} .canUndo=${this.undo.length > 0} @undo=${this.undoLast} @apply=${this.applyPhase} @terraformed=${this.terraformed}
           @param=${(/** @type {CustomEvent<{ key: Param, delta: number }>} */ e) => this.play(E.adjustParam(st, e.detail.key, e.detail.delta))}></phase-screen>`;

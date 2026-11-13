@@ -133,6 +133,26 @@ const fr = {
     fix: "Si le plateau de l'automa ne correspond pas, le corriger avec « Corriger »."
   },
 
+  /* the table: the player's phase card next to the automa card (short texts, on the card) */
+  table: {
+    player: "Joueur", automa: "Automa", empty: "Choisir une phase",
+    meta: "Joueur + automa", metaPhase: "Phase", skill: "Compétence",
+    skillShort: {
+      I: "Jouer 1 carte verte.",
+      II: "Jouer 1 carte bleue ou rouge.",
+      III: "Effets « Action : » et actions standards.",
+      IV: "Production : chaleur, plantes, cartes, MC + NT.",
+      V: "Piocher 2 cartes, en garder 1."
+    },
+    bonusShort: {
+      I: "−3 MC sur cette carte.",
+      II: "+1 carte piochée, ou 1 carte bleue ou rouge de plus.",
+      III: "1 « Action : » une fois de plus.",
+      IV: "+4 MC.",
+      V: "+3 cartes piochées, 1 de plus gardée."
+    }
+  },
+
   ask: {
     title: "Carte réactive",
     oppQuestion: "A-t-il au moins 1 argent dans sa réserve ?",
