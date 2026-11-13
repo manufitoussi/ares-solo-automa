@@ -174,7 +174,7 @@ details summary{cursor:pointer;font-family:var(--display);font-weight:700;letter
 }
 
 /* custom elements are inline by default: make the components blocks */
-:is(automa-app, setup-screen, plan-screen, reveal-screen, phase-screen, end-turn-screen, end-screen, history-screen, tr-curve, automa-status, mars-panel, choice-group, param-stepper){display:block}
+:is(automa-app, setup-screen, plan-screen, ask-screen, reveal-screen, phase-screen, end-turn-screen, end-screen, history-screen, tr-curve, automa-status, mars-panel, choice-group, param-stepper){display:block}
 automa-app{display:flex;flex-direction:column;gap:14px}
 .param.inline{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
 /* start screen, in index.html, until <automa-app> renders */
@@ -193,3 +193,26 @@ automa-app{display:flex;flex-direction:column;gap:14px}
 .with-icon,.icon-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .icon-btn{min-height:40px;min-width:40px;padding:6px}
 .icon-btn.danger{color:var(--danger)}
+
+/* what a phase gives each side (planning and phase screens) */
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.side-blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.side-block{border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:6px;font-size:17px;line-height:1.4;background:var(--bg)}
+.side-block.player{border:2px solid var(--p5)}
+.side-block.automa{border:2px solid var(--cyan)}
+.side-block .muted{font-size:15px}
+.side-block .bonus{padding:8px 12px;font-size:16px}
+.todo .big{font-size:18px;line-height:1.4}
+/* a reactive card's question: big answers, one tap */
+.question{font-family:var(--display);font-weight:700;font-size:24px;line-height:1.15}
+.answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.answers.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.answer{border:2px solid var(--line);background:var(--bg);border-radius:12px;min-height:88px;padding:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.answer b{font-family:var(--display);font-style:italic;font-weight:800;font-size:26px;text-transform:uppercase;line-height:1}
+.answers.three .answer b{font-size:17px}
+.answer span{font-size:15px;color:var(--muted)}
+.answer:active{border-color:var(--cyan);background:var(--panel2)}
+.big-check{align-items:flex-start;gap:12px;padding:8px 0;cursor:pointer}
+.big-check input{width:28px;height:28px;margin-top:2px;flex-shrink:0}
+.big-check b{font-family:var(--display);font-style:italic;font-weight:800;font-size:20px;text-transform:uppercase}

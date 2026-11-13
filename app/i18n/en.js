@@ -43,8 +43,15 @@ const en = {
 
   setup: {
     title: "New game",
-    intro: "The assistant plays the automa: it draws its cards, counts its copper and silver and tells what to do on its board. The board and the project cards stay on the table.",
+    intro: "The app plays the automa: it draws its cards and tells what it does in each phase. It replaces the printed automa cards and player phase cards.",
     level: "Level", deck: "Automa deck",
+    board: "Automa board",
+    boardApp: { title: "In the app", text: "The app keeps its reserve, its engine, its VP counter and its TR." },
+    boardTable: { title: "On the table", text: "A player board for the automa; the app gives the rules to apply." },
+    boardForced: "Detailed tracking keeps the automa board in the app.",
+    tracking: "Detailed tracking",
+    trackingText: "To analyse your games: the app also follows Mars, the player's steps and TR, and draws the curves.",
+    setupApp: engine => `The app keeps the automa board: empty reserve, engine at ${engine}, empty VP counter, TR at 5. No corporation, no hand.`,
     deckApp: { title: "The app draws", text: "The assistant draws the automa card at random." },
     deckCards: { title: "Printed cards", text: "The player flips the printed card and enters its number." },
     setupTitle: "Setup",
@@ -61,7 +68,57 @@ const en = {
     pickCard: "Flip its card, then tap its number", pickPhaseFirst: "First the player's phase",
     emptyTitle: "Empty deck", empty: "Shuffle its 15 cards before drawing.",
     cardAria: (n, label, used) => `Card ${n}, ${label}${used ? ", already out" : ""}`,
-    usedNote: "The cards already out since the last shuffle are greyed out."
+    usedNote: "The cards already out since the last shuffle are greyed out.",
+    turn: n => `Round ${n}`,
+    pick: "Player's phase",
+    hint: "Tap a phase to see what it gives the player and the automa.",
+    revealed: "The automa's effect only applies if the phase is revealed: chosen by the player or drawn by the automa card."
+  },
+
+  info: {
+    player: "Player", automa: "Automa", bonus: "Bonus",
+    skill: {
+      I: "The player may play 1 green Project card.",
+      II: "The player may play 1 blue card or 1 red card.",
+      III: "The player uses the “Action:” effects and the standard actions of their choice.",
+      IV: "The player gains heat, plants and cards from their productions, and as many MC as their production + TR.",
+      V: "The player draws 2 cards and keeps 1."
+    },
+    bonusText: {
+      I: "this card costs 3 MC less.",
+      II: "they draw 1 card or play 1 more blue or red card.",
+      III: "they may use one “Action:” once more.",
+      IV: "they gain 4 MC.",
+      V: "they draw 3 more cards and keep 1 more."
+    },
+    chosen: "their phase,", notChosen: "No bonus: this is not the phase they chose.",
+    rule: {
+      I: "+1 copper, then if it has 1 silver, it spends it: engine +1.",
+      II: "+1 copper, then it puts 1 cube on its VP counter.",
+      III: "+1 copper, then it spends all its silver on the target of its card: 1 step and 1 TR per silver.",
+      IV: "+1 copper, then it gains as many copper as its engine.",
+      V: "+1 copper. Nothing more."
+    },
+    now: {
+      I: (has, a, b) => has ? `+1 copper, then it spends 1 silver: engine ${a} → ${b}.` : `+1 copper, but no silver: the engine stays at ${a}.`,
+      II: (a, b) => `+1 copper, then 1 cube on its VP counter: ${a} → ${b}.`,
+      III: (n, a, b) => n ? `+1 copper, then it has ${silver(n)}: ${steps(n)} on its target, TR ${a} → ${b}.` : "+1 copper, but no silver: nothing on its target.",
+      IV: n => `+1 copper, then +${copper(n)} from its engine.`,
+      V: "+1 copper. Nothing more."
+    },
+    reserve: n => `Its reserve: ${purse(n)}.`,
+    target: name => `Its target: ${name}.`,
+    targetRule: "If its target is maxed, it goes for the next one: oxygen → temperature → ocean. An ocean it places gives it back 1 copper.",
+    fix: "If the automa board does not match, fix it with “Fix”."
+  },
+
+  ask: {
+    title: "Reactive card",
+    oppQuestion: "Does it have at least 1 silver in its reserve?",
+    oppYes: "Yes", oppYesText: "Action", oppNo: "No", oppNoText: "Production",
+    courseQuestion: "Which parameter is the least advanced?",
+    courseHow: "Compare the share of each track already done: oxygen out of 14 steps, temperature out of 19, oceans out of 9. It goes for the lowest share.",
+    courseAria: name => `Least advanced: ${name}`
   },
 
   reveal: {
@@ -100,7 +157,6 @@ const en = {
     target: (name, other) => ` Target: ${name}${other ? ` maxed, it goes for ${other}` : ""}.`,
     noBonus: " No bonus for the automa.",
     lastRoundTitle: "Last round", lastRound: "Every parameter is maxed: each silver it has left is worth 1 VP.",
-    playerBonus: "The player chose this phase: they take its bonus.", playerNoBonus: "The player also plays this phase, without its bonus.",
     done: "Done",
     stepsTitle: n => `The player raises their steps · ${steps(n)} in this Action`,
     stepsNote: "Before resolving the automa. Each step also gives the player 1 TR; the automa's plan is computed again."
@@ -136,11 +192,17 @@ const en = {
       : `the assistant sets it aside. It only comes back once its whole deck has been used (${left} left).`}`,
     trTitle: "Player's TR",
     tr: (p, a) => `${p}, against ${a} for the automa. It can be set at any time in the Mars panel and draws the curve of the game.`,
-    next: "Next round", end: "End the game"
+    next: "Next round", end: "End the game",
+    terraformed: "Mars is terraformed: end of the game"
   },
 
   end: {
     title: "Final scoring", maxed: "Every parameter is maxed.", stopped: "Game stopped before the parameters were maxed.",
+    terraformed: "Mars is terraformed.",
+    lastRoundTable: " Last round: each silver it has left is worth 1 VP.",
+    automaCount: "Count its board",
+    automaFields: { nt: "Its TR", compteur: "Counter cubes", argents: "Silver left" },
+    automaScore: a => `Automa's score · ${a}`,
     scoring: " The player scores as usual: 1 VP per TR point, plus their forest and card VP. The automa has no forests.",
     automa: "Automa", vp: "VP", tr: "TR", silverLeft: "Silver left in the last round", counter: "VP counter (1 VP per cube)", total: "Total",
     playerScore: (p, a) => `Player's score · ${p} against ${a} for the automa`,
@@ -160,6 +222,7 @@ const en = {
     cols: ["Game", "Date", "Level", "Rules", "Rounds", "Player", "Player TR", "Steps / Action", "Automa", "Winner", "TR per round", "Steps", "Remarks"],
     winner: { player: "Player", automa: "Automa", tie: "Tie" },
     current: "In progress", unsaved: "Ended, not saved",
+    mode: { jeu: "Play", suivi: "Tracking" },
     export: "Export", copy: "Copy", delete: "Delete",
     actionAria: (action, date) => `${action} the game of ${date}`,
     confirmDelete: "Delete this game from the history?",
@@ -194,6 +257,7 @@ const en = {
       case "riposteFirst": return "First round: Production.";
       case "oppSilver": return `It has ${silver(w.silver)}: it spends in Action.`;
       case "oppNone": return "It has no silver: it produces.";
+      case "oppYes": return "It has at least 1 silver: it spends in Action.";
       case "course": return `Least advanced parameter: ${targetLower[w.target]}.`;
     }
   },
@@ -218,6 +282,7 @@ const en = {
         case "lastRound": return `Last round: ${silver(e.silver)} left = ${e.silver} VP`;
         case "maxed": return "Every parameter is maxed: end of the game.";
         case "stopped": return "Game ended on request";
+        case "terraformed": return "Mars is terraformed: end of the game";
         case "correct": return `Fix ${keys[e.key]}: ${e.from} → ${e.to}`;
       }
     })();

@@ -1,19 +1,22 @@
 import { html, nothing, styleMap } from "lit";
 import { LightElement } from "./light-element.js";
-import { COST, MAX, computePhase, effCible, allMax, cu, vpOf } from "../engine.js";
+import { COST, MAX, computePhase, effCible, allMax, cu, vpOf, hasBoard, tracksMars } from "../engine.js";
 import { t } from "../i18n.js";
 import { PHASE_COLOR, phaseChip, icon } from "./ui.js";
 import "./param-stepper.js";
 import "./automa-card.js";
+import { playerBlock } from "./phase-info.js";
 /** @typedef {import("../engine.js").Game} Game */
 
 /** @typedef {import("../engine.js").Phase} Phase */
 /** @typedef {import("../engine.js").Target} Target */
 /** @typedef {import("../engine.js").Automa} Automa */
 
-/* One phase of the round: what to do on the automa board, computed by the engine from the
-   current state. Mars can still change in the side panel: Lit re-renders and the plan follows.
-   Reports `apply` once the player has done it on the table. */
+/* One phase of the round: what the player does (and their bonus if they chose it), and what the
+   automa does: computed by the engine from its board when the app keeps it, else the rule.
+   In detailed tracking, Mars can still change in the side panel: Lit re-renders and the plan
+   follows. Reports `apply` once the player has done it on the table, and, in mode "jeu",
+   `terraformed` when the player says Mars is terraformed. */
 export class PhaseScreen extends LightElement {
   static properties = { game: { attribute: false } };
 
@@ -60,27 +63,51 @@ export class PhaseScreen extends LightElement {
       </div>`;
   }
 
+  /** the automa's side, from its board in the app @param {Phase} ph */
+  automaTodo(ph) {
+    const st = this.game, r = computePhase(st, ph), a0 = st.a, P = t.phaseScreen, track = tracksMars(st);
+    const cible = /** @type {Target} */ (st.cible), eff = track ? effCible(cible, st.p) : cible;
+    return html`
+      <div class="todo"><span class="lab">${track ? P.todo : t.info.automa}</span>
+        <ul>${this.todo(ph, r, a0).map(item => html`<li>${item}</li>`)}</ul>
+        <p style="font-size:14px;color:var(--muted)">${P.reserve(a0.cubes, r.a.cubes)}${ph === "III"
+          ? P.target(t.target[cible], eff !== cible ? t.targetLower[eff] : null) : ""}${P.noBonus}</p>
+        ${ph === "III" && !track ? html`<p style="font-size:14px;color:var(--muted)">${t.info.targetRule} ${t.info.fix}</p>` : nothing}
+      </div>
+      ${track && ph === "III" && allMax(r.p) ? html`<p class="note"><b>${P.lastRoundTitle}</b> ${P.lastRound}</p>` : nothing}`;
+  }
+
+  /** the automa's side, its board on the table: the rule to apply @param {Phase} ph */
+  automaRule(ph) {
+    const cible = /** @type {Target} */ (this.game.cible);
+    return html`
+      <div class="todo"><span class="lab">${t.info.automa}</span>
+        <p class="big">${t.info.rule[ph]}</p>
+        ${ph === "III" ? html`<p>${t.info.target(t.targetLower[cible])}</p>
+          <p style="font-size:14px;color:var(--muted)">${t.info.targetRule}</p>` : nothing}
+        <p style="font-size:14px;color:var(--muted)">${t.phaseScreen.noBonus.trim()}</p>
+      </div>`;
+  }
+
   render() {
-    const st = this.game, ph = st.queue[st.qi], r = computePhase(st, ph), a0 = st.a, C = PHASE_COLOR[ph], P = t.phaseScreen;
-    const cible = /** @type {Target} */ (st.cible), eff = effCible(cible, st.p);
+    const st = this.game, ph = st.queue[st.qi], C = PHASE_COLOR[ph], P = t.phaseScreen, track = tracksMars(st);
+    const cible = /** @type {Target} */ (st.cible);
     return html`
       <section class="panel">
         <div class="steps">${st.queue.map((x, i) => phaseChip(x, i < st.qi ? "done" : i === st.qi ? "cur" : ""))}</div>
         <div class="reveal">
-          <automa-card still .number=${st.card ?? undefined} .phase=${st.automaPhase ?? undefined} .target=${cible} .why=${t.why(st.why)}></automa-card>
+          <automa-card still .size=${track ? undefined : "small"} .number=${st.card ?? undefined} .phase=${st.automaPhase ?? undefined} .target=${cible} .why=${t.why(st.why)}></automa-card>
           <div>
             <div class="ban ${C.dark ? "dark" : ""}" style=${styleMap({ background: C.col })}>
               <span class="r">${ph}</span><div><span class="nm">${t.phase[ph]}</span><span class="tg">${P.tag[ph]}</span></div>
             </div>
-            ${ph === "III" ? this.playerSteps() : nothing}
-            <div class="todo"><span class="lab">${P.todo}</span>
-              <ul>${this.todo(ph, r, a0).map(item => html`<li>${item}</li>`)}</ul>
-              <p style="font-size:14px;color:var(--muted)">${P.reserve(a0.cubes, r.a.cubes)}${ph === "III"
-                ? P.target(t.target[cible], eff !== cible ? t.targetLower[eff] : null) : ""}${P.noBonus}</p>
+            ${playerBlock(ph, st.playerPhase === ph)}
+            ${track && ph === "III" ? this.playerSteps() : nothing}
+            ${hasBoard(st) ? this.automaTodo(ph) : this.automaRule(ph)}
+            <div class="row">
+              <button type="button" class="cta" @click=${() => this.emit("apply")}>${P.done}</button>
+              ${track ? nothing : html`<button type="button" class="ghost" @click=${() => this.emit("terraformed")}>${t.endTurn.terraformed}</button>`}
             </div>
-            ${ph === "III" && allMax(r.p) ? html`<p class="note"><b>${P.lastRoundTitle}</b> ${P.lastRound}</p>` : nothing}
-            <p style="font-size:14px;color:var(--muted)">${st.playerPhase === ph ? P.playerBonus : P.playerNoBonus}</p>
-            <div class="row"><button type="button" class="cta" @click=${() => this.emit("apply")}>${P.done}</button></div>
           </div>
         </div>
       </section>`;
