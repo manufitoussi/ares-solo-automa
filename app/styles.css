@@ -86,6 +86,15 @@ button{cursor:pointer}
 /* the buttons at the bottom of a screen: undo on the left, actions on the right, room to tap */
 .row.actions{gap:14px 12px;margin-top:8px}
 .row > .undo{margin-right:auto}
+.undo{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+/* on a phone, the undo button is just its icon, so that it fits next to the main action */
+@media (max-width:520px){
+  .undo{padding:10px;min-width:48px}
+  .undo .lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  /* basis 0: the main action always fits next to the undo icon (its text may wrap);
+     a third button goes to the next line */
+  .row.actions > .cta{flex:1 1 0;min-width:0}
+}
 .ban .tg{font-size:14px}
 .ban .by{font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
 .ban.dark{color:#1F1A24}
