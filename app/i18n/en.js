@@ -141,7 +141,7 @@ const en = {
   },
 
   reveal: {
-    title: "The automa card", todo: "This round, for the automa",
+    title: "The automa card", todo: "This round, for the player and the automa",
     playerPhase: "player's phase", automaPhase: "automa's phase", and: " and ",
     whatI: ok => `+1 copper${ok ? ", then engine +1 for 1 silver" : ": no silver for the engine"}`,
     whatII: "+1 copper, then 1 cube on its VP counter",

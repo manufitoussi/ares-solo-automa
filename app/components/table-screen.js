@@ -145,11 +145,14 @@ export class TableScreen extends LightElement {
   phaseLine(ph) {
     const st = this.game, R = t.reveal;
     const who = [st.playerPhase === ph ? R.playerPhase : "", st.automaPhase === ph ? R.automaPhase : ""].filter(Boolean).join(R.and);
-    if (!hasBoard(st)) return html`<li>${phaseChip(ph)} <span class="muted small">(${who})</span><br>${t.info.rule[ph]}</li>`;
-    const c = computePhase(st, ph).ch;
-    const what = ph === "I" ? R.whatI(st.a.cubes + 1 >= COST) : ph === "II" ? R.whatII
-      : ph === "III" ? R.whatIII(c.nt) : ph === "IV" ? R.whatIV(st.a.moteur) : R.whatV;
-    return html`<li>${phaseChip(ph)} <span class="muted small">(${who})</span><br>${what}.</li>`;
+    const c = hasBoard(st) ? computePhase(st, ph).ch : null;
+    const what = !c ? t.info.rule[ph] : `${ph === "I" ? R.whatI(st.a.cubes + 1 >= COST) : ph === "II" ? R.whatII
+      : ph === "III" ? R.whatIII(c.nt) : ph === "IV" ? R.whatIV(st.a.moteur) : R.whatV}.`;
+    /* both sides of the phase: the player's skill (and bonus when they chose it), then the automa */
+    return html`<li>${phaseChip(ph)} <span class="muted small">(${who})</span>
+      <div class="who-line"><b>${t.info.player}</b> ${t.info.skill[ph]}${st.playerPhase === ph
+        ? html` <span class="bonus-inline"><b>${t.info.bonus}</b>${t.info.bonusText[ph]}</span>` : ""}</div>
+      <div class="who-line"><b>${t.info.automa}</b> ${what}</div></li>`;
   }
 
   reveal() {

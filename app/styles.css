@@ -84,6 +84,10 @@ button{cursor:pointer}
 .ban > div{padding:8px 16px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
 .ban .nm{font-family:var(--display);font-style:italic;font-weight:800;font-size:26px;text-transform:uppercase;line-height:1}
 .row > .undo{margin-right:auto}
+.who-line{margin-top:4px}
+.who-line > b{font-family:var(--display);font-weight:700;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:6px}
+.bonus-inline{background:var(--sand);color:var(--ink);border-radius:6px;padding:1px 6px}
+.bonus-inline b{font-family:var(--display);font-weight:700;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sand-ink);margin-right:4px}
 .ban .tg{font-size:14px}
 .ban .by{font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
 .ban.dark{color:#1F1A24}

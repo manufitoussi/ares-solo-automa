@@ -164,7 +164,7 @@ const fr = {
   },
 
   reveal: {
-    title: "Carte de l'automa", todo: "Ce tour, pour l'automa",
+    title: "Carte de l'automa", todo: "Ce tour, pour le joueur et l'automa",
     playerPhase: "phase du joueur", automaPhase: "phase de l'automa", and: " et ",
     /** @param {boolean} ok */
     whatI: ok => `+1 cuivre${ok ? ", puis moteur +1 pour 1 argent" : " : pas d'argent pour le moteur"}`,
