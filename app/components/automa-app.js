@@ -2,10 +2,9 @@ import { html, nothing } from "lit";
 import { LightElement } from "./light-element.js";
 import * as E from "../engine.js";
 import "./setup-screen.js";
-import "./plan-screen.js";
+import "./table-screen.js";
 import "./automa-status.js";
 import "./mars-panel.js";
-import "./reveal-screen.js";
 import "./phase-screen.js";
 import "./end-turn-screen.js";
 import "./end-screen.js";
@@ -19,6 +18,7 @@ import { t, lang, setLang } from "../i18n.js";
 /** @typedef {import("../engine.js").Param} Param */
 /** @typedef {import("../engine.js").AutomaKey} AutomaKey */
 /** @typedef {import("../engine.js").GameRecord} GameRecord */
+/** @typedef {import("../engine.js").Target} Target */
 
 const UNDO_MAX = 30;
 
@@ -46,6 +46,30 @@ export class AutomaApp extends LightElement {
     this.view = "game";
     this.history = /** @type {GameRecord[]} */ ([]);
     this.notice = /** @type {{ error: boolean, text: string } | null} */ (null);
+    /** @type {WakeLockSentinel | null} keeps the screen on during a game */
+    this.wakeLock = null;
+    this.onVisibility = () => { this.keepAwake(); };
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    document.addEventListener("visibilitychange", this.onVisibility);
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    document.removeEventListener("visibilitychange", this.onVisibility);
+  }
+
+  /* The screen stays on while a game is played (the phone lies on the table). The browser
+     releases the lock when the page is hidden: it is asked again when the page comes back.
+     Not every browser has it, and it can be refused: then the screen sleeps as usual. */
+  async keepAwake() {
+    const want = !!this.game && this.game.status === "playing" && document.visibilityState === "visible";
+    try {
+      if (!want) { await this.wakeLock?.release(); this.wakeLock = null; return; }
+      if (this.wakeLock && !this.wakeLock.released) return;
+      this.wakeLock = await navigator.wakeLock.request("screen");
+    } catch { this.wakeLock = null; }
   }
 
   /* The tag holds the start screen of index.html: clear it before the first render,
@@ -59,7 +83,7 @@ export class AutomaApp extends LightElement {
      every way the game can change (a move, undo, a new game) in one place. */
   /** @param {Map<PropertyKey, unknown>} changed */
   updated(changed) {
-    if (changed.has("game")) saveGame(this.game);
+    if (changed.has("game")) { saveGame(this.game); this.keepAwake(); }
   }
 
   /* Every change of the game goes through here. The engine returns a new state and never
@@ -179,8 +203,6 @@ export class AutomaApp extends LightElement {
     return html`
       <header class="top">
         <a class="brand" href="../" title=${T.back}><b>${T.brand}</b><span>${T.sub(E.RULES)}</span></a>
-        <button class="tb" aria-label=${T.undo} ?disabled=${!this.undo.length || this.view !== "game"} @click=${this.undoLast}>
-          <span class="full">${T.undo}</span><span class="short" aria-hidden="true">${T.undoShort}</span></button>
         <button class="tb" aria-label=${T.history} @click=${this.showHistory}>
           <span class="full">${T.history}</span><span class="short" aria-hidden="true">${T.historyShort}</span></button>
         <button class=${this.confirmNew ? "tb warn" : "tb"} @click=${this.askNew}
@@ -199,48 +221,66 @@ export class AutomaApp extends LightElement {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  /* the record goes to the history; the game keeps the score and remark, marked as saved */
-  /** @param {CustomEvent<{ playerScore: number, remark: string, player: import("../engine.js").PlayerScore }>} e */
+  /* Mars is terraformed (mode "jeu"): the last round rule, then the scoring */
+  terraformed() {
+    if (!this.game || !window.confirm(t.confirmTerraformed)) return;
+    this.play(E.terraformed(this.game));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  /* the record goes to the history; the game keeps the score and remark, marked as saved.
+     With the automa board on the table, its counted board goes into the game first. */
+  /** @param {CustomEvent<{ playerScore: number, remark: string, player: import("../engine.js").PlayerScore, automa: { nt: number, compteur: number, silver: number } | null }>} e */
   saveResult(e) {
     if (!this.game) return;
-    const { playerScore, remark, player } = e.detail;
-    addToHistory(E.gameRecord(this.game, { playerScore, remark, player }));
-    this.game = { ...this.game, playerScore, remark, playerFinal: player, saved: true };
+    const { playerScore, remark, player, automa } = e.detail;
+    const st = automa ? E.setAutomaFinal(this.game, automa) : this.game;
+    addToHistory(E.gameRecord(st, { playerScore, remark, player }));
+    this.game = { ...st, playerScore, remark, playerFinal: player, saved: true };
   }
 
   /* the screen of the current step; each one only reports what the player did */
   /** @param {Game} st */
   renderStep(st) {
     if (st.status === "ended") return html`
-      <end-screen .game=${st} @save=${this.saveResult}
+      <end-screen .game=${st} .canUndo=${this.undo.length > 0} @undo=${this.undoLast} @save=${this.saveResult}
         @resume=${() => this.play(E.resumeGame(st))}></end-screen>`;
     switch (st.step) {
-      case "plan": return html`
-        <plan-screen .game=${st}
+      /* one element for the three steps: the automa card is flipped in place and stays */
+      case "plan": case "ask": case "reveal": return html`
+        <table-screen .game=${st} .canUndo=${this.undo.length > 0} @undo=${this.undoLast}
           @pick=${(/** @type {CustomEvent<Phase>} */ e) => this.play(E.pickPhase(st, e.detail), { undoable: false })}
-          @draw=${(/** @type {CustomEvent<number | null>} */ e) => this.play(E.draw(st, { n: e.detail }))}></plan-screen>`;
-      case "reveal": return html`<reveal-screen .game=${st} @start=${() => this.play(E.startPhases(st))}></reveal-screen>`;
+          @draw=${(/** @type {CustomEvent<number | null>} */ e) => this.play(E.draw(st, { n: e.detail }))}
+          @opportunist=${(/** @type {CustomEvent<boolean>} */ e) => this.play(E.answerOpportunist(st, e.detail))}
+          @course=${(/** @type {CustomEvent<Target>} */ e) => this.play(E.answerCourse(st, e.detail))}
+          @start=${() => this.play(E.startPhases(st))}></table-screen>`;
       case "phase": return html`
-        <phase-screen .game=${st} @apply=${this.applyPhase}
+        <phase-screen .game=${st} .canUndo=${this.undo.length > 0} @undo=${this.undoLast} @apply=${this.applyPhase} @terraformed=${this.terraformed}
           @param=${(/** @type {CustomEvent<{ key: Param, delta: number }>} */ e) => this.play(E.adjustParam(st, e.detail.key, e.detail.delta))}></phase-screen>`;
       default: return html`
-        <end-turn-screen .game=${st} @next=${() => this.play(E.nextTurn(st))}
+        <end-turn-screen .game=${st} .canUndo=${this.undo.length > 0} @undo=${this.undoLast} @next=${() => this.play(E.nextTurn(st))} @terraformed=${this.terraformed}
           @end=${() => this.play(E.endGame(st))}></end-turn-screen>`;
     }
   }
 
+  /* Detailed tracking shows Mars, the curves and the log; mode "jeu" only the automa board,
+     when the app keeps it. */
   /** @param {Game} st */
   renderGame(st) {
+    const track = E.tracksMars(st);
     return html`
       <div class="layout">
         <div class="main">${this.renderStep(st)}</div>
         <aside class="side">
-          <automa-status .game=${st} @correct=${(/** @type {CustomEvent<{ key: AutomaKey, delta: number }>} */ e) => this.play(E.adjustAutoma(st, e.detail.key, e.detail.delta))}></automa-status>
-          <mars-panel .game=${st}
-            @param=${(/** @type {CustomEvent<{ key: Param, delta: number }>} */ e) => this.play(E.adjustParam(st, e.detail.key, e.detail.delta))}
-            @player-tr=${(/** @type {CustomEvent<number>} */ e) => this.play(E.adjustPlayerTR(st, e.detail))}></mars-panel>
+          ${E.hasBoard(st) ? html`
+            <automa-status .game=${st} ?curves=${track}
+              @correct=${(/** @type {CustomEvent<{ key: AutomaKey, delta: number }>} */ e) => this.play(E.adjustAutoma(st, e.detail.key, e.detail.delta))}></automa-status>` : nothing}
+          ${track ? html`
+            <mars-panel .game=${st}
+              @param=${(/** @type {CustomEvent<{ key: Param, delta: number }>} */ e) => this.play(E.adjustParam(st, e.detail.key, e.detail.delta))}
+              @player-tr=${(/** @type {CustomEvent<number>} */ e) => this.play(E.adjustPlayerTR(st, e.detail))}></mars-panel>` : nothing}
         </aside>
-        ${st.log.length ? html`
+        ${track && st.log.length ? html`
           <div class="logz"><details class="panel"><summary>${t.journal(st.log.length)}</summary>
             <ol class="log" reversed>${st.log.map(l => html`<li>${t.log(l)}</li>`)}</ol></details></div>` : nothing}
       </div>`;

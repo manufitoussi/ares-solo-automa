@@ -150,3 +150,90 @@ test("the curve records the steps of each side", () => {
   const rec = E.gameRecord(st, { player: { nt: 6, forets: 1, cartes: 2, autres: 0 } });
   assert.deepEqual(rec.joueur, { nt: 6, forets: 1, cartes: 2, autres: 0, cransParAction: [1], cransHorsAction: 0 });
 });
+
+/* ---------- Modes: "jeu" (the app replaces the printed cards) and "suivi" (detailed tracking) ---------- */
+/** @param {Partial<E.Setup>} [over] @param {Partial<E.Game>} [state] @returns {E.Game} */
+const jeu = (over = {}, state = {}) => ({ ...E.newGame({ niveau: "normal", mode: "jeu", plateau: true, ...over }, { rng: seeded(), now: 0 }), ...state });
+
+test("a game saved without a mode is a detailed tracking game with the board in the app", () => {
+  const { mode, plateau, ...old } = game();
+  assert.equal(E.isCurrent(old), true);
+  assert.equal(E.modeOf(old), "suivi");
+  assert.equal(E.tracksMars(old), true);
+  assert.equal(E.hasBoard(old), true);
+  const rec = E.gameRecord(old);
+  assert.deepEqual([rec.mode, rec.plateau, rec.version], ["suivi", true, "0.7"]);
+});
+
+test("a game in mode jeu: app deck, no Mars; detailed tracking forces the board", () => {
+  const st = jeu({ pioche: "cartes", plateau: false });
+  assert.deepEqual([st.mode, st.plateau, st.pioche], ["jeu", false, "app"]);
+  assert.equal(E.hasBoard(st), false);
+  assert.equal(E.newGame({ niveau: "normal", mode: "suivi", plateau: false }).plateau, true);
+});
+
+test("mode jeu: the Action spends every silver on the card's target, whatever Mars", () => {
+  const p = { oxy: E.MAX.oxy, temp: E.MAX.temp, oce: E.MAX.oce };
+  const st = jeu({}, { cible: "oxy", p, a: { cubes: 14, moteur: 3, compteur: 0, nt: 5, pvFin: 0 } });
+  const r = E.computePhase(st, "III");
+  assert.deepEqual([r.ch.oxy, r.ch.nt, r.a.nt, r.a.cubes], [3, 3, 8, 0]);
+  assert.deepEqual(r.p, p);
+  /* ocean: +1 copper per ocean; 9 + 1 = 10 → 6 → 2 */
+  const o = E.computePhase(jeu({}, { cible: "ocean", a: { cubes: 9, moteur: 3, compteur: 0, nt: 5, pvFin: 0 } }), "III");
+  assert.deepEqual([o.ch.oce, o.a.cubes], [2, 2]);
+});
+
+test("mode jeu: the game never ends by itself", () => {
+  let st = jeu({}, { p: { oxy: E.MAX.oxy, temp: E.MAX.temp, oce: E.MAX.oce }, cible: "ocean", playerPhase: "III", card: 6, automaPhase: "III",
+    queue: ["III"], qi: 0, step: "phase", a: { cubes: 14, moteur: 3, compteur: 2, nt: 30, pvFin: 0 } });
+  st = E.applyPhase(st);
+  assert.equal(st.status, "playing");
+  assert.equal(st.step, "endturn");
+});
+
+test("Mars is terraformed: last round rule, then the scoring; resume undoes it", () => {
+  const st = jeu({}, { step: "phase", queue: ["II", "IV"], qi: 1, a: { cubes: 12, moteur: 3, compteur: 2, nt: 20, pvFin: 0 } });
+  const end = E.terraformed(st);
+  assert.deepEqual([end.status, end.terraformed, end.a.pvFin], ["ended", true, 2]);
+  assert.deepEqual(E.scoreAutoma(end.a), { nt: 20, pv: 2, fin: 2, total: 24 });
+  assert.equal(E.terraformed(end), end);
+  const back = E.resumeGame(end);
+  assert.deepEqual([back.status, back.terraformed, back.a.pvFin], ["playing", false, 0]);
+  /* the board on the table: the player counts the silver left */
+  assert.equal(E.terraformed(jeu({ plateau: false }, { a: { cubes: 12, moteur: 3, compteur: 0, nt: 5, pvFin: 0 } })).a.pvFin, 0);
+});
+
+test("the board on the table: the phases leave the app's board alone, the final board is typed", () => {
+  let st = jeu({ plateau: false });
+  st = E.startPhases(E.draw(E.pickPhase(st, "IV"), { n: 2 }));
+  st = E.applyPhase(st);
+  assert.deepEqual(st.a, { cubes: 0, moteur: 3, compteur: 0, nt: 5, pvFin: 0 });
+  st = E.setAutomaFinal(E.terraformed(st), { nt: 21, compteur: 4, silver: 1 });
+  assert.deepEqual(E.scoreAutoma(st.a), { nt: 21, pv: 4, fin: 1, total: 26 });
+  const rec = E.gameRecord(st);
+  assert.deepEqual([rec.scoreAutoma, rec.mode, rec.plateau, rec.courbe], [26, "jeu", false, []]);
+});
+
+test("Opportuniste without the board asks whether it has a silver", () => {
+  const st = E.draw(E.pickPhase(jeu({ plateau: false }), "I"), { n: 14 });
+  assert.deepEqual([st.step, st.automaPhase, st.queue], ["ask", null, []]);
+  assert.equal(E.question(st), "opportuniste");
+  const yes = E.answerOpportunist(st, true), no = E.answerOpportunist(st, false);
+  assert.deepEqual([yes.step, yes.automaPhase, yes.cible, yes.queue], ["reveal", "III", "temp", ["I", "III"]]);
+  assert.deepEqual(yes.why, { k: "oppYes" });
+  assert.deepEqual([no.automaPhase, no.queue], ["IV", ["I", "IV"]]);
+  assert.equal(E.answerCourse(st, "oxy"), st);
+  assert.equal(JSON.stringify(st), JSON.stringify(E.draw(E.pickPhase(jeu({ plateau: false }), "I"), { n: 14 })));
+  /* with the board in the app, the app knows */
+  assert.equal(E.draw(E.pickPhase(jeu(), "I"), { n: 14 }).step, "reveal");
+});
+
+test("Course without Mars asks for the least advanced parameter", () => {
+  const st = E.draw(E.pickPhase(jeu(), "II"), { n: 15 });
+  assert.equal(E.question(st), "course");
+  const r = E.answerCourse(st, "ocean");
+  assert.deepEqual([r.step, r.automaPhase, r.cible, r.queue], ["reveal", "III", "ocean", ["II", "III"]]);
+  assert.equal(E.answerOpportunist(st, true), st);
+  /* detailed tracking: the app chooses */
+  assert.equal(E.draw(E.pickPhase(game(), "II"), { n: 15 }).step, "reveal");
+});

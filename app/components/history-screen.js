@@ -69,7 +69,7 @@ export class HistoryScreen extends LightElement {
       <tr style=${current ? "background:var(--panel2)" : ""}>
         <td>${this.actions(current ? "current" : recordKey(h), date)}</td>
         <td>${date}</td>
-        <td>${t.level[h.niveau] || h.niveau}</td>
+        <td>${t.level[h.niveau] || h.niveau} <small style="color:var(--muted)">· ${t.history.mode[h.mode ?? "suivi"]}</small></td>
         <td>${h.version || "—"}</td>
         <td class="n">${h.tours}</td>
         <td class="n">${h.scoreJoueur ?? "—"}</td>

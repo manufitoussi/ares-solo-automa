@@ -4,11 +4,30 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ares Solo Automa — a solo automa for Ares Expedition</title>
-  <meta name="description" content="Unofficial solo automa for Terraforming Mars: Ares Expedition: rulebook, print &amp; play cards and app.">
+  <meta name="description" content="Unofficial solo automa for Terraforming Mars: Ares Expedition. Play without printing anything with the app, or with the rulebook and print &amp; play cards.">
   <meta name="theme-color" content="#12202b">
+  <!-- link previews (forums, chats, social networks): absolute URLs -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Ares Solo Automa">
+  <meta property="og:title" content="Hybrid automa: play Ares Expedition solo, without printing anything">
+  <meta property="og:description" content="An unofficial solo automa for Terraforming Mars: Ares Expedition. The free web app, which works offline, draws its cards and resolves the phases with you. Rulebook and print &amp; play cards also available.">
+  <meta property="og:url" content="https://manufitoussi.github.io/ares-solo-automa/en/">
+  <meta property="og:image" content="https://manufitoussi.github.io/ares-solo-automa/assets/og-en.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Hybrid automa, an opponent that plays almost like a player: two automa cards and “Play without printing anything”. Unofficial fan-made project.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="fr_FR">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Hybrid automa: play Ares Expedition solo, without printing anything">
+  <meta name="twitter:description" content="An unofficial solo automa for Terraforming Mars: Ares Expedition. The free web app, which works offline, draws its cards and resolves the phases with you. Rulebook and print &amp; play cards also available.">
+  <meta name="twitter:image" content="https://manufitoussi.github.io/ares-solo-automa/assets/og-en.png">
+  <meta name="twitter:image:alt" content="Hybrid automa, an opponent that plays almost like a player: two automa cards and “Play without printing anything”. Unofficial fan-made project.">
   <link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
   <link rel="alternate" hreflang="fr" href="../fr/">
-  <!-- <link rel="manifest" href="../manifest.webmanifest"> -->
+  <!-- installing from the website installs the app: same manifest, so the same installed app -->
+  <link rel="manifest" href="../app/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="../app/icons/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,800&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;display=swap">
   <link rel="stylesheet" href="../assets/style.css">
@@ -35,13 +54,50 @@
         <p class="kicker">Terraforming Mars · Ares Expedition</p>
         <h1><span class="big">Automa</span> <span class="sub">hybrid</span></h1>
         <p class="tagline">An opponent that plays almost like a player.</p>
-        <p class="tags"><span class="tag teal">15 automa cards</span><span class="tag rust">Version 0.6</span></p>
-        <p class="lead">An automa to play <em>Terraforming Mars: Ares Expedition</em> solo. It builds up its engine, terraforms Mars and scores points; a small deck of 15 cards decides its phases and its targets. Everything runs on cubes: its turn needs no arithmetic and asks the player for almost no decisions.</p>
+        <p class="tags"><span class="tag teal">15 automa cards</span><span class="tag rust">Version 0.7</span></p>
+        <p class="lead">An automa to play <em>Terraforming Mars: Ares Expedition</em> solo. It builds up its engine, terraforms Mars and scores points. A small deck of 15 cards decides its phases and its targets. Everything runs on cubes: its turn needs no arithmetic and asks the player for almost no decisions.</p>
+        <div class="cta">
+          <p class="cta-title">Play without printing anything</p>
+          <a class="button primary" href="../app/">Open the app</a>
+          <p class="cta-hint">Add it to your phone's home screen: after a first visit, it works without a network.</p>
+          <p class="cta-alt">Rather play with cards? <a href="#cards">Rulebook and print &amp; play cards</a></p>
+        </div>
       </div>
       <img class="mars" src="../assets/mars.svg" alt="">
     </section>
 
-    <div class="sec"><span class="num">01</span><h2>How it plays</h2></div>
+    <div class="sec" id="app"><span class="num">01</span><h2>Play with the app</h2></div>
+    <div class="app-grid">
+      <section class="tile">
+        <h3>Play mode, round by round</h3>
+        <ol class="steps">
+          <li><b>Choose your phase</b> while seeing what it triggers for the automa.</li>
+          <li><b>The app draws the automa card</b>: its phase and its target.</li>
+          <li><b>The phases are resolved one by one</b>: what you do, then what the automa does.</li>
+          <li><b>Its board, your choice</b>: the app keeps it, or it stays on the table. Optionally, a detailed log keeps the Mars parameters and the game's curves.</li>
+        </ol>
+      </section>
+      <section class="tile">
+        <h3>What you need</h3>
+        <ul class="need">
+          <li>The base game <em>Terraforming Mars: Ares Expedition</em>.</li>
+          <li>A phone, a tablet or a computer, lying on the table.</li>
+          <li>Nothing to print: the app replaces the automa cards and the player phase cards.</li>
+          <li>In English and in French.</li>
+        </ul>
+        <a class="button" href="../app/">Open the app</a>
+      </section>
+      <section class="tile qr">
+        <img src="../assets/qr-app.svg" width="148" height="148" alt="QR code to the app">
+        <p>On a computer? Scan this code to open the app on your phone.</p>
+      </section>
+    </div>
+    <div class="note sand">
+      <p class="bt">Version 0.7</p>
+      <p>The values (5 copper for 1 silver, starting engine by level) are being tested. Game reports, shared on <a href="https://github.com/manufitoussi/ares-solo-automa/issues/new/choose">GitHub</a>, will help tune them.</p>
+    </div>
+
+    <div class="sec"><span class="num">02</span><h2>How it plays</h2></div>
     <div class="grid four">
       <section class="tile">
         <div class="illus"><automa-card number="1" size="tiny" still style="transform:rotate(-6deg) translateX(.6rem)" aria-hidden="true"><div class="mcard">
@@ -74,7 +130,7 @@
           <span class="jo"><b>Player</b> plays 1 green card.</span>
         </div></automa-card><svg class="engine" width="96" height="60" viewBox="0 0 96 60" aria-hidden="true"><rect x="6" y="44" width="11" height="10" rx="2" fill="#B84D18"/><rect x="21" y="36" width="11" height="18" rx="2" fill="#B84D18"/><rect x="36" y="28" width="11" height="26" rx="2" fill="#B84D18"/><rect x="51" y="20" width="11" height="34" rx="2" fill="#E7D5C8"/><rect x="66" y="12" width="11" height="42" rx="2" fill="#E7D5C8"/><rect x="81" y="4" width="11" height="50" rx="2" fill="#E7D5C8"/><path d="M40 8l6 6-6 6" fill="none" stroke="#12202B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <h3>An engine that speeds up</h3>
-        <p>In Development, it invests one silver in its engine; in Production, its engine pays back that many copper. Slow at first, it gains power as the game goes on, like a real player. But every engine step costs one silver that does not terraform.</p>
+        <p>In Development, it invests one silver in its engine. In Production, its engine pays back that many copper. Slow at first, it gains power as the game goes on, like a real player. But every engine step costs one silver that does not terraform.</p>
       </section>
       <section class="tile">
         <div class="illus"><automa-card number="15" size="tiny" still style="transform:rotate(-3deg)" aria-hidden="true"><div class="mcard">
@@ -129,7 +185,7 @@
       <p>Three moves, no arithmetic. From Very easy to Very hard: only its starting production changes (1 to 5).</p>
     </div>
 
-    <div class="sec"><span class="num">02</span><h2>Versus the official solo</h2></div>
+    <div class="sec"><span class="num">03</span><h2>Versus the official solo</h2></div>
     <p class="vs-lead">The base game's solo mode is a race against the clock. The hybrid automa turns it into a duel: a rival that terraforms for itself and scores points.</p>
     <div class="vs-wrap">
       <table class="vs">
@@ -144,37 +200,12 @@
       </table>
     </div>
 
-    <div class="sec"><span class="num">03</span><h2>What you need</h2></div>
-    <div class="grid">
-      <section class="tile">
-        <h3>With the printed cards</h3>
-        <ul class="need">
-          <li>The base game <em>Terraforming Mars: Ares Expedition</em>, with a player board and copper and silver cubes for the automa.</li>
-          <li><b>The 15 automa cards</b>: 3 A4 sheets, with their backs and 3 optional reference cards.</li>
-          <li><b>Optionally, the player phase cards</b>: 1 A4 sheet (5 cards), instead of the game's phase cards.</li>
-          <li>The rulebook, for the first game.</li>
-        </ul>
-      </section>
-      <section class="tile">
-        <h3>Or with the app</h3>
-        <ul class="need">
-          <li>The base game, with its usual phase cards.</li>
-          <li>A phone, a tablet or a computer: the app draws the automa cards, counts its cubes and tells what to do on its board.</li>
-          <li>Nothing to print.</li>
-        </ul>
-        <a class="button" href="../app/">Open the app</a>
-      </section>
-    </div>
-    <div class="note cyan">
-      <p class="bt">Why player phase cards?</p>
-      <p>They are optional and replace the game's phase cards. For the player, they say the same thing in our own words: the ability and the bonus. On top of that, each one shows what the automa does when the phase is revealed. During the game, everything is on the table: no need to open the rulebook.</p>
-    </div>
-
-    <div class="sec"><span class="num">04</span><h2>Rules and cards</h2></div>
+    <div class="sec" id="cards"><span class="num">04</span><h2>Rather play with cards?</h2></div>
+    <p class="sec-lead">Everything also plays without a screen: the v0.6 rulebook and cards remain valid for v0.7, the rules have not changed.</p>
     <div class="grid">
       <section class="tile">
         <h3 class="count"><span class="big">6</span> Rulebook pages</h3>
-        <p>The automa rulebook, as an A4 PDF: 6 pages of rules plus a reference page. The rules are written in French first; the English version will follow.</p>
+        <p>The automa rulebook, as an A4 PDF: 6 pages of rules plus a reference page. The rules are written in French first, and the English version will follow.</p>
         <!-- downloads rules/en -->
         <p><span class="soon">Coming soon</span></p>
         <!-- /downloads -->
@@ -187,19 +218,20 @@
         <p><span class="soon">Coming soon</span></p>
         <!-- /downloads -->
       </section>
-    </div>
 
-    <div class="sec"><span class="num">05</span><h2>The app</h2></div>
-    <div class="grid">
       <section class="tile">
-        <h3>Game assistant</h3>
-        <p>It draws the automa cards, counts its cubes, tells what to do on its board and keeps the scores. It works on a phone, a tablet or a computer. In French for now.</p>
-        <a class="button" href="../app/">Open the app</a>
+        <h3>What you need</h3>
+        <ul class="need">
+          <li>The base game, with a player board and copper and silver cubes for the automa.</li>
+          <li><b>The 15 automa cards</b>: 3 A4 sheets, with their backs and 3 optional reference cards.</li>
+          <li><b>Optionally, the player phase cards</b>: 1 A4 sheet (5 cards), instead of the game's phase cards.</li>
+          <li>The rulebook, for the first game.</li>
+        </ul>
       </section>
-      <div class="note sand" style="margin-top:0">
-        <p class="bt">Prototype v0.6</p>
-        <p>The values (5 copper for 1 silver, starting engine by level) are being tested. Game reports, shared on <a href="https://github.com/manufitoussi/ares-solo-automa/issues/new/choose">GitHub</a>, will help tune them.</p>
-      </div>
+    </div>
+    <div class="note cyan">
+      <p class="bt">Why player phase cards?</p>
+      <p>They are optional and replace the game's phase cards. For the player, they say the same thing in our own words: the ability and the bonus. On top of that, each one shows what the automa does when the phase is revealed. During the game, everything is on the table: no need to open the rulebook.</p>
     </div>
   </main>
 

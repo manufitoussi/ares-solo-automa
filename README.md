@@ -4,6 +4,8 @@
 >
 > **Unofficial fan-made project**, not affiliated with FryxGames or Stronghold Games. *Terraforming Mars* is a trademark of FryxGames. Requires the original game.
 
+**▶ Jouer sans rien imprimer : [ouvrir l'appli](https://manufitoussi.github.io/ares-solo-automa/app/)** · *Play without printing anything: [open the app](https://manufitoussi.github.io/ares-solo-automa/app/)*
+
 🌐 Site : <https://manufitoussi.github.io/ares-solo-automa/>
 
 [Français](#français) · [English](#english)
@@ -16,19 +18,19 @@ Un automa pour jouer en solo à *Terraforming Mars: Ares Expedition* contre un o
 
 Le projet a trois volets :
 
-1. **Le livret de règles**, à télécharger, en français d'abord puis en anglais.
-2. **Les cartes à imprimer** (PDF A4) : le paquet automa de 15 cartes, les aides-mémoire et les cartes de phase joueur.
-3. **Une appli web (PWA)**, *en préparation* : elle jouera un ou plusieurs automas (tirage des cartes, gains, achats, scores) et pourra, en option, tenir leur plateau. Elle fonctionnera hors ligne, sur une tablette ou un téléphone posé sur la table.
+1. **Une appli web (PWA)**, pour jouer sans rien imprimer : elle tire les cartes de l'automa, résout les phases une par une avec vous et, au choix, tient son plateau. Elle s'installe sur l'écran d'accueil et marche hors ligne après une première visite, sur une tablette ou un téléphone posé sur la table.
+2. **Le livret de règles**, à télécharger, en français d'abord puis en anglais.
+3. **Les cartes à imprimer** (PDF A4) : le paquet automa de 15 cartes, les aides-mémoire et les cartes de phase joueur.
 
 ### État
 
-Les règles (v0.6) sont en cours de conception et de test. Le livret, les cartes et le prototype de l'appli sont sur le [site](https://manufitoussi.github.io/ares-solo-automa/).
+Version 0.7. Les règles sont en cours de test. Elles n'ont pas changé depuis la v0.6, dont le livret et les cartes restent valables. L'appli, le livret et les cartes sont sur le [site](https://manufitoussi.github.io/ares-solo-automa/).
 
 ### Organisation du dépôt
 
 | Dossier | Contenu |
 | --- | --- |
-| `site/` | le site publié sur GitHub Pages (accueil, pages par langue) ; l'appli y est ajoutée au build |
+| `site/` | le site publié sur GitHub Pages (accueil, pages par langue), auquel le build ajoute l'appli |
 | `app/` | l'appli, et l'ancien prototype gardé comme référence (`app/prototype/`) |
 | `rules/<langue>/` | le livret de règles publié (PDF) |
 | `cards/<langue>/` | les cartes à imprimer publiées (PDF) |
@@ -55,19 +57,19 @@ An automa to play *Terraforming Mars: Ares Expedition* solo against one or more 
 
 The project has three parts:
 
-1. **The rulebook**, to download, in French first, then in English.
-2. **The print & play cards** (A4 PDF): the 15-card automa deck, the reference cards and the player phase cards.
-3. **A web app (PWA)**, *in preparation*: it will play one or more automas (card draws, income, purchases, scores) and may, optionally, keep track of their boards. It will work offline, on a tablet or a phone lying on the table.
+1. **A web app (PWA)**, to play without printing anything: it draws the automa's cards, resolves the phases one by one with you and, if you like, keeps its board. It can be added to the home screen and works offline after a first visit, on a tablet or a phone lying on the table.
+2. **The rulebook**, to download, in French first, then in English.
+3. **The print & play cards** (A4 PDF): the 15-card automa deck, the reference cards and the player phase cards.
 
 ### Status
 
-The rules (v0.6) are being designed and playtested. The rulebook, the cards and the app prototype are on the [website](https://manufitoussi.github.io/ares-solo-automa/).
+Version 0.7. The rules are being playtested. They have not changed since v0.6, whose rulebook and cards remain valid. The app, the rulebook and the cards are on the [website](https://manufitoussi.github.io/ares-solo-automa/).
 
 ### Repository layout
 
 | Folder | Content |
 | --- | --- |
-| `site/` | the website published on GitHub Pages (home page, pages per language); the app is added at build time |
+| `site/` | the website published on GitHub Pages (home page, pages per language), to which the build adds the app |
 | `app/` | the app, and the former prototype kept as a reference (`app/prototype/`) |
 | `rules/<language>/` | the published rulebook (PDF) |
 | `cards/<language>/` | the published print & play cards (PDF) |

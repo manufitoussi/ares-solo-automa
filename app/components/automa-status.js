@@ -13,6 +13,7 @@ import "./tr-curve.js";
 export class AutomaStatus extends LightElement {
   static properties = {
     game: { attribute: false },
+    curves: { type: Boolean },   /* the progress curves, in detailed tracking only */
     edit: { state: true }
   };
 
@@ -20,6 +21,7 @@ export class AutomaStatus extends LightElement {
     super();
     /** @type {Game} */
     this.game;
+    this.curves = false;
     this.edit = false;
   }
 
@@ -53,7 +55,7 @@ export class AutomaStatus extends LightElement {
           ${this.stat(S.counter, html`${icon("pv")}${a.compteur} <small>${S.vp(vpOf(a))}</small>`, "compteur", S.counterSub)}
           ${this.stat(S.tr, html`${icon("nt")}${a.nt}`, "nt")}
         </div>
-        ${(st.track || []).length >= 2
+        ${!this.curves ? nothing : (st.track || []).length >= 2
           ? html`<tr-curve legend .track=${st.track ?? []}></tr-curve><tr-curve legend kind="crans" .track=${st.track ?? []}></tr-curve>`
           : html`<p style="font-size:13px;color:var(--muted)">${S.curveSoon}</p>`}
       </section>`;

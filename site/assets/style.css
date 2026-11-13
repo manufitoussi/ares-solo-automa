@@ -372,3 +372,36 @@ automa-card { display: inline-block; position: relative; flex-shrink: 0; vertica
   .vs td::before { content: attr(data-l); display: block; font-family: var(--display); font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
   .vs td:last-child { border-radius: 0.5rem; margin: 0 0.6rem 0.6rem; }
 }
+
+/* call to action in the hero: the app first, the printed cards second */
+.cta { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 2px solid var(--cyan); display: flex; flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+.cta-title { font-family: var(--display); font-style: italic; font-weight: 800; font-size: 1.6rem; line-height: 1.1; text-transform: uppercase; color: var(--ink); }
+.button.primary { min-height: 3.5rem; padding-inline: 1.6rem 2.2rem; font-size: 1.45rem; background: var(--rust); color: #ffffff; }
+.button.primary::after { content: "→"; margin-left: 0.6rem; font-style: normal; }
+.cta-hint { color: var(--muted); font-size: 1rem; }
+.cta-alt { font-size: 1rem; }
+.cta-alt a { font-weight: 600; }
+
+/* "play with the app": play mode steps, what you need, and a QR code for large screens */
+.app-grid { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
+.steps { margin: 0; padding: 0; list-style: none; counter-reset: step; display: flex; flex-direction: column; gap: 0.7rem; color: var(--muted); }
+.steps li { counter-increment: step; position: relative; padding-left: 2.6rem; }
+.steps li::before { content: counter(step); position: absolute; left: 0; top: 0.1rem; width: 2rem; font-family: var(--display); font-style: italic; font-weight: 800; font-size: 1.1rem; text-align: center; color: var(--chip); background: var(--chip-bg); padding: 0.05rem 0 0.1rem; clip-path: polygon(0.35rem 0, 100% 0, 100% calc(100% - 0.35rem), calc(100% - 0.35rem) 100%, 0 100%, 0 0.35rem); }
+.steps b { color: var(--ink); }
+/* the QR code only helps to go from a computer to a phone: hidden on small screens */
+.tile.qr { display: none; }
+.tile.qr img { display: block; width: 9.25rem; height: auto; border-radius: 0.3rem; }
+.tile.qr p { text-align: left; hyphens: manual; -webkit-hyphens: manual; }
+
+@media (min-width: 720px) {
+  .app-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tile.qr { display: flex; flex-direction: row; align-items: center; gap: 1.25rem; grid-column: 1 / -1; }
+}
+
+@media (min-width: 940px) {
+  .app-grid { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) 12rem; }
+  .tile.qr { flex-direction: column; align-items: center; grid-column: auto; }
+  .tile.qr p { text-align: center; }
+}
+
+.sec-lead { font-size: 1.1rem; margin-bottom: 1rem; }
