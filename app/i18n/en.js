@@ -50,7 +50,7 @@ const en = {
     boardTable: { title: "On the table", text: "A player board for the automa; the app gives the rules to apply." },
     boardForced: "Detailed tracking keeps the automa board in the app.",
     tracking: "Detailed tracking",
-    trackingText: "To test the balance: the app also follows Mars, the player's steps and TR, and draws the curves.",
+    trackingText: "To analyse your games: the app also follows Mars, the player's steps and TR, and draws the curves.",
     setupApp: engine => `The app keeps the automa board: empty reserve, engine at ${engine}, empty VP counter, TR at 5. No corporation, no hand.`,
     deckApp: { title: "The app draws", text: "The assistant draws the automa card at random." },
     deckCards: { title: "Printed cards", text: "The player flips the printed card and enters its number." },

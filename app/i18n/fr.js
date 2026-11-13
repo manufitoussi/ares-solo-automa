@@ -58,7 +58,7 @@ const fr = {
     boardTable: { title: "Sur la table", text: "Un plateau joueur pour l'automa ; l'appli donne les règles à appliquer." },
     boardForced: "Le suivi détaillé tient le plateau de l'automa dans l'appli.",
     tracking: "Suivi détaillé",
-    trackingText: "Pour tester l'équilibrage : l'appli suit aussi Mars, les crans et le NT du joueur, et trace les courbes.",
+    trackingText: "Pour analyser vos parties : l'appli suit aussi Mars, les crans et le NT du joueur, et trace les courbes.",
     /** @param {number} engine */
     setupApp: engine => `L'appli tient le plateau de l'automa : réserve vide, moteur à ${engine}, compteur de PV vide, NT à 5. Ni corporation, ni main.`,
     deckApp: { title: "L'appli tire", text: "L'assistant tire la carte automa au hasard." },
