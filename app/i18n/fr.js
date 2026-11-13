@@ -51,8 +51,16 @@ const fr = {
 
   setup: {
     title: "Nouvelle partie",
-    intro: "L'assistant joue l'automa : il tire ses cartes, compte ses cuivres et ses argents et dit quoi faire sur son plateau. Le plateau et les cartes projet restent sur la table.",
+    intro: "L'appli joue l'automa : elle tire ses cartes et dit ce qu'il fait à chaque phase. Elle remplace les cartes automa et les cartes de phase joueur à imprimer.",
     level: "Niveau", deck: "Pioche de l'automa",
+    board: "Plateau de l'automa",
+    boardApp: { title: "Dans l'appli", text: "L'appli tient sa réserve, son moteur, son compteur de PV et son NT." },
+    boardTable: { title: "Sur la table", text: "Un plateau joueur pour l'automa ; l'appli donne les règles à appliquer." },
+    boardForced: "Le suivi détaillé tient le plateau de l'automa dans l'appli.",
+    tracking: "Suivi détaillé",
+    trackingText: "Pour tester l'équilibrage : l'appli suit aussi Mars, les crans et le NT du joueur, et trace les courbes.",
+    /** @param {number} engine */
+    setupApp: engine => `L'appli tient le plateau de l'automa : réserve vide, moteur à ${engine}, compteur de PV vide, NT à 5. Ni corporation, ni main.`,
     deckApp: { title: "L'appli tire", text: "L'assistant tire la carte automa au hasard." },
     deckCards: { title: "Cartes imprimées", text: "Le joueur retourne la carte imprimée et indique son numéro." },
     setupTitle: "Mise en place",
@@ -73,7 +81,66 @@ const fr = {
     emptyTitle: "Pioche vide", empty: "Remélanger ses 15 cartes avant de tirer.",
     /** @param {number} n @param {string} label @param {boolean} used */
     cardAria: (n, label, used) => `Carte ${n}, ${label}${used ? ", déjà sortie" : ""}`,
-    usedNote: "Les cartes déjà sorties depuis le dernier mélange sont grisées."
+    usedNote: "Les cartes déjà sorties depuis le dernier mélange sont grisées.",
+    /** @param {number} n */
+    turn: n => `Tour ${n}`,
+    pick: "Phase du joueur",
+    hint: "Toucher une phase pour voir ce qu'elle donne au joueur et à l'automa.",
+    revealed: "L'effet de l'automa ne s'applique que si la phase est révélée : choisie par le joueur ou tirée par la carte automa."
+  },
+
+  /* the player phase cards and the automa's effect, in our words */
+  info: {
+    player: "Joueur", automa: "Automa", bonus: "Bonus",
+    skill: {
+      I: "Le joueur peut jouer 1 carte Projet verte.",
+      II: "Le joueur peut jouer 1 carte bleue ou 1 carte rouge.",
+      III: "Le joueur active les effets « Action : » et les actions standards de son choix.",
+      IV: "Le joueur gagne chaleur, plantes et cartes selon ses productions, et autant de MC que sa production + NT.",
+      V: "Le joueur pioche 2 cartes et en conserve 1."
+    },
+    bonusText: {
+      I: "le coût de cette carte est réduit de 3 MC.",
+      II: "il pioche 1 carte ou joue 1 carte bleue ou rouge supplémentaire.",
+      III: "il peut activer une « Action : » une fois de plus.",
+      IV: "il gagne 4 MC.",
+      V: "il pioche 3 cartes supplémentaires et en conserve 1 de plus."
+    },
+    chosen: "c'est sa phase,", notChosen: "Pas de bonus : ce n'est pas la phase qu'il a choisie.",
+    rule: {
+      I: "+1 cuivre, puis s'il a 1 argent, il le dépense : moteur +1.",
+      II: "+1 cuivre, puis il pose 1 cube sur son compteur de PV.",
+      III: "+1 cuivre, puis il dépense tous ses argents sur la cible de sa carte : 1 cran et 1 NT par argent.",
+      IV: "+1 cuivre, puis il gagne autant de cuivres que son moteur.",
+      V: "+1 cuivre. Rien de plus."
+    },
+    now: {
+      /** @param {boolean} has @param {number} a @param {number} b */
+      I: (has, a, b) => has ? `+1 cuivre, puis il dépense 1 argent : moteur ${a} → ${b}.` : `+1 cuivre, mais pas d'argent : le moteur reste à ${a}.`,
+      /** @param {number} a @param {number} b */
+      II: (a, b) => `+1 cuivre, puis 1 cube sur son compteur de PV : ${a} → ${b}.`,
+      /** @param {number} n @param {number} a @param {number} b */
+      III: (n, a, b) => n ? `+1 cuivre, puis il a ${silver(n)} : ${steps(n)} sur sa cible, NT ${a} → ${b}.` : "+1 cuivre, mais pas d'argent : rien sur sa cible.",
+      /** @param {number} n */
+      IV: n => `+1 cuivre, puis +${copper(n)} grâce à son moteur.`,
+      V: "+1 cuivre. Rien de plus."
+    },
+    /** @param {number} n */
+    reserve: n => `Sa réserve : ${purse(n)}.`,
+    /** @param {string} name */
+    target: name => `Sa cible : ${name}.`,
+    targetRule: "Si sa cible est au maximum, il passe à la suivante : oxygène → température → océan. Un océan posé lui rend 1 cuivre.",
+    fix: "Si le plateau de l'automa ne correspond pas, le corriger avec « Corriger »."
+  },
+
+  ask: {
+    title: "Carte réactive",
+    oppQuestion: "A-t-il au moins 1 argent dans sa réserve ?",
+    oppYes: "Oui", oppYesText: "Action", oppNo: "Non", oppNoText: "Production",
+    courseQuestion: "Quel paramètre est le moins avancé ?",
+    courseHow: "Comparer la part de piste parcourue : oxygène sur 14 crans, température sur 19, océans sur 9. Il vise la part la plus faible.",
+    /** @param {string} name */
+    courseAria: name => `Le moins avancé : ${name}`
   },
 
   reveal: {
@@ -127,7 +194,6 @@ const fr = {
     target: (name, other) => ` Cible : ${name}${other ? ` au maximum, il passe à ${other}` : ""}.`,
     noBonus: " Pas de bonus pour l'automa.",
     lastRoundTitle: "Dernier tour", lastRound: "Tous les paramètres sont au maximum : chaque argent qu'il lui reste vaut 1 PV.",
-    playerBonus: "Le joueur a choisi cette phase : il prend son bonus.", playerNoBonus: "Le joueur joue aussi cette phase, sans bonus.",
     done: "C'est fait",
     /** @param {number} n */
     stepsTitle: n => `Le joueur monte ses crans · ${steps(n)} dans cette Action`,
@@ -173,11 +239,18 @@ const fr = {
     trTitle: "NT du joueur",
     /** @param {number} p @param {number} a */
     tr: (p, a) => `${p}, contre ${a} pour l'automa. Il se règle à tout moment dans le panneau Mars et sert à tracer la courbe de la partie.`,
-    next: "Tour suivant", end: "Terminer la partie"
+    next: "Tour suivant", end: "Terminer la partie",
+    terraformed: "Mars est terraformé : fin de partie"
   },
 
   end: {
     title: "Décompte final", maxed: "Tous les paramètres sont au maximum.", stopped: "Partie arrêtée avant la fin des paramètres.",
+    terraformed: "Mars est terraformé.",
+    lastRoundTable: " Dernier tour : chaque argent qui lui reste vaut 1 PV.",
+    automaCount: "Compter son plateau",
+    automaFields: { nt: "Son NT", compteur: "Cubes du compteur", argents: "Argents restants" },
+    /** @param {number} a */
+    automaScore: a => `Score de l'automa · ${a}`,
     scoring: " Le joueur compte comme d'habitude : 1 PV par point de NT, plus ses PV de forêt et de cartes. L'automa n'a pas de forêt.",
     automa: "Automa", vp: "PV", tr: "NT", silverLeft: "Argents restants au dernier tour", counter: "Compteur de PV (1 PV par cube)", total: "Total",
     /** @param {number} p @param {number} a */
@@ -201,6 +274,7 @@ const fr = {
     cols: ["Partie", "Date", "Niveau", "Règles", "Tours", "Joueur", "NT joueur", "Crans / Action", "Automa", "Gagnant", "NT par tour", "Crans", "Remarques"],
     winner: { player: "Joueur", automa: "Automa", tie: "Égalité" },
     current: "En cours", unsaved: "Terminée, non enregistrée",
+    mode: { jeu: "Jeu", suivi: "Suivi" },
     export: "Exporter", copy: "Copier", delete: "Supprimer",
     /** @param {string} action @param {string} date */
     actionAria: (action, date) => `${action} la partie du ${date}`,
@@ -242,6 +316,7 @@ const fr = {
       case "riposteFirst": return "Premier tour : Production.";
       case "oppSilver": return `Il a ${silver(w.silver)} : il dépense en Action.`;
       case "oppNone": return "Il n'a aucun argent : il produit.";
+      case "oppYes": return "Il a au moins 1 argent : il dépense en Action.";
       case "course": return `Paramètre le moins avancé : ${targetLower[w.target]}.`;
     }
   },
@@ -268,6 +343,7 @@ const fr = {
         case "lastRound": return `Dernier tour : ${silver(e.silver)} restant = ${e.silver} PV`;
         case "maxed": return "Tous les paramètres sont au maximum : fin de partie.";
         case "stopped": return "Partie terminée à la demande";
+        case "terraformed": return "Mars est terraformé : fin de partie";
         case "correct": return `Correction ${keys[e.key]} : ${e.from} → ${e.to}`;
       }
     })();

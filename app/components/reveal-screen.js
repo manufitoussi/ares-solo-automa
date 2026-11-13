@@ -1,6 +1,6 @@
 import { html } from "lit";
 import { LightElement } from "./light-element.js";
-import { COST, computePhase, effCible } from "../engine.js";
+import { COST, computePhase, effCible, hasBoard, tracksMars } from "../engine.js";
 import { t } from "../i18n.js";
 import { phaseChip } from "./ui.js";
 import "./automa-card.js";
@@ -22,6 +22,7 @@ export class RevealScreen extends LightElement {
     const st = this.game;
     const R = t.reveal;
     const who = [st.playerPhase === ph ? R.playerPhase : "", st.automaPhase === ph ? R.automaPhase : ""].filter(Boolean).join(R.and);
+    if (!hasBoard(st)) return html`<li>${phaseChip(ph)} <span style="font-size:13px;color:var(--muted)">(${who})</span><br>${t.info.rule[ph]}</li>`;
     const c = computePhase(st, ph).ch;
     const what = ph === "I" ? R.whatI(st.a.cubes + 1 >= COST) : ph === "II" ? R.whatII
       : ph === "III" ? R.whatIII(c.nt) : ph === "IV" ? R.whatIV(st.a.moteur) : R.whatV;
@@ -29,7 +30,9 @@ export class RevealScreen extends LightElement {
   }
 
   render() {
-    const st = this.game, cible = /** @type {import("../engine.js").Target} */ (st.cible), cib = effCible(cible, st.p);
+    const st = this.game, cible = /** @type {import("../engine.js").Target} */ (st.cible);
+    /* without Mars, the app does not know whether the target is maxed: it gives the rule */
+    const cib = tracksMars(st) ? effCible(cible, st.p) : cible;
     return html`
       <section class="panel">
         <h2 style="font-size:28px;font-style:italic;text-transform:uppercase">${t.reveal.title}</h2>
@@ -41,6 +44,7 @@ export class RevealScreen extends LightElement {
             <p class="note"><b>${t.reveal.targetTitle}</b>${st.queue.includes("III")
               ? t.reveal.targetAction(cib !== cible ? t.targetLower[cib] : null)
               : t.reveal.targetNoAction}</p>
+            ${st.queue.includes("III") && !tracksMars(st) ? html`<p style="font-size:14px;color:var(--muted)">${t.info.targetRule}</p>` : ""}
             <p style="font-size:14px;color:var(--muted)">${t.reveal.wait}</p>
             <div class="row"><button type="button" class="cta" @click=${() => this.emit("start")}>${t.reveal.start}</button></div>
           </div>

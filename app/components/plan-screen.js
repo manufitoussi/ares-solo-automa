@@ -3,6 +3,7 @@ import { LightElement } from "./light-element.js";
 import { ORDER, CARDS, canPick } from "../engine.js";
 import { t } from "../i18n.js";
 import { PHASE_COLOR, REACT_COLOR } from "./ui.js";
+import { playerBlock, automaBlock } from "./phase-info.js";
 /** @typedef {import("../engine.js").Game} Game */
 
 /** @typedef {import("../engine.js").Phase} Phase */
@@ -13,7 +14,8 @@ const cardLabel = cd => cd.react ?? `${t.phaseShort[/** @type {Phase} */ (cd.ph)
 /** @param {number} n */
 const pad = n => String(n).padStart(2, "0");
 
-/* Planning: the player picks their phase, then the automa card is drawn.
+/* Planning: the player picks their phase, seeing what it gives them and the automa (under the
+   buttons, for the selected phase), then the automa card is drawn.
    It only displays the game it receives and reports `pick` (a phase) and `draw`
    (a card number with the printed cards, null when the app draws). */
 export class PlanScreen extends LightElement {
@@ -62,9 +64,16 @@ export class PlanScreen extends LightElement {
     const st = this.game, n = st.deck.length;
     return html`
       <section class="panel">
-        <h2 style="font-size:28px;font-style:italic;text-transform:uppercase">${t.plan.title}</h2>
+        <div class="row" style="justify-content:space-between">
+          <h2 style="font-size:28px;font-style:italic;text-transform:uppercase">${t.plan.title}</h2>
+          <span class="lab">${t.plan.turn(st.turn)}</span>
+        </div>
         <p>${t.plan.intro(st.lastPlayerPhase ? t.phase[st.lastPlayerPhase] : null)}</p>
         <div class="phases">${ORDER.map(ph => this.phaseButton(ph))}</div>
+        ${st.playerPhase ? html`
+          <div class="side-blocks">${playerBlock(st.playerPhase, true)}${automaBlock(st, st.playerPhase)}</div>
+          <p class="muted small">${t.plan.revealed}</p>`
+        : html`<p class="muted small">${t.plan.hint}</p>`}
         ${st.pioche === "cartes" ? this.printedCards() : html`
           <div class="row">
             <button type="button" class="cta" ?disabled=${!st.playerPhase} @click=${() => this.emit("draw", null)}>${t.plan.draw}</button>
