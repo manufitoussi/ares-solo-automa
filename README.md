@@ -4,9 +4,9 @@
 >
 > **Unofficial fan-made project**, not affiliated with FryxGames or Stronghold Games. *Terraforming Mars* is a trademark of FryxGames. Requires the original game.
 
-**▶ Jouer sans rien imprimer : [ouvrir l'appli](https://manufitoussi.github.io/ares-solo-automa/app/)** · *Play without printing anything: [open the app](https://manufitoussi.github.io/ares-solo-automa/app/)*
+**▶ Jouer sans rien imprimer : [ouvrir l'appli](https://ares-automa.softef.com/app/)** · *Play without printing anything: [open the app](https://ares-automa.softef.com/app/)*
 
-🌐 Site : <https://manufitoussi.github.io/ares-solo-automa/>
+🌐 Site : <https://ares-automa.softef.com/>
 
 [Français](#français) · [English](#english)
 
@@ -24,7 +24,7 @@ Le projet a trois volets :
 
 ### État
 
-Version 0.7. Les règles sont en cours de test. Elles n'ont pas changé depuis la v0.6, dont le livret et les cartes restent valables. L'appli, le livret et les cartes sont sur le [site](https://manufitoussi.github.io/ares-solo-automa/).
+Version 0.7. Les règles sont en cours de test. Elles n'ont pas changé depuis la v0.6, dont le livret et les cartes restent valables. L'appli, le livret et les cartes sont sur le [site](https://ares-automa.softef.com/).
 
 ### Organisation du dépôt
 
@@ -63,7 +63,7 @@ The project has three parts:
 
 ### Status
 
-Version 0.7. The rules are being playtested. They have not changed since v0.6, whose rulebook and cards remain valid. The app, the rulebook and the cards are on the [website](https://manufitoussi.github.io/ares-solo-automa/).
+Version 0.7. The rules are being playtested. They have not changed since v0.6, whose rulebook and cards remain valid. The app, the rulebook and the cards are on the [website](https://ares-automa.softef.com/).
 
 ### Repository layout
 
