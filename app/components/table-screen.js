@@ -2,7 +2,7 @@ import { html, nothing, styleMap } from "lit";
 import { LightElement } from "./light-element.js";
 import { ORDER, CARDS, TARGETS, COST, canPick, computePhase, effCible, hasBoard, tracksMars, question } from "../engine.js";
 import { t } from "../i18n.js";
-import { PHASE_COLOR, PHASE_TINT, REACT_COLOR, phaseChip, icon, undoButton } from "./ui.js";
+import { PHASE_COLOR, REACT_COLOR, icon, undoButton } from "./ui.js";
 import { playerBlock, automaBlock, playerCard } from "./phase-info.js";
 import "./automa-card.js";
 /** @typedef {import("../engine.js").Game} Game */
@@ -128,15 +128,17 @@ export class TableScreen extends LightElement {
   /** @param {Phase} ph */
   phaseLine(ph) {
     const st = this.game, R = t.reveal;
-    const who = [st.playerPhase === ph ? R.playerPhase : "", st.automaPhase === ph ? R.automaPhase : ""].filter(Boolean).join(R.and);
     const c = hasBoard(st) ? computePhase(st, ph).ch : null;
     const what = !c ? t.info.rule[ph] : `${ph === "I" ? R.whatI(st.a.cubes + 1 >= COST) : ph === "II" ? R.whatII
       : ph === "III" ? R.whatIII(c.nt) : ph === "IV" ? R.whatIV(st.a.moteur) : R.whatV}.`;
-    /* both sides of the phase: the player's skill (and bonus when they chose it), then the automa */
-    return html`<li>${phaseChip(ph)} <span class="muted small">(${who})</span>
-      <div class="who-line"><b>${t.info.player}</b> ${t.info.skill[ph]}${st.playerPhase === ph
-        ? html` <span class="bonus-inline"><b>${t.info.bonus}</b>${t.info.bonusText[ph]}</span>` : ""}</div>
-      <div class="who-line"><b>${t.info.automa}</b> ${what}</div></li>`;
+    /* as on the phase screen: the banner (who chose it), then the player's and the automa's side */
+    const C = PHASE_COLOR[ph], P = t.phaseScreen;
+    return html`
+      <div class="ban ${C.dark ? "dark" : ""}" style=${styleMap({ background: C.col })}>
+        <span class="r">${ph}</span><div><span class="by">${P.chosenBy(st.playerPhase === ph, st.automaPhase === ph)}</span><span class="nm">${t.phase[ph]}</span><span class="tg">${P.tag[ph]}</span></div>
+      </div>
+      <div class="side-blocks">${playerBlock(ph, st.playerPhase === ph)}
+        <div class="side-block automa"><span class="lab">${t.info.automa}</span><p>${what}</p></div></div>`;
   }
 
   reveal() {
@@ -144,8 +146,8 @@ export class TableScreen extends LightElement {
     /* without Mars, the app does not know whether the target is maxed: it gives the rule */
     const cib = tracksMars(st) ? effCible(cible, st.p) : cible;
     return html`
-      <div class="todo"><span class="lab">${t.reveal.todo}</span>
-        <ul style="list-style:none;padding-left:0;gap:10px">${st.queue.map(ph => this.phaseLine(ph))}</ul></div>
+      <span class="lab">${t.reveal.todo}</span>
+      ${st.queue.map(ph => this.phaseLine(ph))}
       <p class="note"><b>${t.reveal.targetTitle}</b>${st.queue.includes("III")
         ? t.reveal.targetAction(cib !== cible ? t.targetLower[cib] : null)
         : t.reveal.targetNoAction}</p>
