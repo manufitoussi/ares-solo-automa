@@ -14,6 +14,21 @@
   if (!id) return;
   /* app/analytics.js only keeps events for later where they can be sent */
   window.automaStats = true;
+
+  /* Campaign parameters (?utm_source=qr on the QR code, on links posted in forums) leave the
+     address bar before Umami loads: a bookmark or a shared link would count again as coming
+     from the campaign. The first page view still gives Umami the address it came with. */
+  var arrival = new URL(location.href);
+  var clean = new URL(location.href);
+  Array.from(clean.searchParams.keys()).forEach(function (k) { if (/^utm_/.test(k)) clean.searchParams.delete(k); });
+  if (clean.search !== arrival.search) {
+    try { history.replaceState(history.state, "", clean.pathname + clean.search + clean.hash); } catch (e) { /* keeps them */ }
+  }
+  var firstView = arrival.href;
+  window.automaStatsBeforeSend = function (type, payload) {
+    if (firstView && type === "event" && !payload.name) { payload.url = firstView; firstView = ""; }
+    return payload;
+  };
   function load() {
     if (window.umami || document.getElementById("umami-tracker")) return;
     var s = document.createElement("script");
@@ -21,6 +36,7 @@
     s.src = "https://stats.softef.com/s.js";
     s.setAttribute("data-website-id", id);
     s.setAttribute("data-do-not-track", "true");
+    s.setAttribute("data-before-send", "automaStatsBeforeSend");
     s.setAttribute("data-errors", "true");
     s.setAttribute("data-environment", location.hostname === "ares-automa.softef.com" ? "production" : "development");
     s.onload = function () { window.dispatchEvent(new Event("automa-stats-ready")); };

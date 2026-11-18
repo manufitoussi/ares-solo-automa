@@ -28,7 +28,7 @@ Pour savoir si l'automa est joué, comment, et surtout s'il est bien équilibré
 
 ## Ce qu'Umami compte de lui-même
 
-À chaque page vue : l'adresse de la page (avec ses paramètres, par exemple `?utm_source=qr` pour le QR code du site), la page d'où vous venez, le pays, la langue du navigateur, la taille de l'écran, le type d'appareil, le navigateur et le système. Umami reconnaît un même visiteur sans cookie, avec une empreinte calculée à partir de l'adresse IP et du navigateur, brouillée avec une valeur qui change régulièrement : elle ne permet pas de remonter jusqu'à vous.
+À chaque page vue : l'adresse de la page (avec ses paramètres, par exemple `?utm_source=qr` pour le QR code du site : ces paramètres `utm_` sont envoyés avec la première page vue, puis retirés de la barre d'adresse pour qu'un favori ou un lien partagé ne les répète pas), la page d'où vous venez, le pays, la langue du navigateur, la taille de l'écran, le type d'appareil, le navigateur et le système. Umami reconnaît un même visiteur sans cookie, avec une empreinte calculée à partir de l'adresse IP et du navigateur, brouillée avec une valeur qui change régulièrement : elle ne permet pas de remonter jusqu'à vous.
 
 **Erreurs** : si l'appli plante, Umami reçoit le message d'erreur technique et l'endroit du code concerné, pour corriger les bugs que personne ne signale.
 
