@@ -30,4 +30,12 @@
   }
   load();
   window.addEventListener("online", load);
+
+  /* PDF downloads (links written by the site build). Not with data-umami-event: Umami would
+     cancel the click and follow the link itself, which loses its "download" attribute, so the
+     PDF would open in the tab. A download stays on the page: the event has time to leave. */
+  document.addEventListener("click", function (e) {
+    var a = e.target instanceof Element ? e.target.closest("a[data-stats-download]") : null;
+    if (a && window.umami) window.umami.track("download", { file: a.getAttribute("data-stats-download") || "" });
+  }, true);
 })();
