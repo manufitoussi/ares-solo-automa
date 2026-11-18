@@ -95,7 +95,7 @@ for (const page of await listHtml(out)) {
     const lang = source.split('/')[1];
     const items = files.map(({ name, size }) => {
       const href = `${prefix}downloads/${source}/${encodeURIComponent(name)}`;
-      return `<li><a href="${href}" download>${escapeHtml(name)}</a> <span class="size">${formatSize(size, lang)}</span></li>`;
+      return `<li><a href="${href}" download data-umami-event="download" data-umami-event-file="${escapeHtml(source)}/${escapeHtml(name)}">${escapeHtml(name)}</a> <span class="size">${formatSize(size, lang)}</span></li>`;
     });
     return `<ul class="files">\n${items.join('\n')}\n</ul>`;
   });
