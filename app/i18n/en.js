@@ -155,6 +155,8 @@ const en = {
     start: "Resolve the phases"
   },
 
+  statsOff: "Statistics turned off on this device. Your visits will no longer be counted. To turn them back on, open the app with ?track at the end of the address.",
+  statsOn: "Statistics turned back on on this device.",
   confirmTerraformed: "Is Mars terraformed? The game stops here: each silver the automa has left is worth 1 VP, then comes the scoring.",
   phaseScreen: {
     title: "Resolution",

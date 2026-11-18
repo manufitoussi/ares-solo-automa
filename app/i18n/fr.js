@@ -182,6 +182,8 @@ const fr = {
     start: "Résoudre les phases"
   },
 
+  statsOff: "Statistiques désactivées sur cet appareil. Vos visites ne seront plus comptées. Pour les réactiver, ouvrez l'appli avec ?track à la fin de l'adresse.",
+  statsOn: "Statistiques réactivées sur cet appareil.",
   confirmTerraformed: "Mars est terraformé ? La partie s'arrête ici : chaque argent restant de l'automa vaut 1 PV, puis on passe au décompte.",
   phaseScreen: {
     title: "Résolution",
