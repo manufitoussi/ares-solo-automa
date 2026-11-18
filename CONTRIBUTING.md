@@ -46,6 +46,8 @@ npm test                           # types, templates et tests du moteur
 python3 -m http.server             # puis http://localhost:8000/app/ pour travailler sur l'appli
 ```
 
+En local (`localhost`), les statistiques vont dans un site Umami de test, séparé de celui du site publié : on y vérifie les événements (onglet Events ou vue Realtime). Tout ce qui est envoyé est listé dans [STATISTIQUES.md](STATISTIQUES.md).
+
 ## Branches et commits
 
 - `main` est la branche des versions publiées : chaque push y déploie le site. `develop` est la branche de stabilisation, où arrivent les changements.

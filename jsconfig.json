@@ -15,7 +15,7 @@
     "skipLibCheck": true,
     "paths": { "lit": ["./app/vendor/lit-all.min.d.ts"] }
   },
-  "include": ["app/**/*.js"],
+  "include": ["app/**/*.js", "app/globals.d.ts"],
   // sw.js runs in a service worker, not in a page: the DOM types do not apply to it
   "exclude": ["app/vendor/*.js", "app/sw.js"]
 }
