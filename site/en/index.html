@@ -34,8 +34,8 @@
   <!-- the automa cards are drawn by the app's component; without JS, the hand-drawn card inside each one shows -->
   <script type="importmap">{ "imports": { "lit": "../app/vendor/lit-all.min.js" } }</script>
   <script type="module" src="../app/components/automa-card.js"></script>
-  <!-- anonymous visit statistics, no cookies: only on the published domain -->
-  <script defer src="https://stats.softef.com/s.js" data-website-id="4487b560-1c83-43eb-a099-51a68068405e" data-domains="ares-automa.softef.com" data-do-not-track="true"></script>
+  <!-- anonymous visit statistics, no cookies: what is sent is in STATISTIQUES.md -->
+  <script src="../app/stats.js"></script>
 </head>
 <body>
   <header class="top">
@@ -43,7 +43,7 @@
       <a class="brand" href="./"><img src="../assets/icon.svg" alt=""><span><b>Ares Solo Automa</b><small>Ares Expedition · solo</small></span></a>
       <nav aria-label="Language">
         <ul class="lang">
-          <li><a href="../fr/" hreflang="fr" lang="fr">FR</a></li>
+          <li><a href="../fr/" hreflang="fr" data-umami-event="switch-lang" data-umami-event-from="site" data-umami-event-to="fr" lang="fr">FR</a></li>
           <li><a href="./" hreflang="en" aria-current="page">EN</a></li>
         </ul>
       </nav>
@@ -60,7 +60,7 @@
         <p class="lead">An automa to play <em>Terraforming Mars: Ares Expedition</em> solo. It builds up its engine, terraforms Mars and scores points. A small deck of 15 cards decides its phases and its targets. Everything runs on cubes: its turn needs no arithmetic and asks the player for almost no decisions.</p>
         <div class="cta">
           <p class="cta-title">Play without printing anything</p>
-          <a class="button primary" href="../app/">Open the app</a>
+          <a class="button primary" href="../app/" data-umami-event="open-app" data-umami-event-from="hero">Open the app</a>
           <p class="cta-hint">Add it to your phone's home screen: after a first visit, it works without a network.</p>
           <p class="cta-alt">Rather play with cards? <a href="#cards">Rulebook and print &amp; play cards</a></p>
         </div>
@@ -87,7 +87,7 @@
           <li>Nothing to print: the app replaces the automa cards and the player phase cards.</li>
           <li>In English and in French.</li>
         </ul>
-        <a class="button" href="../app/">Open the app</a>
+        <a class="button" href="../app/" data-umami-event="open-app" data-umami-event-from="app-tile">Open the app</a>
       </section>
       <section class="tile qr">
         <img src="../assets/qr-app.svg" width="148" height="148" alt="QR code to the app">
@@ -96,7 +96,7 @@
     </div>
     <div class="note sand">
       <p class="bt">Version 0.7</p>
-      <p>The values (5 copper for 1 silver, starting engine by level) are being tested. Game reports, shared on <a href="https://github.com/manufitoussi/ares-solo-automa/issues/new/choose">GitHub</a>, will help tune them.</p>
+      <p>The values (5 copper for 1 silver, starting engine by level) are being tested. Game reports, shared on <a href="https://github.com/manufitoussi/ares-solo-automa/issues/new/choose" data-umami-event="github" data-umami-event-to="report">GitHub</a>, will help tune them.</p>
     </div>
 
     <div class="sec"><span class="num">02</span><h2>How it plays</h2></div>
@@ -241,8 +241,8 @@
     <div class="wrap">
       <p class="ft">Terraforming Mars · Ares Expedition</p>
       <p>Unofficial fan-made project, not affiliated with FryxGames or Stronghold Games. Terraforming Mars is a trademark of FryxGames. Requires the original game.</p>
-      <p>Anonymous visit statistics, without cookies.</p>
-      <p>Rules and cards under the CC BY-NC-SA 4.0 licence · <a href="https://github.com/manufitoussi/ares-solo-automa">GitHub</a></p>
+      <p><a href="https://github.com/manufitoussi/ares-solo-automa/blob/main/STATISTIQUES.md">Anonymous visit statistics</a>, without cookies (details in French).</p>
+      <p>Rules and cards under the CC BY-NC-SA 4.0 licence · <a href="https://github.com/manufitoussi/ares-solo-automa" data-umami-event="github" data-umami-event-to="repo">GitHub</a></p>
     </div>
   </footer>
   <script>
