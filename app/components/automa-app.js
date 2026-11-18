@@ -12,6 +12,7 @@ import "./history-screen.js";
 import { loadGame, saveGame, addToHistory, loadHistory, saveHistory } from "../storage.js";
 import { exportData, parseImport, mergeHistory, recordKey, ImportError } from "../transfer.js";
 import { t, lang, setLang } from "../i18n.js";
+import { track } from "../analytics.js";
 /** @typedef {import("../engine.js").Game} Game */
 /** @typedef {import("../engine.js").Setup} Setup */
 /** @typedef {import("../engine.js").Phase} Phase */
@@ -93,6 +94,8 @@ export class AutomaApp extends LightElement {
   play(next, { undoable = true } = {}) {
     if (next === this.game) return;
     if (undoable && this.game) this.undo = [...this.undo, this.game].slice(-UNDO_MAX);
+    if (next.status === "ended" && this.game?.status !== "ended")
+      track("game-end", { mode: E.modeOf(next), level: next.niveau, turns: next.turn });
     this.game = next;
   }
 
@@ -100,6 +103,7 @@ export class AutomaApp extends LightElement {
   begin(e) {
     this.undo = [];
     this.game = E.newGame(e.detail);
+    track("game-start", { mode: E.modeOf(this.game), level: this.game.niveau, lang });
   }
 
   undoLast() {
