@@ -12,6 +12,7 @@ import "./history-screen.js";
 import { loadGame, saveGame, addToHistory, loadHistory, saveHistory } from "../storage.js";
 import { exportData, parseImport, mergeHistory, recordKey, ImportError } from "../transfer.js";
 import { t, lang, setLang } from "../i18n.js";
+import { track, countUndo, undosOf } from "../analytics.js";
 /** @typedef {import("../engine.js").Game} Game */
 /** @typedef {import("../engine.js").Setup} Setup */
 /** @typedef {import("../engine.js").Phase} Phase */
@@ -19,6 +20,16 @@ import { t, lang, setLang } from "../i18n.js";
 /** @typedef {import("../engine.js").AutomaKey} AutomaKey */
 /** @typedef {import("../engine.js").GameRecord} GameRecord */
 /** @typedef {import("../engine.js").Target} Target */
+
+/** What the statistics say of a game: its shape only (see STATISTIQUES.md) @param {Game} st */
+const shape = st => ({
+  mode: E.modeOf(st), level: st.niveau, board: E.hasBoard(st) ? "app" : "table", deck: st.pioche, rules: E.RULES
+});
+/** how a game ended @param {Game} st */
+const endOf = st => st.terraformed ? "terraformed"
+  : st.log.some(l => typeof l === "object" && l.k === "maxed") ? "maxed" : "stopped";
+/** @param {number} player @param {number} automa */
+const outcome = (player, automa) => player > automa ? "win" : player < automa ? "loss" : "tie";
 
 const UNDO_MAX = 30;
 
@@ -54,6 +65,9 @@ export class AutomaApp extends LightElement {
   connectedCallback() {
     super.connectedCallback();
     document.addEventListener("visibilitychange", this.onVisibility);
+    const installed = window.matchMedia("(display-mode: standalone)").matches
+      || /** @type {Navigator & { standalone?: boolean }} */ (navigator).standalone === true;
+    track("app-open", { display: installed ? "installed" : "browser", game: this.game ? this.game.status : "none", lang });
   }
   disconnectedCallback() {
     super.disconnectedCallback();
@@ -93,6 +107,8 @@ export class AutomaApp extends LightElement {
   play(next, { undoable = true } = {}) {
     if (next === this.game) return;
     if (undoable && this.game) this.undo = [...this.undo, this.game].slice(-UNDO_MAX);
+    if (next.status === "ended" && this.game?.status !== "ended")
+      track("game-end", { ...shape(next), turns: next.turn, end: endOf(next), undos: undosOf(next.createdAt) });
     this.game = next;
   }
 
@@ -100,11 +116,13 @@ export class AutomaApp extends LightElement {
   begin(e) {
     this.undo = [];
     this.game = E.newGame(e.detail);
+    track("game-start", { ...shape(this.game), lang });
   }
 
   undoLast() {
     const last = this.undo.at(-1);
     if (!last) return;
+    if (this.game) countUndo(this.game.createdAt);
     this.game = last;
     this.undo = this.undo.slice(0, -1);
   }
@@ -117,12 +135,19 @@ export class AutomaApp extends LightElement {
       return;
     }
     this.confirmNew = false;
+    if (this.game) this.abandoned(this.game);
     this.game = null;
     this.undo = [];
     this.view = "game";
   }
 
+  /** a game left before its end, for the statistics @param {Game} st */
+  abandoned(st) {
+    if (st.status !== "ended") track("game-abandon", { ...shape(st), turn: st.turn, undos: undosOf(st.createdAt) });
+  }
+
   showHistory() {
+    track("history-open");
     this.history = loadHistory();
     this.notice = null;
     this.view = "history";
@@ -136,10 +161,14 @@ export class AutomaApp extends LightElement {
     return exportData({ game: null, history: loadHistory().filter(r => recordKey(r) === which) });
   }
 
+  /** what a backup holds, for the statistics @param {import("./history-screen.js").Which} which */
+  whatOf(which) { return which === "all" || which === "current" ? which : "game"; }
+
   /** as a file to save @param {CustomEvent<import("./history-screen.js").Which>} e */
   exportFile(e) {
     const data = this.backupOf(e.detail);
     this.notice = null;
+    track("export", { what: this.whatOf(e.detail), how: "file" });
     const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
     const a = Object.assign(document.createElement("a"), { href: url, download: t.transfer.fileName(data.exportedAt.slice(0, 10), e.detail === "all") });
     document.body.append(a);
@@ -154,6 +183,7 @@ export class AutomaApp extends LightElement {
     try {
       await navigator.clipboard.writeText(JSON.stringify(this.backupOf(e.detail)));
       this.notice = { error: false, text: t.transfer.copied };
+      track("export", { what: this.whatOf(e.detail), how: "copy" });
     } catch {
       this.notice = { error: true, text: t.transfer.copyFailed };
     }
@@ -165,6 +195,7 @@ export class AutomaApp extends LightElement {
     const H = t.history;
     if (e.detail === "current") {
       if (!window.confirm(H.confirmAbandon)) return;
+      if (this.game) this.abandoned(this.game);
       this.game = null;
       this.undo = [];
     } else {
@@ -176,13 +207,13 @@ export class AutomaApp extends LightElement {
   }
 
   /** @param {CustomEvent<File>} e */
-  async importFile(e) { this.importText(await e.detail.text()); }
+  async importFile(e) { this.importText(await e.detail.text(), "file"); }
   /** @param {CustomEvent<string>} e */
-  importPasted(e) { this.importText(e.detail); }
+  importPasted(e) { this.importText(e.detail, "paste"); }
 
   /** the history of the backup is added; its game replaces the one in progress, once confirmed
-      @param {string} text */
-  importText(text) {
+      @param {string} text @param {"file" | "paste"} how */
+  importText(text, how) {
     const T = t.transfer;
     try {
       const data = parseImport(text);
@@ -193,8 +224,10 @@ export class AutomaApp extends LightElement {
       const replace = !!data.game && (!busy || window.confirm(T.replace));
       if (replace && data.game) { this.game = data.game; this.undo = []; }
       this.notice = { error: false, text: T.done(replace, added) + (data.game && !replace ? ` ${T.kept}` : "") };
+      track("import", { how, games: added, replaced: replace });
     } catch (err) {
       this.notice = { error: true, text: err instanceof ImportError ? T.error[err.code] : T.error.json };
+      track("import-error", { how, code: err instanceof ImportError ? err.code : "json" });
     }
   }
 
@@ -211,8 +244,14 @@ export class AutomaApp extends LightElement {
             ? html`<span class="full">${T.confirm}</span><span class="short" aria-hidden="true">${T.confirmShort}</span>`
             : html`<span class="full">${T.newGame}</span><span class="short" aria-hidden="true">${T.newShort}</span>`}
         </button>
-        <button class="tb" lang=${lang === "fr" ? "en" : "fr"} aria-label=${T.otherAria} @click=${() => setLang(lang === "fr" ? "en" : "fr")}>${T.other}</button>
+        <button class="tb" lang=${lang === "fr" ? "en" : "fr"} aria-label=${T.otherAria} @click=${this.switchLang}>${T.other}</button>
       </header>`;
+  }
+
+  switchLang() {
+    const to = lang === "fr" ? "en" : "fr";
+    track("switch-lang", { from: "app", to });
+    setLang(to);
   }
 
   applyPhase() {
@@ -235,7 +274,13 @@ export class AutomaApp extends LightElement {
     if (!this.game) return;
     const { playerScore, remark, player, automa } = e.detail;
     const st = automa ? E.setAutomaFinal(this.game, automa) : this.game;
-    addToHistory(E.gameRecord(st, { playerScore, remark, player }));
+    const record = E.gameRecord(st, { playerScore, remark, player });
+    addToHistory(record);
+    if (!this.game.saved) track("game-result", {
+      ...shape(st), turns: record.tours, end: endOf(st), undos: undosOf(st.createdAt),
+      player: playerScore, automa: record.scoreAutoma, diff: playerScore - record.scoreAutoma,
+      result: outcome(playerScore, record.scoreAutoma)
+    });
     this.game = { ...st, playerScore, remark, playerFinal: player, saved: true };
   }
 

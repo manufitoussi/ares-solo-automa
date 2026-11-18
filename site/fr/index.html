@@ -34,6 +34,8 @@
   <!-- the automa cards are drawn by the app's component; without JS, the hand-drawn card inside each one shows -->
   <script type="importmap">{ "imports": { "lit": "../app/vendor/lit-all.min.js" } }</script>
   <script type="module" src="../app/components/automa-card.js"></script>
+  <!-- anonymous visit statistics, no cookies: what is sent is in STATISTIQUES.md -->
+  <script src="../app/stats.js"></script>
 </head>
 <body>
   <header class="top">
@@ -42,7 +44,7 @@
       <nav aria-label="Langue">
         <ul class="lang">
           <li><a href="./" hreflang="fr" aria-current="page">FR</a></li>
-          <li><a href="../en/" hreflang="en" lang="en">EN</a></li>
+          <li><a href="../en/" hreflang="en" data-umami-event="switch-lang" data-umami-event-from="site" data-umami-event-to="en" lang="en">EN</a></li>
         </ul>
       </nav>
     </div>
@@ -58,7 +60,7 @@
         <p class="lead">Un automa pour jouer en solo à <em>Terraforming Mars: Ares Expedition</em>. Il fait monter son moteur, terraforme Mars et marque des points. Un petit paquet de 15 cartes décide de ses phases et de ses cibles. Tout passe par des cubes : son tour se joue sans calcul et ne demande presque aucune décision au joueur.</p>
         <div class="cta">
           <p class="cta-title">Jouer sans rien imprimer</p>
-          <a class="button primary" href="../app/">Ouvrir l'appli</a>
+          <a class="button primary" href="../app/" data-umami-event="open-app" data-umami-event-from="hero">Ouvrir l'appli</a>
           <p class="cta-hint">Ajoutez-la à l'écran d'accueil de votre téléphone&nbsp;: après une première visite, elle marche sans réseau.</p>
           <p class="cta-alt">Vous préférez des cartes&nbsp;? <a href="#cartes">Livret et cartes à imprimer</a></p>
         </div>
@@ -85,7 +87,7 @@
           <li>Rien à imprimer&nbsp;: l'appli remplace les cartes automa et les cartes de phase joueur.</li>
           <li>En français et en anglais.</li>
         </ul>
-        <a class="button" href="../app/">Ouvrir l'appli</a>
+        <a class="button" href="../app/" data-umami-event="open-app" data-umami-event-from="app-tile">Ouvrir l'appli</a>
       </section>
       <section class="tile qr">
         <img src="../assets/qr-app.svg" width="148" height="148" alt="QR code vers l'appli">
@@ -94,7 +96,7 @@
     </div>
     <div class="note sand">
       <p class="bt">Version 0.7</p>
-      <p>Les valeurs (5 cuivres pour 1 argent, moteur de départ selon le niveau) sont en test. Les comptes rendus de parties, partagés sur <a href="https://github.com/manufitoussi/ares-solo-automa/issues/new/choose">GitHub</a>, serviront à les ajuster.</p>
+      <p>Les valeurs (5 cuivres pour 1 argent, moteur de départ selon le niveau) sont en test. Les comptes rendus de parties, partagés sur <a href="https://github.com/manufitoussi/ares-solo-automa/issues/new/choose" data-umami-event="github" data-umami-event-to="report">GitHub</a>, serviront à les ajuster.</p>
     </div>
 
     <div class="sec"><span class="num">02</span><h2>Comment il joue</h2></div>
@@ -239,7 +241,8 @@
     <div class="wrap">
       <p class="ft">Terraforming Mars · Expédition Arès</p>
       <p>Projet de fans non officiel, non affilié à FryxGames ni à Stronghold Games. Terraforming Mars est une marque de FryxGames. Nécessite le jeu original.</p>
-      <p>Règles et cartes sous licence CC BY-NC-SA 4.0 · <a href="https://github.com/manufitoussi/ares-solo-automa">GitHub</a></p>
+      <p><a href="https://github.com/manufitoussi/ares-solo-automa/blob/main/STATISTIQUES.md">Statistiques de visite anonymes</a>, sans cookies.</p>
+      <p>Règles et cartes sous licence CC BY-NC-SA 4.0 · <a href="https://github.com/manufitoussi/ares-solo-automa" data-umami-event="github" data-umami-event-to="repo">GitHub</a></p>
     </div>
   </footer>
   <script>

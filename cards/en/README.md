@@ -1,5 +1,5 @@
 # Print & play cards — English
 
-**À traduire / To be translated.** A4 PDF files: 15-card automa deck, reference cards, solo phase cards.
+A4 PDF files to print: the 15-card automa deck, reference cards, player phase cards. These are the published versions. Their sources are not in this repository.
 
-The PDF files placed here are copied to `downloads/cards/en/` on the website at each deployment.
+The PDF files in this folder are copied to `downloads/cards/en/` on the website at each deployment, under the name they have here.

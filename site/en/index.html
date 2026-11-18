@@ -34,6 +34,8 @@
   <!-- the automa cards are drawn by the app's component; without JS, the hand-drawn card inside each one shows -->
   <script type="importmap">{ "imports": { "lit": "../app/vendor/lit-all.min.js" } }</script>
   <script type="module" src="../app/components/automa-card.js"></script>
+  <!-- anonymous visit statistics, no cookies: what is sent is in STATISTIQUES.md -->
+  <script src="../app/stats.js"></script>
 </head>
 <body>
   <header class="top">
@@ -41,7 +43,7 @@
       <a class="brand" href="./"><img src="../assets/icon.svg" alt=""><span><b>Ares Solo Automa</b><small>Ares Expedition · solo</small></span></a>
       <nav aria-label="Language">
         <ul class="lang">
-          <li><a href="../fr/" hreflang="fr" lang="fr">FR</a></li>
+          <li><a href="../fr/" hreflang="fr" data-umami-event="switch-lang" data-umami-event-from="site" data-umami-event-to="fr" lang="fr">FR</a></li>
           <li><a href="./" hreflang="en" aria-current="page">EN</a></li>
         </ul>
       </nav>
@@ -58,7 +60,7 @@
         <p class="lead">An automa to play <em>Terraforming Mars: Ares Expedition</em> solo. It builds up its engine, terraforms Mars and scores points. A small deck of 15 cards decides its phases and its targets. Everything runs on cubes: its turn needs no arithmetic and asks the player for almost no decisions.</p>
         <div class="cta">
           <p class="cta-title">Play without printing anything</p>
-          <a class="button primary" href="../app/">Open the app</a>
+          <a class="button primary" href="../app/" data-umami-event="open-app" data-umami-event-from="hero">Open the app</a>
           <p class="cta-hint">Add it to your phone's home screen: after a first visit, it works without a network.</p>
           <p class="cta-alt">Rather play with cards? <a href="#cards">Rulebook and print &amp; play cards</a></p>
         </div>
@@ -85,7 +87,7 @@
           <li>Nothing to print: the app replaces the automa cards and the player phase cards.</li>
           <li>In English and in French.</li>
         </ul>
-        <a class="button" href="../app/">Open the app</a>
+        <a class="button" href="../app/" data-umami-event="open-app" data-umami-event-from="app-tile">Open the app</a>
       </section>
       <section class="tile qr">
         <img src="../assets/qr-app.svg" width="148" height="148" alt="QR code to the app">
@@ -94,7 +96,7 @@
     </div>
     <div class="note sand">
       <p class="bt">Version 0.7</p>
-      <p>The values (5 copper for 1 silver, starting engine by level) are being tested. Game reports, shared on <a href="https://github.com/manufitoussi/ares-solo-automa/issues/new/choose">GitHub</a>, will help tune them.</p>
+      <p>The values (5 copper for 1 silver, starting engine by level) are being tested. Game reports, shared on <a href="https://github.com/manufitoussi/ares-solo-automa/issues/new/choose" data-umami-event="github" data-umami-event-to="report">GitHub</a>, will help tune them.</p>
     </div>
 
     <div class="sec"><span class="num">02</span><h2>How it plays</h2></div>
@@ -154,7 +156,7 @@
             <div class="rp"><span class="who">Player</span><div class="mcard pcard" aria-hidden="true">
           <span class="kb" style="background:#3D7A47"><i>I</i><span>Development</span></span>
           <span class="mt"><span>Player + automa</span><span>Phase</span></span>
-          <span class="cp"><b>Ability</b><span>May play 1&nbsp;<svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="1.5" width="12" height="17" rx="2" fill="#FFFFFF" stroke="#1F1A24" stroke-width="1.2"/><rect x="5.5" y="3" width="9" height="4" fill="#3D7A47"/></svg>&nbsp;green card.</span></span>
+          <span class="cp"><b>Skill</b><span>May play 1&nbsp;<svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="1.5" width="12" height="17" rx="2" fill="#FFFFFF" stroke="#1F1A24" stroke-width="1.2"/><rect x="5.5" y="3" width="9" height="4" fill="#3D7A47"/></svg>&nbsp;green card.</span></span>
           <span class="bn"><b>Bonus</b>−3&nbsp;<svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><rect x="1.5" y="1.5" width="17" height="17" rx="4" fill="#E2BE2C" stroke="#8A6D0B" stroke-width="1.2"/><text x="10" y="13.6" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="700" font-size="9" fill="#3A2C00">MC</text></svg></span>
           <span class="au" style="background:#DCEADB"><b class="tg">Automa</b>+1 <svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#B87333"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#D9985A"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#5E3A17" stroke-width="1.1" stroke-linejoin="round"/></svg>, then 1 <svg class="pi" width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8z" fill="#AEB6BD"/><path d="M10 2l7 3.8-7 3.8-7-3.8z" fill="#E4E9ED"/><path d="M10 2l7 3.8v8.4L10 18l-7-3.8V5.8zM3 5.8l7 3.8 7-3.8M10 9.6V18" fill="none" stroke="#4F5B62" stroke-width="1.1" stroke-linejoin="round"/></svg>: engine +1.</span>
         </div></div>
@@ -205,7 +207,7 @@
     <div class="grid">
       <section class="tile">
         <h3 class="count"><span class="big">6</span> Rulebook pages</h3>
-        <p>The automa rulebook, as an A4 PDF: 6 pages of rules plus a reference page. The rules are written in French first, and the English version will follow.</p>
+        <p>The automa rulebook, as an A4 PDF: setup, round, cards and phases, plus a reference page.</p>
         <!-- downloads rules/en -->
         <p><span class="soon">Coming soon</span></p>
         <!-- /downloads -->
@@ -231,7 +233,7 @@
     </div>
     <div class="note cyan">
       <p class="bt">Why player phase cards?</p>
-      <p>They are optional and replace the game's phase cards. For the player, they say the same thing in our own words: the ability and the bonus. On top of that, each one shows what the automa does when the phase is revealed. During the game, everything is on the table: no need to open the rulebook.</p>
+      <p>They are optional and replace the game's phase cards. For the player, they say the same thing in our own words: the skill and the bonus. On top of that, each one shows what the automa does when the phase is revealed. During the game, everything is on the table: no need to open the rulebook.</p>
     </div>
   </main>
 
@@ -239,7 +241,8 @@
     <div class="wrap">
       <p class="ft">Terraforming Mars · Ares Expedition</p>
       <p>Unofficial fan-made project, not affiliated with FryxGames or Stronghold Games. Terraforming Mars is a trademark of FryxGames. Requires the original game.</p>
-      <p>Rules and cards under the CC BY-NC-SA 4.0 licence · <a href="https://github.com/manufitoussi/ares-solo-automa">GitHub</a></p>
+      <p><a href="https://github.com/manufitoussi/ares-solo-automa/blob/main/STATISTIQUES.md">Anonymous visit statistics</a>, without cookies (details in French).</p>
+      <p>Rules and cards under the CC BY-NC-SA 4.0 licence · <a href="https://github.com/manufitoussi/ares-solo-automa" data-umami-event="github" data-umami-event-to="repo">GitHub</a></p>
     </div>
   </footer>
   <script>

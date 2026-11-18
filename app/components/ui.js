@@ -13,7 +13,7 @@ import { t } from "../i18n.js";
     @param {import("./light-element.js").LightElement} host @param {boolean} enabled */
 export const undoButton = (host, enabled) => html`
   <button type="button" class="ghost undo" ?disabled=${!enabled} aria-label=${t.top.undo}
-    @click=${() => host.emit("undo")}>↶ ${t.top.undo}</button>`;
+    @click=${() => host.emit("undo")}>${actionIcon("undo")}<span class="lbl">${t.top.undo}</span></button>`;
 
 /** @type {Record<Phase, { col: string, dark?: boolean }>} */
 export const PHASE_COLOR = {
@@ -68,7 +68,9 @@ const ACTIONS = {
   import: svg`<path d="M12 21V9M7 14l5-5 5 5M5 3h14"/>`,
   copy: svg`<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/>`,
   paste: svg`<rect x="5" y="4" width="14" height="18" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/>`,
-  delete: svg`<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>`
+  delete: svg`<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>`,
+  /* an SVG arrow: the ↶ character looks broken in the iOS fonts */
+  undo: svg`<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>`
 };
 /** @typedef {keyof typeof ACTIONS} ActionIcon */
 /** @param {ActionIcon} name @param {number} [size] */
